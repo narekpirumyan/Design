@@ -252,6 +252,7 @@ export function MatchResultScreen() {
           </motion.div>
         )}
       </div>
+      </div>
     </PhoneFrame>
   )
 }

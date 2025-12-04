@@ -16,7 +16,7 @@ export const mockMovies = [
     id: '2',
     title: 'The Grand Budapest Hotel',
     year: 2014,
-    poster: 'https://image.tmdb.org/t/p/w500/nX5XotM9yprCKarRH4fzOq1vm1q.jpg',
+    poster: 'https://image.tmdb.org/t/p/w500/eWdyYQreja6JGCzqHWXpWHDrrPo.jpg',
     genres: ['Comedy', 'Drama', 'Adventure'],
     vibeTags: ['whimsical', 'stylish', 'cozy'],
     description: 'A whimsical tale of a legendary concierge.',

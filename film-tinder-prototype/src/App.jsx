@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { CreateJoinRoomScreen } from './screens/CreateJoinRoom/CreateJoinRoomScreen'
 import { GroupRoomScreen } from './screens/GroupRoom/GroupRoomScreen'
 import { MatchResultScreen } from './screens/MatchResult/MatchResultScreen'
+import { IndividualSwipeScreen } from './screens/IndividualSwipe/IndividualSwipeScreen'
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
         <Route path="/" element={<CreateJoinRoomScreen />} />
         <Route path="/room/:roomCode" element={<GroupRoomScreen />} />
         <Route path="/match/:roomCode" element={<MatchResultScreen />} />
+        <Route path="/swipe" element={<IndividualSwipeScreen />} />
       </Routes>
     </BrowserRouter>
   )

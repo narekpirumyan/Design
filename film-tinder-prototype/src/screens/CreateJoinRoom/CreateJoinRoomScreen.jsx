@@ -110,6 +110,16 @@ export function CreateJoinRoomScreen() {
         <p className="text-center text-text-muted text-sm">
           Swipe right to like, left to pass. Find movies everyone loves!
         </p>
+
+        {/* Individual Browse Link */}
+        <div className="pt-4">
+          <button
+            onClick={() => navigate('/swipe')}
+            className="w-full py-3 text-text-secondary hover:text-text-primary transition-colors text-sm"
+          >
+            Browse movies individually →
+          </button>
+        </div>
         </div>
       </div>
     </PhoneFrame>

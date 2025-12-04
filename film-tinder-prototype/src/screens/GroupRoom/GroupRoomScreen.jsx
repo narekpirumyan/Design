@@ -73,86 +73,86 @@ export function GroupRoomScreen() {
 
   return (
     <PhoneFrame>
-      <div className="h-full bg-background flex flex-col overflow-hidden">
+      <div className="h-full bg-background flex flex-col overflow-hidden relative">
         {/* Header */}
         <div className="p-4 space-y-3">
-        <div className="flex items-center justify-between">
-          <RoomCodeDisplay roomCode={roomCode} />
-          <button
-            onClick={handleLeaveRoom}
-            className="p-2 hover:bg-surface rounded-lg transition-colors"
-            aria-label="Leave room"
-          >
-            <FiX className="w-5 h-5 text-text-secondary" />
-          </button>
-        </div>
-
-        {/* Participants */}
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-text-muted">Participants:</span>
-          <div className="flex gap-2">
-            {participants.map((participant) => (
-              <ParticipantAvatar
-                key={participant.id}
-                participant={participant}
-                isActive={false}
-              />
-            ))}
+          <div className="flex items-center justify-between">
+            <RoomCodeDisplay roomCode={roomCode} />
+            <button
+              onClick={handleLeaveRoom}
+              className="p-2 hover:bg-surface rounded-lg transition-colors"
+              aria-label="Leave room"
+            >
+              <FiX className="w-5 h-5 text-text-secondary" />
+            </button>
           </div>
-        </div>
+
+          {/* Participants */}
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-text-muted">Participants:</span>
+            <div className="flex gap-2">
+              {participants.map((participant) => (
+                <ParticipantAvatar
+                  key={participant.id}
+                  participant={participant}
+                  isActive={false}
+                />
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Swipe Area */}
         <div className="flex-1 relative max-w-md mx-auto w-full px-4 pb-24">
-        <div className="relative w-full" style={{ height: '600px', perspective: '1000px' }}>
-          {nextMovies.map((movie, idx) => (
-            <SwipeableCard
-              key={`${movie.id}-${currentIndex}`}
-              movie={movie}
-              index={idx}
-              isTop={idx === 0}
-              onSwipe={idx === 0 ? handleSwipe : undefined}
-            />
-          ))}
-        </div>
-      </div>
-
-        {/* Controls */}
-        <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-surface p-4">
-        <div className="max-w-md mx-auto">
-          {/* Action Buttons */}
-          <div className="flex items-center justify-center gap-6">
-            <button
-              onClick={() => handleSwipe('left', currentMovie.id)}
-              className="w-16 h-16 rounded-full bg-red-500/20 hover:bg-red-500/30 flex items-center justify-center transition-all active:scale-95"
-              aria-label="Pass"
-            >
-              <FiXCircle className="w-8 h-8 text-red-400" />
-            </button>
-
-            {/* Reaction Emojis */}
-            <div className="flex gap-2">
-              {['🔥', '😂', '😴', '🤯'].map(emoji => (
-                <button
-                  key={emoji}
-                  onClick={() => handleReaction(emoji)}
-                  className="w-12 h-12 rounded-full bg-surface hover:bg-surface/80 flex items-center justify-center text-xl transition-all active:scale-95"
-                  aria-label={`React with ${emoji}`}
-                >
-                  {emoji}
-                </button>
-              ))}
-            </div>
-
-            <button
-              onClick={() => handleSwipe('right', currentMovie.id)}
-              className="w-16 h-16 rounded-full bg-green-500/20 hover:bg-green-500/30 flex items-center justify-center transition-all active:scale-95"
-              aria-label="Like"
-            >
-              <FiHeart className="w-8 h-8 text-green-400" />
-            </button>
+          <div className="relative w-full" style={{ height: '600px', perspective: '1000px' }}>
+            {nextMovies.map((movie, idx) => (
+              <SwipeableCard
+                key={`${movie.id}-${currentIndex}`}
+                movie={movie}
+                index={idx}
+                isTop={idx === 0}
+                onSwipe={idx === 0 ? handleSwipe : undefined}
+              />
+            ))}
           </div>
         </div>
+
+        {/* Controls */}
+        <div className="absolute bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-surface p-4">
+          <div className="max-w-md mx-auto">
+            {/* Action Buttons */}
+            <div className="flex items-center justify-center gap-6">
+              <button
+                onClick={() => handleSwipe('left', currentMovie.id)}
+                className="w-16 h-16 rounded-full bg-red-500/20 hover:bg-red-500/30 flex items-center justify-center transition-all active:scale-95"
+                aria-label="Pass"
+              >
+                <FiXCircle className="w-8 h-8 text-red-400" />
+              </button>
+
+              {/* Reaction Emojis */}
+              <div className="flex gap-2">
+                {['🔥', '😂', '😴', '🤯'].map(emoji => (
+                  <button
+                    key={emoji}
+                    onClick={() => handleReaction(emoji)}
+                    className="w-12 h-12 rounded-full bg-surface hover:bg-surface/80 flex items-center justify-center text-xl transition-all active:scale-95"
+                    aria-label={`React with ${emoji}`}
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={() => handleSwipe('right', currentMovie.id)}
+                className="w-16 h-16 rounded-full bg-green-500/20 hover:bg-green-500/30 flex items-center justify-center transition-all active:scale-95"
+                aria-label="Like"
+              >
+                <FiHeart className="w-8 h-8 text-green-400" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </PhoneFrame>

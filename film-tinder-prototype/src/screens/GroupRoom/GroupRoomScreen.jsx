@@ -1,181 +1,33 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { SwipeableCard } from '../../components/SwipeableCard/SwipeableCard'
 import { ParticipantAvatar } from '../../components/ParticipantAvatar/ParticipantAvatar'
 import { RoomCodeDisplay } from '../../components/RoomCodeDisplay/RoomCodeDisplay'
 import { Button } from '../../components/Button/Button'
 import { mockMovies } from '../../data/mockMovies'
-import { mockParticipants, simulateOtherUserSwipe, findMatches } from '../../utils/mockGroupState'
+import { mockParticipants } from '../../utils/mockGroupState'
 import { FiX, FiHeart, FiXCircle } from 'react-icons/fi'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 
 export function GroupRoomScreen() {
   const { roomCode } = useParams()
   const navigate = useNavigate()
   
-  const [movies, setMovies] = useState([...mockMovies].sort(() => Math.random() - 0.5))
+  const [movies] = useState([...mockMovies].sort(() => Math.random() - 0.5))
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [swipes, setSwipes] = useState([])
-  const [swipedMovieIds, setSwipedMovieIds] = useState(new Set()) // Track swiped movies
   const [participants] = useState(mockParticipants.slice(0, 4))
   const [iDontCare, setIDontCare] = useState(false)
-  const [reactions, setReactions] = useState([])
-  const [otherUserSwipes, setOtherUserSwipes] = useState([])
-  const [isLoading, setIsLoading] = useState(false)
-  const simulationTimeoutRef = useRef(null)
-  const matchCheckTimeoutRef = useRef(null)
-
-  const currentUser = participants.find(p => p.isCurrentUser)
-
-  // Simulate other users swiping - only for the current movie
-  useEffect(() => {
-    if (currentIndex >= movies.length) return
-    
-    const currentMovie = movies[currentIndex]
-    if (!currentMovie) return
-    
-    // Don't simulate if current user already swiped on this movie
-    if (swipedMovieIds.has(currentMovie.id)) return
-
-    // Clear any existing simulation
-    if (simulationTimeoutRef.current) {
-      clearTimeout(simulationTimeoutRef.current)
-    }
-
-    const movieId = currentMovie.id // Capture for closure
-
-    // Simulate other users swiping on the CURRENT movie only
-    const simulateSwipe = () => {
-      const delay = 2000 + Math.random() * 2000 // 2-4 seconds
-      
-      simulationTimeoutRef.current = setTimeout(() => {
-        // Double-check we're still on the same movie
-        const stillCurrentMovie = movies[currentIndex]
-        if (!stillCurrentMovie || stillCurrentMovie.id !== movieId) {
-          return // User moved to next movie, cancel simulation
-        }
-
-        const simulatedSwipe = simulateOtherUserSwipe(
-          movieId,
-          participants,
-          currentUser.id
-        )
-
-        if (simulatedSwipe) {
-          setOtherUserSwipes(prev => [...prev, simulatedSwipe])
-          
-          // Add to swipes
-          setSwipes(prev => {
-            const newSwipes = [...prev, {
-              userId: simulatedSwipe.userId,
-              movieId: simulatedSwipe.movieId,
-              direction: simulatedSwipe.direction,
-              timestamp: simulatedSwipe.timestamp
-            }]
-
-            // Check for matches
-            const matches = findMatches(newSwipes, participants)
-            if (matches.length > 0 && matches[0].matchPercentage >= 75) {
-              // Good match! (75% or higher) Navigate to result
-              setTimeout(() => {
-                navigate(`/match/${roomCode}`, { 
-                  state: { 
-                    matchMovieId: matches[0].movieId,
-                    matches 
-                  } 
-                })
-              }, 1000)
-            }
-
-            return newSwipes
-          })
-        }
-      }, delay)
-    }
-
-    // Start simulation for this movie
-    simulateSwipe()
-
-    return () => {
-      if (simulationTimeoutRef.current) {
-        clearTimeout(simulationTimeoutRef.current)
-      }
-    }
-  }, [currentIndex, movies, participants, currentUser.id, navigate, roomCode, swipedMovieIds])
 
   const handleSwipe = (direction, movieId) => {
-    // Mark this movie as swiped
-    setSwipedMovieIds(prev => new Set([...prev, movieId]))
-
-    if (iDontCare) {
-      // If "I Don't Care" is active, just move to next
-      setCurrentIndex(prev => {
-        // Skip to next unswiped movie
-        let nextIndex = prev + 1
-        while (nextIndex < movies.length && swipedMovieIds.has(movies[nextIndex].id)) {
-          nextIndex++
-        }
-        return nextIndex
-      })
-      return
-    }
-
-    setIsLoading(true)
-
-    const swipe = {
-      userId: currentUser.id,
-      movieId,
-      direction,
-      timestamp: Date.now()
-    }
-
-    const newSwipes = [...swipes, swipe]
-    setSwipes(newSwipes)
-
-    // Clear any existing match check timeout
-    if (matchCheckTimeoutRef.current) {
-      clearTimeout(matchCheckTimeoutRef.current)
-    }
-
-    // Check for matches after a delay to allow simulated users to swipe
-    matchCheckTimeoutRef.current = setTimeout(() => {
-      // Re-read swipes from state to get latest (including simulated user swipes)
-      setSwipes(currentSwipes => {
-        const matches = findMatches(currentSwipes, participants)
-        
-        if (matches.length > 0 && matches[0].matchPercentage >= 75) {
-          // Good match! (75% or higher)
-          setIsLoading(false)
-          navigate(`/match/${roomCode}`, { 
-            state: { 
-              matchMovieId: matches[0].movieId,
-              matches 
-            } 
-          })
-          return currentSwipes
-        }
-
-        // Move to next unswiped movie
-        setIsLoading(false)
-        setCurrentIndex(prev => {
-          let nextIndex = prev + 1
-          // Skip already swiped movies
-          while (nextIndex < movies.length && swipedMovieIds.has(movies[nextIndex].id)) {
-            nextIndex++
-          }
-          return nextIndex
-        })
-        return currentSwipes
-      })
-    }, 3000) // Wait 3 seconds for simulated users to swipe on this movie
+    // Simply advance to next movie
+    setCurrentIndex(prev => {
+      const nextIndex = prev + 1
+      return nextIndex
+    })
   }
 
   const handleReaction = (emoji) => {
-    setReactions(prev => [...prev, {
-      emoji,
-      userId: currentUser.id,
-      timestamp: Date.now()
-    }])
+    // Visual only - no state tracking needed
   }
 
   const handleLeaveRoom = () => {
@@ -185,7 +37,6 @@ export function GroupRoomScreen() {
   }
 
   if (currentIndex >= movies.length) {
-    const finalMatches = findMatches(swipes, participants)
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-6">
         <motion.div 
@@ -195,22 +46,17 @@ export function GroupRoomScreen() {
         >
           <h2 className="text-2xl font-bold text-text-primary">No more movies!</h2>
           <p className="text-text-secondary">
-            {finalMatches.length > 0 
-              ? `Found ${finalMatches.length} potential match${finalMatches.length > 1 ? 'es' : ''}!`
-              : 'No matches found. Try a new room with different preferences.'
-            }
+            You've seen all the movies. Try a new room!
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            {finalMatches.length > 0 && (
-              <Button onClick={() => navigate(`/match/${roomCode}`, { 
-                state: { 
-                  matchMovieId: finalMatches[0].movieId,
-                  matches: finalMatches 
-                } 
-              })}>
-                View Matches
-              </Button>
-            )}
+            <Button onClick={() => navigate(`/match/${roomCode}`, { 
+              state: { 
+                matchMovieId: mockMovies[0].id,
+                matches: [{ movieId: mockMovies[0].id, likedBy: true, likedByCount: participants.length, matchPercentage: 100 }]
+              } 
+            })}>
+              View Matches
+            </Button>
             <Button onClick={() => navigate('/')} variant="secondary">
               New Room
             </Button>
@@ -220,14 +66,8 @@ export function GroupRoomScreen() {
     )
   }
 
-  // Filter out already-swiped movies and get current movie
-  const availableMovies = movies.filter((movie, idx) => {
-    // Include current movie and next ones that haven't been swiped
-    return idx >= currentIndex && !swipedMovieIds.has(movie.id)
-  })
-  
-  const currentMovie = availableMovies[0] || movies[currentIndex]
-  const nextMovies = availableMovies.slice(0, 3)
+  const currentMovie = movies[currentIndex]
+  const nextMovies = movies.slice(currentIndex, currentIndex + 3)
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -248,68 +88,30 @@ export function GroupRoomScreen() {
         <div className="flex items-center gap-4">
           <span className="text-sm text-text-muted">Participants:</span>
           <div className="flex gap-2">
-            {participants.map((participant, idx) => {
-              const hasSwiped = swipes.some(
-                s => s.userId === participant.id && 
-                s.movieId === currentMovie?.id
-              )
-              return (
-                <ParticipantAvatar
-                  key={participant.id}
-                  participant={participant}
-                  isActive={hasSwiped}
-                />
-              )
-            })}
+            {participants.map((participant) => (
+              <ParticipantAvatar
+                key={participant.id}
+                participant={participant}
+                isActive={false}
+              />
+            ))}
           </div>
         </div>
       </div>
 
       {/* Swipe Area */}
       <div className="flex-1 relative max-w-md mx-auto w-full px-4 pb-24">
-        {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center z-50">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="bg-surface/90 backdrop-blur-sm rounded-full px-4 py-2"
-            >
-              <span className="text-text-primary">Processing...</span>
-            </motion.div>
-          </div>
-        )}
         <div className="relative w-full" style={{ height: '600px', perspective: '1000px' }}>
-          <AnimatePresence mode="wait">
-            {nextMovies.map((movie, idx) => (
-              <SwipeableCard
-                key={`${movie.id}-${currentIndex}`}
-                movie={movie}
-                index={idx}
-                isTop={idx === 0 && !isLoading}
-                onSwipe={idx === 0 && !isLoading ? handleSwipe : undefined}
-              />
-            ))}
-          </AnimatePresence>
+          {nextMovies.map((movie, idx) => (
+            <SwipeableCard
+              key={`${movie.id}-${currentIndex}`}
+              movie={movie}
+              index={idx}
+              isTop={idx === 0}
+              onSwipe={idx === 0 ? handleSwipe : undefined}
+            />
+          ))}
         </div>
-
-        {/* Swipe Indicators */}
-        <AnimatePresence>
-          {otherUserSwipes
-            .filter(s => s.movieId === currentMovie?.id)
-            .map((swipe, idx) => (
-              <motion.div
-                key={`${swipe.userId}-${swipe.timestamp}`}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                className="absolute top-20 left-1/2 transform -translate-x-1/2 bg-surface/90 backdrop-blur-sm px-4 py-2 rounded-full text-sm"
-              >
-                <span className="text-text-primary">
-                  {swipe.userName} {swipe.direction === 'right' ? 'liked' : 'passed'} this
-                </span>
-              </motion.div>
-            ))}
-        </AnimatePresence>
       </div>
 
       {/* Controls */}
@@ -329,17 +131,13 @@ export function GroupRoomScreen() {
             </button>
             <button
               onClick={() => {
-                const matches = findMatches(swipes, participants)
-                if (matches.length > 0) {
-                  navigate(`/match/${roomCode}`, { 
-                    state: { 
-                      matchMovieId: matches[0].movieId,
-                      matches 
-                    } 
-                  })
-                } else {
-                  alert('No matches yet. Keep swiping!')
-                }
+                // Navigate to match screen with mock data
+                navigate(`/match/${roomCode}`, { 
+                  state: { 
+                    matchMovieId: mockMovies[0].id,
+                    matches: [{ movieId: mockMovies[0].id, likedBy: true, likedByCount: participants.length, matchPercentage: 100 }]
+                  } 
+                })
               }}
               className="px-4 py-2 rounded-full text-sm font-medium bg-primary/20 text-primary hover:bg-primary/30 transition-all"
             >

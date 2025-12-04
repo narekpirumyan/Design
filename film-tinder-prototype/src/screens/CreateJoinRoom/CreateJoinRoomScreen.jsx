@@ -17,19 +17,9 @@ export function CreateJoinRoomScreen() {
   const handleJoinRoom = () => {
     const trimmedCode = roomCode.trim().toUpperCase()
     
-    if (!trimmedCode) {
-      setError('Please enter a room code')
-      return
-    }
-    
+    // Minimal validation - just check length
     if (trimmedCode.length !== 6) {
       setError('Room code must be 6 characters')
-      return
-    }
-
-    // Validate alphanumeric
-    if (!/^[A-Z0-9]{6}$/.test(trimmedCode)) {
-      setError('Room code must be letters and numbers only')
       return
     }
 

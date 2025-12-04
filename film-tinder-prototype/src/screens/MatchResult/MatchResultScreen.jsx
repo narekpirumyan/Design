@@ -15,24 +15,29 @@ export function MatchResultScreen() {
   const matches = location.state?.matches || []
   const participants = mockParticipants.slice(0, 4)
 
-  // Get the match movie - prioritize matchMovieId, then first match, then fallback
+  // Get the match movie - prioritize matchMovieId, then first match, then fallback to mock data
   let matchMovie = null
   if (matchMovieId) {
     matchMovie = mockMovies.find(m => m.id === matchMovieId)
   }
-  if (!matchMovie && matches.length > 0) {
+  if (!matchMovie && matches.length > 0 && matches[0].movieId) {
     matchMovie = mockMovies.find(m => m.id === matches[0].movieId)
   }
   if (!matchMovie) {
-    matchMovie = mockMovies[0] // Fallback
+    matchMovie = mockMovies[0] // Fallback to first mock movie
   }
 
-  const alternativeMatches = matches
-    .slice(1, 4)
-    .map(m => mockMovies.find(movie => movie.id === m.movieId))
-    .filter(Boolean)
+  // Get alternative matches from state or use mock data
+  const alternativeMatches = matches.length > 1
+    ? matches
+        .slice(1, 4)
+        .map(m => mockMovies.find(movie => movie.id === m.movieId))
+        .filter(Boolean)
+    : mockMovies.slice(1, 4) // Fallback to mock movies
 
-  const matchInfo = matches.find(m => m.movieId === matchMovieId) || matches[0]
+  const matchInfo = matches.length > 0 
+    ? (matches.find(m => m.movieId === matchMovieId) || matches[0])
+    : { likedBy: true, likedByCount: participants.length, matchPercentage: 100 }
 
   const handleShare = () => {
     if (navigator.share) {

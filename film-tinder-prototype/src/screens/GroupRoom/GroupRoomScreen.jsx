@@ -22,6 +22,7 @@ export function GroupRoomScreen() {
   const [otherUserSwipes, setOtherUserSwipes] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const simulationTimeoutRef = useRef(null)
+  const matchCheckTimeoutRef = useRef(null)
 
   const currentUser = participants.find(p => p.isCurrentUser)
 
@@ -62,8 +63,8 @@ export function GroupRoomScreen() {
           }]
 
           const matches = findMatches(allSwipes, participants)
-          if (matches.length > 0 && matches[0].matchPercentage === 100) {
-            // Perfect match! Navigate to result
+          if (matches.length > 0 && matches[0].matchPercentage >= 75) {
+            // Good match! (75% or higher) Navigate to result
             setTimeout(() => {
               navigate(`/match/${roomCode}`, { 
                 state: { 
@@ -89,6 +90,9 @@ export function GroupRoomScreen() {
       if (simulationTimeoutRef.current) {
         clearTimeout(simulationTimeoutRef.current)
       }
+      if (matchCheckTimeoutRef.current) {
+        clearTimeout(matchCheckTimeoutRef.current)
+      }
     }
   }, [currentIndex, movies, participants, currentUser.id, swipes, navigate, roomCode])
 
@@ -111,27 +115,35 @@ export function GroupRoomScreen() {
     const newSwipes = [...swipes, swipe]
     setSwipes(newSwipes)
 
-    // Check for matches
-    const matches = findMatches(newSwipes, participants)
-    if (matches.length > 0 && matches[0].matchPercentage === 100) {
-      // Perfect match!
-      setTimeout(() => {
-        setIsLoading(false)
-        navigate(`/match/${roomCode}`, { 
-          state: { 
-            matchMovieId: matches[0].movieId,
-            matches 
-          } 
-        })
-      }, 500)
-      return
+    // Clear any existing match check timeout
+    if (matchCheckTimeoutRef.current) {
+      clearTimeout(matchCheckTimeoutRef.current)
     }
 
-    // Move to next movie with slight delay for smooth transition
-    setTimeout(() => {
-      setIsLoading(false)
-      setCurrentIndex(prev => prev + 1)
-    }, 300)
+    // Check for matches after a delay to allow simulated users to swipe
+    matchCheckTimeoutRef.current = setTimeout(() => {
+      // Re-read swipes from state to get latest (including simulated user swipes)
+      setSwipes(currentSwipes => {
+        const matches = findMatches(currentSwipes, participants)
+        
+        if (matches.length > 0 && matches[0].matchPercentage >= 75) {
+          // Good match! (75% or higher)
+          setIsLoading(false)
+          navigate(`/match/${roomCode}`, { 
+            state: { 
+              matchMovieId: matches[0].movieId,
+              matches 
+            } 
+          })
+          return currentSwipes
+        }
+
+        // Move to next movie
+        setIsLoading(false)
+        setCurrentIndex(prev => prev + 1)
+        return currentSwipes
+      })
+    }, 3000) // Wait 3 seconds for simulated users to swipe on this movie
   }
 
   const handleReaction = (emoji) => {
@@ -273,7 +285,7 @@ export function GroupRoomScreen() {
       {/* Controls */}
       <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-surface p-4">
         <div className="max-w-md mx-auto space-y-4">
-          {/* I Don't Care Toggle */}
+          {/* I Don't Care Toggle & Check Matches */}
           <div className="flex items-center justify-center gap-2">
             <button
               onClick={() => setIDontCare(!iDontCare)}
@@ -284,6 +296,24 @@ export function GroupRoomScreen() {
               }`}
             >
               {iDontCare ? '✓ I Don\'t Care' : 'I Don\'t Care'}
+            </button>
+            <button
+              onClick={() => {
+                const matches = findMatches(swipes, participants)
+                if (matches.length > 0) {
+                  navigate(`/match/${roomCode}`, { 
+                    state: { 
+                      matchMovieId: matches[0].movieId,
+                      matches 
+                    } 
+                  })
+                } else {
+                  alert('No matches yet. Keep swiping!')
+                }
+              }}
+              className="px-4 py-2 rounded-full text-sm font-medium bg-primary/20 text-primary hover:bg-primary/30 transition-all"
+            >
+              Check Matches
             </button>
           </div>
 

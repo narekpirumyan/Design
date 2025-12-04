@@ -59,6 +59,9 @@ export function findMatches(swipes, participants) {
     const likedByAll = allParticipantsIds.every(id => likedBy.includes(id))
     const likedByCount = likedBy.length
     
+    // Consider it a match if at least 75% of participants liked it (or all of them)
+    const matchThreshold = Math.ceil(allParticipantsIds.length * 0.75)
+    
     if (likedByAll) {
       matches.push({
         movieId,
@@ -66,8 +69,8 @@ export function findMatches(swipes, participants) {
         likedByCount,
         matchPercentage: 100
       })
-    } else if (likedByCount >= Math.ceil(allParticipantsIds.length / 2)) {
-      // At least half liked it
+    } else if (likedByCount >= matchThreshold) {
+      // At least 75% liked it - consider it a good match
       matches.push({
         movieId,
         likedBy: false,
@@ -89,7 +92,8 @@ export function simulateOtherUserSwipe(movieId, participants, currentUserId) {
   if (otherUsers.length === 0) return null
   
   const randomUser = otherUsers[Math.floor(Math.random() * otherUsers.length)]
-  const direction = Math.random() > 0.4 ? 'right' : 'left' // 60% chance of like
+  // Increased to 75% chance of like to make matches more likely
+  const direction = Math.random() > 0.25 ? 'right' : 'left'
   
   return {
     userId: randomUser.id,

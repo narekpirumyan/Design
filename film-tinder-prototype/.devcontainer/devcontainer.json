@@ -1,0 +1,40 @@
+{
+  "name": "Film Tinder Prototype",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:18",
+  
+  // Automatically install dependencies when Codespace is created
+  "postCreateCommand": "npm install",
+  
+  // Forward the Vite dev server port
+  "forwardPorts": [5173],
+  
+  // Port configuration
+  "portsAttributes": {
+    "5173": {
+      "label": "Vite Dev Server",
+      "onAutoForward": "openBrowser",
+      "protocol": "http"
+    }
+  },
+  
+  // VS Code features
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
+  
+  // Customizations
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+      }
+    }
+  }
+}
+

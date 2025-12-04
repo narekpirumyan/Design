@@ -16,6 +16,7 @@ export function GroupRoomScreen() {
   const [movies, setMovies] = useState([...mockMovies].sort(() => Math.random() - 0.5))
   const [currentIndex, setCurrentIndex] = useState(0)
   const [swipes, setSwipes] = useState([])
+  const [swipedMovieIds, setSwipedMovieIds] = useState(new Set()) // Track swiped movies
   const [participants] = useState(mockParticipants.slice(0, 4))
   const [iDontCare, setIDontCare] = useState(false)
   const [reactions, setReactions] = useState([])
@@ -26,19 +27,36 @@ export function GroupRoomScreen() {
 
   const currentUser = participants.find(p => p.isCurrentUser)
 
-  // Simulate other users swiping
+  // Simulate other users swiping - only for the current movie
   useEffect(() => {
     if (currentIndex >= movies.length) return
+    
+    const currentMovie = movies[currentIndex]
+    if (!currentMovie) return
+    
+    // Don't simulate if current user already swiped on this movie
+    if (swipedMovieIds.has(currentMovie.id)) return
 
+    // Clear any existing simulation
+    if (simulationTimeoutRef.current) {
+      clearTimeout(simulationTimeoutRef.current)
+    }
+
+    const movieId = currentMovie.id // Capture for closure
+
+    // Simulate other users swiping on the CURRENT movie only
     const simulateSwipe = () => {
-      const delay = 2000 + Math.random() * 3000 // 2-5 seconds
+      const delay = 2000 + Math.random() * 2000 // 2-4 seconds
       
       simulationTimeoutRef.current = setTimeout(() => {
-        const currentMovie = movies[currentIndex]
-        if (!currentMovie) return
+        // Double-check we're still on the same movie
+        const stillCurrentMovie = movies[currentIndex]
+        if (!stillCurrentMovie || stillCurrentMovie.id !== movieId) {
+          return // User moved to next movie, cancel simulation
+        }
 
         const simulatedSwipe = simulateOtherUserSwipe(
-          currentMovie.id,
+          movieId,
           participants,
           currentUser.id
         )
@@ -47,59 +65,58 @@ export function GroupRoomScreen() {
           setOtherUserSwipes(prev => [...prev, simulatedSwipe])
           
           // Add to swipes
-          setSwipes(prev => [...prev, {
-            userId: simulatedSwipe.userId,
-            movieId: simulatedSwipe.movieId,
-            direction: simulatedSwipe.direction,
-            timestamp: simulatedSwipe.timestamp
-          }])
+          setSwipes(prev => {
+            const newSwipes = [...prev, {
+              userId: simulatedSwipe.userId,
+              movieId: simulatedSwipe.movieId,
+              direction: simulatedSwipe.direction,
+              timestamp: simulatedSwipe.timestamp
+            }]
 
-          // Check for matches
-          const allSwipes = [...swipes, {
-            userId: simulatedSwipe.userId,
-            movieId: simulatedSwipe.movieId,
-            direction: simulatedSwipe.direction,
-            timestamp: simulatedSwipe.timestamp
-          }]
+            // Check for matches
+            const matches = findMatches(newSwipes, participants)
+            if (matches.length > 0 && matches[0].matchPercentage >= 75) {
+              // Good match! (75% or higher) Navigate to result
+              setTimeout(() => {
+                navigate(`/match/${roomCode}`, { 
+                  state: { 
+                    matchMovieId: matches[0].movieId,
+                    matches 
+                  } 
+                })
+              }, 1000)
+            }
 
-          const matches = findMatches(allSwipes, participants)
-          if (matches.length > 0 && matches[0].matchPercentage >= 75) {
-            // Good match! (75% or higher) Navigate to result
-            setTimeout(() => {
-              navigate(`/match/${roomCode}`, { 
-                state: { 
-                  matchMovieId: matches[0].movieId,
-                  matches 
-                } 
-              })
-            }, 1000)
-            return
-          }
-        }
-
-        // Continue simulation if there are more movies
-        if (currentIndex < movies.length - 1) {
-          simulateSwipe()
+            return newSwipes
+          })
         }
       }, delay)
     }
 
+    // Start simulation for this movie
     simulateSwipe()
 
     return () => {
       if (simulationTimeoutRef.current) {
         clearTimeout(simulationTimeoutRef.current)
       }
-      if (matchCheckTimeoutRef.current) {
-        clearTimeout(matchCheckTimeoutRef.current)
-      }
     }
-  }, [currentIndex, movies, participants, currentUser.id, swipes, navigate, roomCode])
+  }, [currentIndex, movies, participants, currentUser.id, navigate, roomCode, swipedMovieIds])
 
   const handleSwipe = (direction, movieId) => {
+    // Mark this movie as swiped
+    setSwipedMovieIds(prev => new Set([...prev, movieId]))
+
     if (iDontCare) {
       // If "I Don't Care" is active, just move to next
-      setCurrentIndex(prev => prev + 1)
+      setCurrentIndex(prev => {
+        // Skip to next unswiped movie
+        let nextIndex = prev + 1
+        while (nextIndex < movies.length && swipedMovieIds.has(movies[nextIndex].id)) {
+          nextIndex++
+        }
+        return nextIndex
+      })
       return
     }
 
@@ -138,9 +155,16 @@ export function GroupRoomScreen() {
           return currentSwipes
         }
 
-        // Move to next movie
+        // Move to next unswiped movie
         setIsLoading(false)
-        setCurrentIndex(prev => prev + 1)
+        setCurrentIndex(prev => {
+          let nextIndex = prev + 1
+          // Skip already swiped movies
+          while (nextIndex < movies.length && swipedMovieIds.has(movies[nextIndex].id)) {
+            nextIndex++
+          }
+          return nextIndex
+        })
         return currentSwipes
       })
     }, 3000) // Wait 3 seconds for simulated users to swipe on this movie
@@ -196,8 +220,14 @@ export function GroupRoomScreen() {
     )
   }
 
-  const currentMovie = movies[currentIndex]
-  const nextMovies = movies.slice(currentIndex, currentIndex + 3)
+  // Filter out already-swiped movies and get current movie
+  const availableMovies = movies.filter((movie, idx) => {
+    // Include current movie and next ones that haven't been swiped
+    return idx >= currentIndex && !swipedMovieIds.has(movie.id)
+  })
+  
+  const currentMovie = availableMovies[0] || movies[currentIndex]
+  const nextMovies = availableMovies.slice(0, 3)
 
   return (
     <div className="min-h-screen bg-background flex flex-col">

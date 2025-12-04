@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../../components/Button/Button'
+import { PhoneFrame } from '../../components/PhoneFrame/PhoneFrame'
 import { generateRoomCode } from '../../utils/mockGroupState'
 import { FiUsers, FiLogIn } from 'react-icons/fi'
 
@@ -28,8 +29,9 @@ export function CreateJoinRoomScreen() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
-      <div className="w-full max-w-md space-y-8">
+    <PhoneFrame>
+      <div className="h-full bg-background flex flex-col items-center justify-center p-6 overflow-y-auto">
+        <div className="w-full max-w-md space-y-8">
         {/* Header */}
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold text-text-primary">Film Tinder</h1>
@@ -108,8 +110,9 @@ export function CreateJoinRoomScreen() {
         <p className="text-center text-text-muted text-sm">
           Swipe right to like, left to pass. Find movies everyone loves!
         </p>
+        </div>
       </div>
-    </div>
+    </PhoneFrame>
   )
 }
 

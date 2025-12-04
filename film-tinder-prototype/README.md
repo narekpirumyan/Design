@@ -1,13 +1,13 @@
-# Film Tinder - Group Movie Selection Prototype
+# Film Tinder - UI/UX Prototype
 
-An interactive UI/UX prototype for Film Tinder's Group Movie Selection flow. This prototype demonstrates how friends can collaboratively discover movies they'll all enjoy together.
+A clean UI/UX prototype for Film Tinder's Group Movie Selection interface. This prototype focuses on visual design and user experience, demonstrating the interface within a phone frame.
 
 ## Features
 
 - **Create/Join Room** - Start or join a group movie selection session
-- **Group Swiping** - Real-time collaborative movie discovery with swipe gestures
-- **Match Detection** - Automatically finds movies liked by all group members
-- **Match Results** - Celebratory screen showing the matched movie with actions
+- **Group Swiping** - Swipe through movies with smooth animations
+- **Match Results** - View matched movies with details
+- **Phone Frame UI** - All screens displayed within a realistic phone frame
 
 ## Tech Stack
 
@@ -54,24 +54,14 @@ npm run dev
 2. **Group Room Screen**
    - Swipe right (or click heart) to like a movie
    - Swipe left (or click X) to pass on a movie
-   - Watch as other participants (simulated) also swipe
    - Use reaction emojis to express feelings
-   - Toggle "I Don't Care" if you're flexible
+   - Each movie is shown once
 
 3. **Match Result Screen**
-   - See the matched movie when everyone likes the same film
-   - View streaming options
+   - View the matched movie with details
+   - Check streaming options
    - Share the match
    - Create a new room to start over
-
-### Mobile Testing
-
-The prototype is optimized for mobile viewports (375px - 414px). To test on PC:
-
-1. Open browser DevTools (F12)
-2. Enable device emulation
-3. Select a mobile device (iPhone 12, Pixel 5, etc.)
-4. Refresh the page
 
 ## Project Structure
 
@@ -79,17 +69,27 @@ The prototype is optimized for mobile viewports (375px - 414px). To test on PC:
 film-tinder-prototype/
 ├── src/
 │   ├── components/       # Reusable UI components
+│   │   ├── Button/
+│   │   ├── MovieCard/
+│   │   ├── ParticipantAvatar/
+│   │   ├── PhoneFrame/
+│   │   ├── RoomCodeDisplay/
+│   │   ├── SwipeableCard/
+│   │   └── VibeTag/
 │   ├── screens/          # Main screen components
-│   ├── data/            # Mock data
+│   │   ├── CreateJoinRoom/
+│   │   ├── GroupRoom/
+│   │   └── MatchResult/
+│   ├── data/            # Mock data (5 movies)
 │   ├── utils/           # Helper functions
-│   ├── theme/           # Design system
 │   └── App.jsx          # Main app with routing
-├── public/
-└── package.json
+├── package.json
+└── README.md
 ```
 
 ## Key Components
 
+- **PhoneFrame** - Wraps all screens in a phone frame UI
 - **SwipeableCard** - Draggable movie card with swipe gestures
 - **MovieCard** - Movie poster and info display
 - **VibeTag** - Colored tags for movie vibes
@@ -99,16 +99,15 @@ film-tinder-prototype/
 ## Mock Data
 
 The prototype uses mock data for:
-- 20 popular movies with posters, descriptions, and vibe tags
-- Simulated group participants
-- Real-time swipe simulation
+- 5 popular movies with posters, descriptions, and vibe tags
+- Mock group participants
 
 ## Notes
 
-- All state is managed locally (no backend)
-- Real-time behavior is simulated with delays
-- Match detection finds movies liked by all participants
-- Optimized for mobile-first responsive design
+- This is a UI/UX-only prototype focused on visual design
+- All screens are displayed within a phone frame
+- Each movie is shown exactly once
+- No backend or complex state management
 
 ## Build for Production
 
@@ -117,8 +116,3 @@ npm run build
 ```
 
 The built files will be in the `dist/` directory, ready to deploy to any static hosting service (Vercel, Netlify, etc.).
-
-## License
-
-This is a prototype/demo project.
-

@@ -1,6 +1,7 @@
 import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import { Button } from '../../components/Button/Button'
 import { VibeTag } from '../../components/VibeTag/VibeTag'
+import { PhoneFrame } from '../../components/PhoneFrame/PhoneFrame'
 import { mockMovies } from '../../data/mockMovies'
 import { mockParticipants } from '../../utils/mockGroupState'
 import { motion } from 'framer-motion'
@@ -56,9 +57,10 @@ export function MatchResultScreen() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="p-4">
+    <PhoneFrame>
+      <div className="h-full bg-background overflow-y-auto">
+        {/* Header */}
+        <div className="p-4">
         <button
           onClick={() => navigate(`/room/${roomCode}`)}
           className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors"
@@ -250,7 +252,7 @@ export function MatchResultScreen() {
           </motion.div>
         )}
       </div>
-    </div>
+    </PhoneFrame>
   )
 }
 

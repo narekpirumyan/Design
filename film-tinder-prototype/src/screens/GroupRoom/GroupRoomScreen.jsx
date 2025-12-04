@@ -4,6 +4,7 @@ import { SwipeableCard } from '../../components/SwipeableCard/SwipeableCard'
 import { ParticipantAvatar } from '../../components/ParticipantAvatar/ParticipantAvatar'
 import { RoomCodeDisplay } from '../../components/RoomCodeDisplay/RoomCodeDisplay'
 import { Button } from '../../components/Button/Button'
+import { PhoneFrame } from '../../components/PhoneFrame/PhoneFrame'
 import { mockMovies } from '../../data/mockMovies'
 import { mockParticipants } from '../../utils/mockGroupState'
 import { FiX, FiHeart, FiXCircle } from 'react-icons/fi'
@@ -16,7 +17,6 @@ export function GroupRoomScreen() {
   const [movies] = useState([...mockMovies].sort(() => Math.random() - 0.5))
   const [currentIndex, setCurrentIndex] = useState(0)
   const [participants] = useState(mockParticipants.slice(0, 4))
-  const [iDontCare, setIDontCare] = useState(false)
 
   const handleSwipe = (direction, movieId) => {
     // Simply advance to next movie
@@ -38,31 +38,33 @@ export function GroupRoomScreen() {
 
   if (currentIndex >= movies.length) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-6">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center space-y-4 max-w-md"
-        >
-          <h2 className="text-2xl font-bold text-text-primary">No more movies!</h2>
-          <p className="text-text-secondary">
-            You've seen all the movies. Try a new room!
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button onClick={() => navigate(`/match/${roomCode}`, { 
-              state: { 
-                matchMovieId: mockMovies[0].id,
-                matches: [{ movieId: mockMovies[0].id, likedBy: true, likedByCount: participants.length, matchPercentage: 100 }]
-              } 
-            })}>
-              View Matches
-            </Button>
-            <Button onClick={() => navigate('/')} variant="secondary">
-              New Room
-            </Button>
-          </div>
-        </motion.div>
-      </div>
+      <PhoneFrame>
+        <div className="h-full bg-background flex items-center justify-center p-6">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center space-y-4 max-w-md"
+          >
+            <h2 className="text-2xl font-bold text-text-primary">No more movies!</h2>
+            <p className="text-text-secondary">
+              You've seen all the movies. Try a new room!
+            </p>
+            <div className="flex flex-col gap-4 justify-center">
+              <Button onClick={() => navigate(`/match/${roomCode}`, { 
+                state: { 
+                  matchMovieId: mockMovies[0].id,
+                  matches: [{ movieId: mockMovies[0].id, likedBy: true, likedByCount: participants.length, matchPercentage: 100 }]
+                } 
+              })}>
+                View Matches
+              </Button>
+              <Button onClick={() => navigate('/')} variant="secondary">
+                New Room
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      </PhoneFrame>
     )
   }
 
@@ -70,9 +72,10 @@ export function GroupRoomScreen() {
   const nextMovies = movies.slice(currentIndex, currentIndex + 3)
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
-      <div className="p-4 space-y-3">
+    <PhoneFrame>
+      <div className="h-full bg-background flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="p-4 space-y-3">
         <div className="flex items-center justify-between">
           <RoomCodeDisplay roomCode={roomCode} />
           <button
@@ -97,10 +100,10 @@ export function GroupRoomScreen() {
             ))}
           </div>
         </div>
-      </div>
+        </div>
 
-      {/* Swipe Area */}
-      <div className="flex-1 relative max-w-md mx-auto w-full px-4 pb-24">
+        {/* Swipe Area */}
+        <div className="flex-1 relative max-w-md mx-auto w-full px-4 pb-24">
         <div className="relative w-full" style={{ height: '600px', perspective: '1000px' }}>
           {nextMovies.map((movie, idx) => (
             <SwipeableCard
@@ -114,37 +117,9 @@ export function GroupRoomScreen() {
         </div>
       </div>
 
-      {/* Controls */}
-      <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-surface p-4">
-        <div className="max-w-md mx-auto space-y-4">
-          {/* I Don't Care Toggle & Check Matches */}
-          <div className="flex items-center justify-center gap-2">
-            <button
-              onClick={() => setIDontCare(!iDontCare)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                iDontCare
-                  ? 'bg-accent text-white'
-                  : 'bg-surface text-text-secondary hover:bg-surface/80'
-              }`}
-            >
-              {iDontCare ? '✓ I Don\'t Care' : 'I Don\'t Care'}
-            </button>
-            <button
-              onClick={() => {
-                // Navigate to match screen with mock data
-                navigate(`/match/${roomCode}`, { 
-                  state: { 
-                    matchMovieId: mockMovies[0].id,
-                    matches: [{ movieId: mockMovies[0].id, likedBy: true, likedByCount: participants.length, matchPercentage: 100 }]
-                  } 
-                })
-              }}
-              className="px-4 py-2 rounded-full text-sm font-medium bg-primary/20 text-primary hover:bg-primary/30 transition-all"
-            >
-              Check Matches
-            </button>
-          </div>
-
+        {/* Controls */}
+        <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-surface p-4">
+        <div className="max-w-md mx-auto">
           {/* Action Buttons */}
           <div className="flex items-center justify-center gap-6">
             <button
@@ -178,8 +153,9 @@ export function GroupRoomScreen() {
             </button>
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </PhoneFrame>
   )
 }
 

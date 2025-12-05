@@ -5,14 +5,14 @@ export function ParticipantAvatar({ participant, isActive = false, showName = tr
         w-12 h-12 rounded-full
         flex items-center justify-center
         text-2xl
-        border-2 transition-all
-        ${isActive ? 'border-primary scale-110' : 'border-surface'}
-        ${participant.isCurrentUser ? 'ring-2 ring-primary/50' : ''}
+        border-2 transition-all bg-white/20 backdrop-blur-sm
+        ${isActive ? 'border-white scale-110 ring-2 ring-white/50' : 'border-white/30'}
+        ${participant.isCurrentUser ? 'ring-2 ring-white/50' : ''}
       `}>
         {participant.avatar}
       </div>
       {showName && (
-        <span className="text-xs text-text-secondary max-w-[60px] truncate">
+        <span className="text-xs text-white/80 max-w-[60px] truncate">
           {participant.name}
         </span>
       )}

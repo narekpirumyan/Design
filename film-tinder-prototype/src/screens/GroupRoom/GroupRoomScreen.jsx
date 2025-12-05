@@ -11,7 +11,7 @@ import { FilmShorts } from '../../components/FilmShorts/FilmShorts'
 import { mockMovies } from '../../data/mockMovies'
 import { mockParticipants } from '../../utils/mockGroupState'
 import { FiX, FiFilm, FiInfo, FiVideo } from 'react-icons/fi'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 
 export function GroupRoomScreen() {
   const { roomCode } = useParams()
@@ -111,21 +111,21 @@ export function GroupRoomScreen() {
     <PhoneFrame>
       <div className="h-full bg-gradient-to-br from-red-600 via-pink-500 to-red-700 flex flex-col overflow-hidden relative pb-16">
         {/* Header */}
-        <div className="p-4 space-y-3">
+        <div className="p-4 space-y-3 relative z-10">
           <div className="flex items-center justify-between">
             <RoomCodeDisplay roomCode={roomCode} />
             <button
               onClick={handleLeaveRoom}
-              className="p-2 hover:bg-surface rounded-lg transition-colors"
+              className="p-2 hover:bg-white/20 rounded-lg transition-colors"
               aria-label="Leave room"
             >
-              <FiX className="w-5 h-5 text-text-secondary" />
+              <FiX className="w-5 h-5 text-white" />
             </button>
           </div>
 
           {/* Participants */}
           <div className="flex items-center gap-4">
-            <span className="text-sm text-text-muted">Participants:</span>
+            <span className="text-sm text-white/80">Participants:</span>
             <div className="flex gap-2">
               {participants.map((participant) => (
                 <ParticipantAvatar
@@ -139,7 +139,7 @@ export function GroupRoomScreen() {
         </div>
 
         {/* Mode-based Content with Card Flip Animation */}
-        <div className="absolute inset-0" style={{ perspective: '1200px' }}>
+        <div className="absolute top-24 left-0 right-0 bottom-0" style={{ perspective: '1200px' }}>
           <AnimatePresence mode="wait">
             <motion.div
               key={mode}
@@ -162,17 +162,23 @@ export function GroupRoomScreen() {
               {mode === 'swipe' && (
                 <>
                   {/* Swipe Area */}
-                  <div className="flex-1 relative w-full pb-20 h-full">
+                  <div className="relative w-full h-full pb-20">
                     <div className="relative w-full h-full" style={{ perspective: '1000px' }}>
-                      {nextMovies.map((movie, idx) => (
-                        <SwipeableCard
-                          key={`${movie.id}-${currentIndex}`}
-                          movie={movie}
-                          index={idx}
-                          isTop={idx === 0}
-                          onSwipe={idx === 0 ? handleSwipe : undefined}
-                        />
-                      ))}
+                      {nextMovies.length > 0 ? (
+                        nextMovies.map((movie, idx) => (
+                          <SwipeableCard
+                            key={`${movie.id}-${currentIndex}`}
+                            movie={movie}
+                            index={idx}
+                            isTop={idx === 0}
+                            onSwipe={idx === 0 ? handleSwipe : undefined}
+                          />
+                        ))
+                      ) : (
+                        <div className="flex items-center justify-center h-full text-white">
+                          <p>No movies available</p>
+                        </div>
+                      )}
                     </div>
                   </div>
 

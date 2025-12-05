@@ -2,6 +2,7 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import { Button } from '../../components/Button/Button'
 import { VibeTag } from '../../components/VibeTag/VibeTag'
 import { PhoneFrame } from '../../components/PhoneFrame/PhoneFrame'
+import { BottomNavigation } from '../../components/BottomNavigation/BottomNavigation'
 import { mockMovies } from '../../data/mockMovies'
 import { mockParticipants } from '../../utils/mockGroupState'
 import { motion } from 'framer-motion'
@@ -58,7 +59,7 @@ export function MatchResultScreen() {
 
   return (
     <PhoneFrame>
-      <div className="h-full bg-gradient-to-br from-red-600 via-pink-500 to-red-700 overflow-y-auto">
+      <div className="h-full bg-gradient-to-br from-red-600 via-pink-500 to-red-700 overflow-y-auto pb-16">
         {/* Header */}
         <div className="p-4">
         <button
@@ -253,6 +254,7 @@ export function MatchResultScreen() {
         )}
       </div>
       </div>
+      <BottomNavigation />
     </PhoneFrame>
   )
 }

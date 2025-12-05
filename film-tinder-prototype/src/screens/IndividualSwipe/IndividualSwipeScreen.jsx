@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { SwipeableCard } from '../../components/SwipeableCard/SwipeableCard'
 import { PhoneFrame } from '../../components/PhoneFrame/PhoneFrame'
+import { BottomNavigation } from '../../components/BottomNavigation/BottomNavigation'
 import { mockMovies } from '../../data/mockMovies'
 import { FiHeart, FiXCircle, FiPlus } from 'react-icons/fi'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -49,23 +50,24 @@ export function IndividualSwipeScreen() {
   if (currentIndex >= movies.length) {
     return (
       <PhoneFrame>
-        <div className="h-full bg-background flex items-center justify-center p-6">
+        <div className="h-full bg-gradient-to-br from-red-600 via-pink-500 to-red-700 flex items-center justify-center p-6 pb-20 relative">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-center space-y-4 max-w-md"
           >
-            <h2 className="text-2xl font-bold text-text-primary">All done!</h2>
-            <p className="text-text-secondary">
+            <h2 className="text-2xl font-bold text-white">All done!</h2>
+            <p className="text-white/90">
               You've seen all the movies. Check your watchlists!
             </p>
             <button
               onClick={() => navigate('/')}
-              className="px-6 py-3 bg-primary rounded-full text-white font-medium hover:bg-primary/90 transition-colors"
+              className="px-6 py-3 bg-gradient-to-r from-pink-500 to-red-500 rounded-full text-white font-medium hover:opacity-90 transition-opacity shadow-lg"
             >
               Go Home
             </button>
           </motion.div>
+          <BottomNavigation />
         </div>
       </PhoneFrame>
     )
@@ -126,27 +128,30 @@ export function IndividualSwipeScreen() {
         </div>
 
         {/* Controls */}
-        <div className="absolute bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-surface p-4">
+        <div className="absolute bottom-16 left-0 right-0 p-4">
           <div className="max-w-md mx-auto">
             <div className="flex items-center justify-center gap-6">
               <button
                 onClick={() => handleSwipe('left', currentMovie.id)}
-                className="w-16 h-16 rounded-full bg-red-500/20 hover:bg-red-500/30 flex items-center justify-center transition-all active:scale-95"
+                className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 flex items-center justify-center transition-all active:scale-95 border-2 border-white/30"
                 aria-label="Pass"
               >
-                <FiXCircle className="w-8 h-8 text-red-400" />
+                <FiXCircle className="w-8 h-8 text-white" />
               </button>
 
               <button
                 onClick={() => handleSwipe('right', currentMovie.id)}
-                className="w-16 h-16 rounded-full bg-green-500/20 hover:bg-green-500/30 flex items-center justify-center transition-all active:scale-95"
+                className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 flex items-center justify-center transition-all active:scale-95 border-2 border-white/30"
                 aria-label="Like"
               >
-                <FiHeart className="w-8 h-8 text-green-400" />
+                <FiHeart className="w-8 h-8 text-white" />
               </button>
             </div>
           </div>
         </div>
+
+        {/* Bottom Navigation */}
+        <BottomNavigation />
 
         {/* Group Selection Overlay */}
         <AnimatePresence>

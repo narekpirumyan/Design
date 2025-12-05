@@ -5,6 +5,7 @@ import { ParticipantAvatar } from '../../components/ParticipantAvatar/Participan
 import { RoomCodeDisplay } from '../../components/RoomCodeDisplay/RoomCodeDisplay'
 import { Button } from '../../components/Button/Button'
 import { PhoneFrame } from '../../components/PhoneFrame/PhoneFrame'
+import { BottomNavigation } from '../../components/BottomNavigation/BottomNavigation'
 import { mockMovies } from '../../data/mockMovies'
 import { mockParticipants } from '../../utils/mockGroupState'
 import { FiX, FiHeart, FiXCircle } from 'react-icons/fi'
@@ -39,14 +40,14 @@ export function GroupRoomScreen() {
   if (currentIndex >= movies.length) {
     return (
       <PhoneFrame>
-        <div className="h-full bg-background flex items-center justify-center p-6">
+        <div className="h-full bg-gradient-to-br from-red-600 via-pink-500 to-red-700 flex items-center justify-center p-6 pb-20 relative">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-center space-y-4 max-w-md"
           >
-            <h2 className="text-2xl font-bold text-text-primary">No more movies!</h2>
-            <p className="text-text-secondary">
+            <h2 className="text-2xl font-bold text-white">No more movies!</h2>
+            <p className="text-white/90">
               You've seen all the movies. Try a new room!
             </p>
             <div className="flex flex-col gap-4 justify-center">
@@ -63,6 +64,7 @@ export function GroupRoomScreen() {
               </Button>
             </div>
           </motion.div>
+          <BottomNavigation />
         </div>
       </PhoneFrame>
     )
@@ -73,7 +75,7 @@ export function GroupRoomScreen() {
 
   return (
     <PhoneFrame>
-      <div className="h-full bg-gradient-to-br from-red-600 via-pink-500 to-red-700 flex flex-col overflow-hidden relative">
+      <div className="h-full bg-gradient-to-br from-red-600 via-pink-500 to-red-700 flex flex-col overflow-hidden relative pb-16">
         {/* Header */}
         <div className="p-4 space-y-3">
           <div className="flex items-center justify-between">
@@ -118,16 +120,16 @@ export function GroupRoomScreen() {
         </div>
 
         {/* Controls */}
-        <div className="absolute bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-surface p-4">
+        <div className="absolute bottom-16 left-0 right-0 p-4">
           <div className="max-w-md mx-auto">
             {/* Action Buttons */}
             <div className="flex items-center justify-center gap-6">
               <button
                 onClick={() => handleSwipe('left', currentMovie.id)}
-                className="w-16 h-16 rounded-full bg-red-500/20 hover:bg-red-500/30 flex items-center justify-center transition-all active:scale-95"
+                className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 flex items-center justify-center transition-all active:scale-95 border-2 border-white/30"
                 aria-label="Pass"
               >
-                <FiXCircle className="w-8 h-8 text-red-400" />
+                <FiXCircle className="w-8 h-8 text-white" />
               </button>
 
               {/* Reaction Emojis */}
@@ -136,7 +138,7 @@ export function GroupRoomScreen() {
                   <button
                     key={emoji}
                     onClick={() => handleReaction(emoji)}
-                    className="w-12 h-12 rounded-full bg-surface hover:bg-surface/80 flex items-center justify-center text-xl transition-all active:scale-95"
+                    className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 flex items-center justify-center text-xl transition-all active:scale-95 border-2 border-white/30"
                     aria-label={`React with ${emoji}`}
                   >
                     {emoji}
@@ -146,15 +148,16 @@ export function GroupRoomScreen() {
 
               <button
                 onClick={() => handleSwipe('right', currentMovie.id)}
-                className="w-16 h-16 rounded-full bg-green-500/20 hover:bg-green-500/30 flex items-center justify-center transition-all active:scale-95"
+                className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 flex items-center justify-center transition-all active:scale-95 border-2 border-white/30"
                 aria-label="Like"
               >
-                <FiHeart className="w-8 h-8 text-green-400" />
+                <FiHeart className="w-8 h-8 text-white" />
               </button>
             </div>
           </div>
         </div>
       </div>
+      <BottomNavigation />
     </PhoneFrame>
   )
 }

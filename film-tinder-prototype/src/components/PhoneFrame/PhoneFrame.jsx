@@ -1,4 +1,4 @@
-export function PhoneFrame({ children }) {
+export function PhoneFrame({ children, showNavigation = true }) {
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center p-8">
       <div className="relative">

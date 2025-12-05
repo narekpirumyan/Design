@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../../components/Button/Button'
 import { PhoneFrame } from '../../components/PhoneFrame/PhoneFrame'
+import { BottomNavigation } from '../../components/BottomNavigation/BottomNavigation'
 import { generateRoomCode } from '../../utils/mockGroupState'
 import { FiUsers, FiLogIn } from 'react-icons/fi'
 
@@ -30,7 +31,7 @@ export function CreateJoinRoomScreen() {
 
   return (
     <PhoneFrame>
-      <div className="h-full bg-gradient-to-br from-red-600 via-pink-500 to-red-700 flex flex-col items-center justify-center p-6 overflow-y-auto">
+      <div className="h-full bg-gradient-to-br from-red-600 via-pink-500 to-red-700 flex flex-col items-center justify-center p-6 pb-20 overflow-y-auto">
         <div className="w-full max-w-md space-y-8">
         {/* Header */}
         <div className="text-center space-y-4">
@@ -122,6 +123,7 @@ export function CreateJoinRoomScreen() {
         </div>
         </div>
       </div>
+      <BottomNavigation />
     </PhoneFrame>
   )
 }

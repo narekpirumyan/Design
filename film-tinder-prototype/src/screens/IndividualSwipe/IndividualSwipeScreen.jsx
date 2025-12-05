@@ -24,68 +24,24 @@ export function IndividualSwipeScreen() {
   const [selectedMovie, setSelectedMovie] = useState(null)
   const [selectedApproach, setSelectedApproach] = useState(1)
   const [mode, setMode] = useState('swipe') // 'swipe', 'details', 'shorts'
-  const [showModeSelector, setShowModeSelector] = useState(false)
-  
-  const pressTimerRef = useRef(null)
-  const swipeAreaRef = useRef(null)
 
   // Reset mode to swipe on mount
   useEffect(() => {
     setMode('swipe')
-    setShowModeSelector(false)
   }, [])
 
-  // Press and hold detection
-  useEffect(() => {
-    const swipeArea = swipeAreaRef.current
-    if (!swipeArea || showModeSelector) return // Don't attach if selector is already open
+  const modes = ['swipe', 'details', 'shorts']
+  const currentModeIndex = modes.indexOf(mode)
 
-    const handleTouchStart = (e) => {
-      // Prevent card swipe during hold
-      e.preventDefault()
-      pressTimerRef.current = setTimeout(() => {
-        setShowModeSelector(true)
-      }, 500) // 500ms hold
+  const handleModeChange = (direction) => {
+    if (direction === 'prev') {
+      const prevIndex = currentModeIndex === 0 ? modes.length - 1 : currentModeIndex - 1
+      setMode(modes[prevIndex])
+    } else {
+      const nextIndex = currentModeIndex === modes.length - 1 ? 0 : currentModeIndex + 1
+      setMode(modes[nextIndex])
     }
-
-    const handleTouchEnd = () => {
-      if (pressTimerRef.current) {
-        clearTimeout(pressTimerRef.current)
-        pressTimerRef.current = null
-      }
-    }
-
-    const handleMouseDown = (e) => {
-      pressTimerRef.current = setTimeout(() => {
-        setShowModeSelector(true)
-      }, 500)
-    }
-
-    const handleMouseUp = () => {
-      if (pressTimerRef.current) {
-        clearTimeout(pressTimerRef.current)
-        pressTimerRef.current = null
-      }
-    }
-
-    swipeArea.addEventListener('touchstart', handleTouchStart, { passive: false })
-    swipeArea.addEventListener('touchend', handleTouchEnd)
-    swipeArea.addEventListener('mousedown', handleMouseDown)
-    swipeArea.addEventListener('mouseup', handleMouseUp)
-    swipeArea.addEventListener('mouseleave', handleMouseUp)
-
-    return () => {
-      swipeArea.removeEventListener('touchstart', handleTouchStart)
-      swipeArea.removeEventListener('touchend', handleTouchEnd)
-      swipeArea.removeEventListener('mousedown', handleMouseDown)
-      swipeArea.removeEventListener('mouseup', handleMouseUp)
-      swipeArea.removeEventListener('mouseleave', handleMouseUp)
-      if (pressTimerRef.current) {
-        clearTimeout(pressTimerRef.current)
-        pressTimerRef.current = null
-      }
-    }
-  }, [showModeSelector])
+  }
 
   const handleSwipe = (direction, movieId) => {
     if (mode === 'swipe') {

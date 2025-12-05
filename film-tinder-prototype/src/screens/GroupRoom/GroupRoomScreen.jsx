@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { SwipeableCard } from '../../components/SwipeableCard/SwipeableCard'
 import { ParticipantAvatar } from '../../components/ParticipantAvatar/ParticipantAvatar'
@@ -6,12 +6,11 @@ import { RoomCodeDisplay } from '../../components/RoomCodeDisplay/RoomCodeDispla
 import { Button } from '../../components/Button/Button'
 import { PhoneFrame } from '../../components/PhoneFrame/PhoneFrame'
 import { BottomNavigation } from '../../components/BottomNavigation/BottomNavigation'
-import { ModeSelector } from '../../components/ModeSelector/ModeSelector'
 import { FilmDetails } from '../../components/FilmDetails/FilmDetails'
 import { FilmShorts } from '../../components/FilmShorts/FilmShorts'
 import { mockMovies } from '../../data/mockMovies'
 import { mockParticipants } from '../../utils/mockGroupState'
-import { FiX } from 'react-icons/fi'
+import { FiX, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import { motion } from 'framer-motion'
 
 export function GroupRoomScreen() {
@@ -103,12 +102,6 @@ export function GroupRoomScreen() {
     console.log('Add to watchlist:', movieId)
   }
 
-  const handleModeChange = (newMode) => {
-    if (newMode !== mode) {
-      setMode(newMode)
-    }
-    setShowModeSelector(false)
-  }
 
   const handleReaction = (emoji) => {
     // Visual only - no state tracking needed
@@ -187,26 +180,12 @@ export function GroupRoomScreen() {
           </div>
         </div>
 
-        {/* Mode-based Content with Zoom Animation */}
-        <motion.div
-          animate={{
-            scale: showModeSelector ? 0.6 : 1,
-            opacity: showModeSelector ? 0.3 : 1
-          }}
-          transition={{ type: 'spring', stiffness: 200, damping: 25 }}
-          className="absolute inset-0"
-          style={{ 
-            transformOrigin: 'center center',
-            pointerEvents: showModeSelector ? 'none' : 'auto'
-          }}
-        >
+        {/* Mode-based Content */}
+        <div className="absolute inset-0">
           {mode === 'swipe' && (
             <>
               {/* Swipe Area */}
-              <div 
-                ref={swipeAreaRef}
-                className="flex-1 relative w-full pb-20 h-full"
-              >
+              <div className="flex-1 relative w-full pb-20 h-full">
                 <div className="relative w-full h-full" style={{ perspective: '1000px' }}>
                   {nextMovies.map((movie, idx) => (
                     <SwipeableCard
@@ -241,7 +220,7 @@ export function GroupRoomScreen() {
           )}
 
           {mode === 'details' && (
-            <div ref={swipeAreaRef} className="h-full">
+            <div className="h-full">
               <FilmDetails
                 movie={currentMovie}
                 onBack={() => setMode('swipe')}
@@ -252,7 +231,7 @@ export function GroupRoomScreen() {
           )}
 
           {mode === 'shorts' && (
-            <div ref={swipeAreaRef} className="h-full">
+            <div className="h-full">
               <FilmShorts
                 movie={currentMovie}
                 onBack={() => setMode('swipe')}
@@ -261,16 +240,27 @@ export function GroupRoomScreen() {
               />
             </div>
           )}
-        </motion.div>
+        </div>
 
-        {/* Mode Selector */}
-        {showModeSelector && (
-          <ModeSelector
-            currentMode={mode}
-            onModeChange={handleModeChange}
-            isVisible={showModeSelector}
-          />
-        )}
+        {/* Mode Navigation Buttons */}
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 z-30">
+          <button
+            onClick={() => handleModeChange('prev')}
+            className="p-3 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-r-full transition-all border-r-2 border-t-2 border-b-2 border-white/30"
+            aria-label="Previous mode"
+          >
+            <FiChevronLeft className="w-6 h-6 text-white" />
+          </button>
+        </div>
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 z-30">
+          <button
+            onClick={() => handleModeChange('next')}
+            className="p-3 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-l-full transition-all border-l-2 border-t-2 border-b-2 border-white/30"
+            aria-label="Next mode"
+          >
+            <FiChevronRight className="w-6 h-6 text-white" />
+          </button>
+        </div>
       </div>
       <BottomNavigation />
     </PhoneFrame>

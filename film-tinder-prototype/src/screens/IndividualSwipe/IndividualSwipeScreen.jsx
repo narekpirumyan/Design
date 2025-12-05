@@ -7,7 +7,7 @@ import { FilmDetails } from '../../components/FilmDetails/FilmDetails'
 import { FilmShorts } from '../../components/FilmShorts/FilmShorts'
 import { mockMovies } from '../../data/mockMovies'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
+import { FiCamera, FiFilm, FiInfo, FiVideo } from 'react-icons/fi'
 
 // Import different group selection approaches
 import { GroupSelectionApproach1 } from './GroupSelectionApproach1'
@@ -33,14 +33,15 @@ export function IndividualSwipeScreen() {
   const modes = ['swipe', 'details', 'shorts']
   const currentModeIndex = modes.indexOf(mode)
 
-  const handleModeChange = (direction) => {
-    if (direction === 'prev') {
-      const prevIndex = currentModeIndex === 0 ? modes.length - 1 : currentModeIndex - 1
-      setMode(modes[prevIndex])
-    } else {
-      const nextIndex = currentModeIndex === modes.length - 1 ? 0 : currentModeIndex + 1
-      setMode(modes[nextIndex])
-    }
+  const modeIcons = {
+    swipe: FiFilm,
+    details: FiInfo,
+    shorts: FiVideo
+  }
+
+  const handleModeToggle = () => {
+    const nextIndex = (currentModeIndex + 1) % modes.length
+    setMode(modes[nextIndex])
   }
 
   const handleSwipe = (direction, movieId) => {
@@ -145,68 +146,93 @@ export function IndividualSwipeScreen() {
           </select>
         </div>
 
-        {/* Mode-based Content */}
-        <div className="absolute inset-0">
-          {mode === 'swipe' && (
-            <>
-              {/* Swipe Area */}
-              <div className="flex-1 relative w-full pb-20 h-full">
-                <div className="relative w-full h-full" style={{ perspective: '1000px' }}>
-                  {nextMovies.map((movie, idx) => (
-                    <SwipeableCard
-                      key={`${movie.id}-${currentIndex}`}
-                      movie={movie}
-                      index={idx}
-                      isTop={idx === 0}
-                      onSwipe={idx === 0 ? handleSwipe : undefined}
-                    />
-                  ))}
+        {/* Mode-based Content with Card Flip Animation */}
+        <div className="absolute inset-0" style={{ perspective: '1200px' }}>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={mode}
+              initial={{ rotateY: 90, opacity: 0 }}
+              animate={{ rotateY: 0, opacity: 1 }}
+              exit={{ rotateY: -90, opacity: 0 }}
+              transition={{ 
+                type: 'spring', 
+                stiffness: 300, 
+                damping: 30,
+                duration: 0.6
+              }}
+              style={{
+                transformStyle: 'preserve-3d',
+                width: '100%',
+                height: '100%'
+              }}
+              className="relative"
+            >
+            {mode === 'swipe' && (
+              <>
+                {/* Swipe Area */}
+                <div className="flex-1 relative w-full pb-20 h-full">
+                  <div className="relative w-full h-full" style={{ perspective: '1000px' }}>
+                    {nextMovies.map((movie, idx) => (
+                      <SwipeableCard
+                        key={`${movie.id}-${currentIndex}`}
+                        movie={movie}
+                        index={idx}
+                        isTop={idx === 0}
+                        onSwipe={idx === 0 ? handleSwipe : undefined}
+                      />
+                    ))}
+                  </div>
                 </div>
+              </>
+            )}
+
+            {mode === 'details' && (
+              <div className="h-full">
+                <FilmDetails
+                  movie={currentMovie}
+                  onBack={() => setMode('swipe')}
+                  onSwipe={handleSwipe}
+                  onAddToWatchlist={handleAddToWatchlist}
+                />
               </div>
-            </>
-          )}
+            )}
 
-          {mode === 'details' && (
-            <div className="h-full">
-              <FilmDetails
-                movie={currentMovie}
-                onBack={() => setMode('swipe')}
-                onSwipe={handleSwipe}
-                onAddToWatchlist={handleAddToWatchlist}
-              />
-            </div>
-          )}
-
-          {mode === 'shorts' && (
-            <div className="h-full">
-              <FilmShorts
-                movie={currentMovie}
-                onBack={() => setMode('swipe')}
-                onSwipe={handleSwipe}
-                onAddToWatchlist={handleAddToWatchlist}
-              />
-            </div>
-          )}
+            {mode === 'shorts' && (
+              <div className="h-full">
+                <FilmShorts
+                  movie={currentMovie}
+                  onBack={() => setMode('swipe')}
+                  onSwipe={handleSwipe}
+                  onAddToWatchlist={handleAddToWatchlist}
+                />
+              </div>
+            )}
+          </motion.div>
         </div>
 
-        {/* Mode Navigation Buttons */}
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 z-30">
-          <button
-            onClick={() => handleModeChange('prev')}
-            className="p-3 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-r-full transition-all border-r-2 border-t-2 border-b-2 border-white/30"
-            aria-label="Previous mode"
+        {/* Mode Switch Button - Camera Switch Style */}
+        <div className="absolute top-4 left-4 z-30">
+          <motion.button
+            onClick={handleModeToggle}
+            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.05 }}
+            className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-md border-2 border-white/30 flex items-center justify-center transition-all hover:bg-black/70 hover:border-white/50"
+            aria-label="Switch media mode"
+            title={`Current: ${mode.charAt(0).toUpperCase() + mode.slice(1)}`}
           >
-            <FiChevronLeft className="w-6 h-6 text-white" />
-          </button>
-        </div>
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 z-30">
-          <button
-            onClick={() => handleModeChange('next')}
-            className="p-3 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-l-full transition-all border-l-2 border-t-2 border-b-2 border-white/30"
-            aria-label="Next mode"
-          >
-            <FiChevronRight className="w-6 h-6 text-white" />
-          </button>
+            <motion.div
+              key={mode}
+              initial={{ rotate: -180, opacity: 0 }}
+              animate={{ rotate: 0, opacity: 1 }}
+              exit={{ rotate: 180, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {(() => {
+                const Icon = modeIcons[mode]
+                return <Icon className="w-6 h-6 text-white" />
+              })()}
+            </motion.div>
+          </motion.button>
         </div>
 
         {/* Bottom Navigation */}

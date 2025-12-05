@@ -10,13 +10,17 @@ export function CreateRoomModal({ isOpen, onClose }) {
   const [roomCode, setRoomCode] = useState('')
   const [error, setError] = useState('')
 
-  const handleCreateRoom = () => {
+  const handleCreateRoom = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
     const newRoomCode = generateRoomCode()
     navigate(`/room/${newRoomCode}`)
     onClose()
   }
 
-  const handleJoinRoom = () => {
+  const handleJoinRoom = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
     const trimmedCode = roomCode.trim().toUpperCase()
     
     if (trimmedCode.length !== 6) {
@@ -29,25 +33,25 @@ export function CreateRoomModal({ isOpen, onClose }) {
     onClose()
   }
 
-  if (!isOpen) return null
-
   return (
-    <>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={onClose}
-        className="absolute inset-0 bg-black/60 z-50"
-      />
-      <motion.div
-        initial={{ y: '100%' }}
-        animate={{ y: 0 }}
-        exit={{ y: '100%' }}
-        transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-        onClick={(e) => e.stopPropagation()}
-        className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl z-50 max-h-[85vh] overflow-hidden shadow-2xl"
-      >
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="absolute inset-0 bg-black/60 z-[100]"
+          />
+          <motion.div
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            onClick={(e) => e.stopPropagation()}
+            className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl z-[100] max-h-[85vh] overflow-hidden shadow-2xl"
+          >
         {/* Gradient Header */}
         <div className="bg-gradient-to-r from-red-600 via-pink-500 to-red-600 px-6 pt-6 pb-4">
           <div className="flex items-center justify-between mb-4">
@@ -77,7 +81,7 @@ export function CreateRoomModal({ isOpen, onClose }) {
             <Button 
               onClick={handleCreateRoom}
               variant="primary"
-              className="w-full"
+              className="w-full bg-gradient-to-r from-pink-500 to-red-500 text-white hover:from-pink-600 hover:to-red-600"
             >
               Create New Room
             </Button>
@@ -122,7 +126,7 @@ export function CreateRoomModal({ isOpen, onClose }) {
             <Button 
               onClick={handleJoinRoom}
               variant="secondary"
-              className="w-full"
+              className="w-full bg-gray-200 text-gray-800 hover:bg-gray-300"
               disabled={!roomCode.trim()}
             >
               Join Room
@@ -130,7 +134,9 @@ export function CreateRoomModal({ isOpen, onClose }) {
           </div>
         </div>
       </motion.div>
-    </>
+        </>
+      )}
+    </AnimatePresence>
   )
 }
 

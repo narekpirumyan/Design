@@ -10,7 +10,7 @@ import { FilmDetails } from '../../components/FilmDetails/FilmDetails'
 import { FilmShorts } from '../../components/FilmShorts/FilmShorts'
 import { mockMovies } from '../../data/mockMovies'
 import { mockParticipants } from '../../utils/mockGroupState'
-import { FiX, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
+import { FiX, FiFilm, FiInfo, FiVideo } from 'react-icons/fi'
 import { motion } from 'framer-motion'
 
 export function GroupRoomScreen() {
@@ -21,68 +21,25 @@ export function GroupRoomScreen() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [participants] = useState(mockParticipants.slice(0, 4))
   const [mode, setMode] = useState('swipe') // 'swipe', 'details', 'shorts'
-  const [showModeSelector, setShowModeSelector] = useState(false)
-  
-  const pressTimerRef = useRef(null)
-  const swipeAreaRef = useRef(null)
 
   // Reset mode to swipe on mount
   useEffect(() => {
     setMode('swipe')
-    setShowModeSelector(false)
   }, [])
 
-  // Press and hold detection
-  useEffect(() => {
-    const swipeArea = swipeAreaRef.current
-    if (!swipeArea || showModeSelector) return // Don't attach if selector is already open
+  const modes = ['swipe', 'details', 'shorts']
+  const currentModeIndex = modes.indexOf(mode)
 
-    const handleTouchStart = (e) => {
-      // Prevent card swipe during hold
-      e.preventDefault()
-      pressTimerRef.current = setTimeout(() => {
-        setShowModeSelector(true)
-      }, 500) // 500ms hold
-    }
+  const modeIcons = {
+    swipe: FiFilm,
+    details: FiInfo,
+    shorts: FiVideo
+  }
 
-    const handleTouchEnd = () => {
-      if (pressTimerRef.current) {
-        clearTimeout(pressTimerRef.current)
-        pressTimerRef.current = null
-      }
-    }
-
-    const handleMouseDown = (e) => {
-      pressTimerRef.current = setTimeout(() => {
-        setShowModeSelector(true)
-      }, 500)
-    }
-
-    const handleMouseUp = () => {
-      if (pressTimerRef.current) {
-        clearTimeout(pressTimerRef.current)
-        pressTimerRef.current = null
-      }
-    }
-
-    swipeArea.addEventListener('touchstart', handleTouchStart, { passive: false })
-    swipeArea.addEventListener('touchend', handleTouchEnd)
-    swipeArea.addEventListener('mousedown', handleMouseDown)
-    swipeArea.addEventListener('mouseup', handleMouseUp)
-    swipeArea.addEventListener('mouseleave', handleMouseUp)
-
-    return () => {
-      swipeArea.removeEventListener('touchstart', handleTouchStart)
-      swipeArea.removeEventListener('touchend', handleTouchEnd)
-      swipeArea.removeEventListener('mousedown', handleMouseDown)
-      swipeArea.removeEventListener('mouseup', handleMouseUp)
-      swipeArea.removeEventListener('mouseleave', handleMouseUp)
-      if (pressTimerRef.current) {
-        clearTimeout(pressTimerRef.current)
-        pressTimerRef.current = null
-      }
-    }
-  }, [showModeSelector])
+  const handleModeToggle = () => {
+    const nextIndex = (currentModeIndex + 1) % modes.length
+    setMode(modes[nextIndex])
+  }
 
   const handleSwipe = (direction, movieId) => {
     if (mode === 'swipe') {
@@ -180,86 +137,112 @@ export function GroupRoomScreen() {
           </div>
         </div>
 
-        {/* Mode-based Content */}
-        <div className="absolute inset-0">
-          {mode === 'swipe' && (
-            <>
-              {/* Swipe Area */}
-              <div className="flex-1 relative w-full pb-20 h-full">
-                <div className="relative w-full h-full" style={{ perspective: '1000px' }}>
-                  {nextMovies.map((movie, idx) => (
-                    <SwipeableCard
-                      key={`${movie.id}-${currentIndex}`}
-                      movie={movie}
-                      index={idx}
-                      isTop={idx === 0}
-                      onSwipe={idx === 0 ? handleSwipe : undefined}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* Reaction Emojis */}
-              <div className="absolute bottom-16 left-0 right-0 p-4">
-                <div className="max-w-md mx-auto">
-                  <div className="flex items-center justify-center gap-2">
-                    {['🔥', '😂', '😴', '🤯'].map(emoji => (
-                      <button
-                        key={emoji}
-                        onClick={() => handleReaction(emoji)}
-                        className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 flex items-center justify-center text-xl transition-all active:scale-95 border-2 border-white/30"
-                        aria-label={`React with ${emoji}`}
-                      >
-                        {emoji}
-                      </button>
-                    ))}
+        {/* Mode-based Content with Card Flip Animation */}
+        <div className="absolute inset-0" style={{ perspective: '1200px' }}>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={mode}
+              initial={{ rotateY: 90, opacity: 0 }}
+              animate={{ rotateY: 0, opacity: 1 }}
+              exit={{ rotateY: -90, opacity: 0 }}
+              transition={{ 
+                type: 'spring', 
+                stiffness: 300, 
+                damping: 30,
+                duration: 0.6
+              }}
+              style={{
+                transformStyle: 'preserve-3d',
+                width: '100%',
+                height: '100%'
+              }}
+              className="relative"
+            >
+              {mode === 'swipe' && (
+                <>
+                  {/* Swipe Area */}
+                  <div className="flex-1 relative w-full pb-20 h-full">
+                    <div className="relative w-full h-full" style={{ perspective: '1000px' }}>
+                      {nextMovies.map((movie, idx) => (
+                        <SwipeableCard
+                          key={`${movie.id}-${currentIndex}`}
+                          movie={movie}
+                          index={idx}
+                          isTop={idx === 0}
+                          onSwipe={idx === 0 ? handleSwipe : undefined}
+                        />
+                      ))}
+                    </div>
                   </div>
+
+                  {/* Reaction Emojis */}
+                  <div className="absolute bottom-16 left-0 right-0 p-4">
+                    <div className="max-w-md mx-auto">
+                      <div className="flex items-center justify-center gap-2">
+                        {['🔥', '😂', '😴', '🤯'].map(emoji => (
+                          <button
+                            key={emoji}
+                            onClick={() => handleReaction(emoji)}
+                            className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 flex items-center justify-center text-xl transition-all active:scale-95 border-2 border-white/30"
+                            aria-label={`React with ${emoji}`}
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {mode === 'details' && (
+                <div className="h-full">
+                  <FilmDetails
+                    movie={currentMovie}
+                    onBack={() => setMode('swipe')}
+                    onSwipe={handleSwipe}
+                    onAddToWatchlist={handleAddToWatchlist}
+                  />
                 </div>
-              </div>
-            </>
-          )}
+              )}
 
-          {mode === 'details' && (
-            <div className="h-full">
-              <FilmDetails
-                movie={currentMovie}
-                onBack={() => setMode('swipe')}
-                onSwipe={handleSwipe}
-                onAddToWatchlist={handleAddToWatchlist}
-              />
-            </div>
-          )}
-
-          {mode === 'shorts' && (
-            <div className="h-full">
-              <FilmShorts
-                movie={currentMovie}
-                onBack={() => setMode('swipe')}
-                onSwipe={handleSwipe}
-                onAddToWatchlist={handleAddToWatchlist}
-              />
-            </div>
-          )}
+              {mode === 'shorts' && (
+                <div className="h-full">
+                  <FilmShorts
+                    movie={currentMovie}
+                    onBack={() => setMode('swipe')}
+                    onSwipe={handleSwipe}
+                    onAddToWatchlist={handleAddToWatchlist}
+                  />
+                </div>
+              )}
+            </motion.div>
+          </AnimatePresence>
         </div>
 
-        {/* Mode Navigation Buttons */}
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 z-30">
-          <button
-            onClick={() => handleModeChange('prev')}
-            className="p-3 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-r-full transition-all border-r-2 border-t-2 border-b-2 border-white/30"
-            aria-label="Previous mode"
+        {/* Mode Switch Button - Camera Switch Style */}
+        <div className="absolute top-20 left-4 z-30">
+          <motion.button
+            onClick={handleModeToggle}
+            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.05 }}
+            className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-md border-2 border-white/30 flex items-center justify-center transition-all hover:bg-black/70 hover:border-white/50 shadow-lg"
+            aria-label="Switch media mode"
+            title={`Current: ${mode.charAt(0).toUpperCase() + mode.slice(1)}`}
           >
-            <FiChevronLeft className="w-6 h-6 text-white" />
-          </button>
-        </div>
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 z-30">
-          <button
-            onClick={() => handleModeChange('next')}
-            className="p-3 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-l-full transition-all border-l-2 border-t-2 border-b-2 border-white/30"
-            aria-label="Next mode"
-          >
-            <FiChevronRight className="w-6 h-6 text-white" />
-          </button>
+            <motion.div
+              key={mode}
+              initial={{ rotate: -180, opacity: 0 }}
+              animate={{ rotate: 0, opacity: 1 }}
+              exit={{ rotate: 180, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {(() => {
+                const Icon = modeIcons[mode]
+                return <Icon className="w-6 h-6 text-white" />
+              })()}
+            </motion.div>
+          </motion.button>
         </div>
       </div>
       <BottomNavigation />

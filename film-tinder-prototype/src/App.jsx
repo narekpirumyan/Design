@@ -5,7 +5,6 @@ import { MatchResultScreen } from './screens/MatchResult/MatchResultScreen'
 import { IndividualSwipeScreen } from './screens/IndividualSwipe/IndividualSwipeScreen'
 import { WatchlistScreen } from './screens/Watchlist/WatchlistScreen'
 import { ProfileScreen } from './screens/Profile/ProfileScreen'
-import { AnisScreen } from './screens/Anis/AnisScreen'
 
 function App() {
   return (
@@ -18,7 +17,6 @@ function App() {
         <Route path="/swipe" element={<IndividualSwipeScreen />} />
         <Route path="/watchlist" element={<WatchlistScreen />} />
         <Route path="/profile" element={<ProfileScreen />} />
-        <Route path="/anis" element={<AnisScreen />} />
       </Routes>
     </BrowserRouter>
   )

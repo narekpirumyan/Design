@@ -29,12 +29,20 @@ export function IndividualSwipeScreen() {
   const pressTimerRef = useRef(null)
   const swipeAreaRef = useRef(null)
 
+  // Reset mode to swipe on mount
+  useEffect(() => {
+    setMode('swipe')
+    setShowModeSelector(false)
+  }, [])
+
   // Press and hold detection
   useEffect(() => {
     const swipeArea = swipeAreaRef.current
-    if (!swipeArea) return
+    if (!swipeArea || showModeSelector) return // Don't attach if selector is already open
 
     const handleTouchStart = (e) => {
+      // Prevent card swipe during hold
+      e.preventDefault()
       pressTimerRef.current = setTimeout(() => {
         setShowModeSelector(true)
       }, 500) // 500ms hold
@@ -60,7 +68,7 @@ export function IndividualSwipeScreen() {
       }
     }
 
-    swipeArea.addEventListener('touchstart', handleTouchStart)
+    swipeArea.addEventListener('touchstart', handleTouchStart, { passive: false })
     swipeArea.addEventListener('touchend', handleTouchEnd)
     swipeArea.addEventListener('mousedown', handleMouseDown)
     swipeArea.addEventListener('mouseup', handleMouseUp)
@@ -74,9 +82,10 @@ export function IndividualSwipeScreen() {
       swipeArea.removeEventListener('mouseleave', handleMouseUp)
       if (pressTimerRef.current) {
         clearTimeout(pressTimerRef.current)
+        pressTimerRef.current = null
       }
     }
-  }, [])
+  }, [showModeSelector])
 
   const handleSwipe = (direction, movieId) => {
     if (mode === 'swipe') {
@@ -222,21 +231,25 @@ export function IndividualSwipeScreen() {
           )}
 
           {mode === 'details' && (
-            <FilmDetails
-              movie={currentMovie}
-              onBack={() => setMode('swipe')}
-              onSwipe={handleSwipe}
-              onAddToWatchlist={handleAddToWatchlist}
-            />
+            <div ref={swipeAreaRef} className="h-full">
+              <FilmDetails
+                movie={currentMovie}
+                onBack={() => setMode('swipe')}
+                onSwipe={handleSwipe}
+                onAddToWatchlist={handleAddToWatchlist}
+              />
+            </div>
           )}
 
           {mode === 'shorts' && (
-            <FilmShorts
-              movie={currentMovie}
-              onBack={() => setMode('swipe')}
-              onSwipe={handleSwipe}
-              onAddToWatchlist={handleAddToWatchlist}
-            />
+            <div ref={swipeAreaRef} className="h-full">
+              <FilmShorts
+                movie={currentMovie}
+                onBack={() => setMode('swipe')}
+                onSwipe={handleSwipe}
+                onAddToWatchlist={handleAddToWatchlist}
+              />
+            </div>
           )}
         </motion.div>
 

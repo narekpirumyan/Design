@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion'
 import { FiFilm, FiInfo, FiVideo } from 'react-icons/fi'
 
@@ -11,7 +11,13 @@ const modes = [
 export function ModeSelector({ currentMode, onModeChange, isVisible }) {
   const [rotation, setRotation] = useState(0)
   const dragX = useMotionValue(0)
-  const dragRotation = useTransform(dragX, [-200, 200], [-30, 30])
+  const dragOffset = useTransform(dragX, [-200, 200], [-30, 30])
+  
+  // Reset rotation when mode changes externally
+  useEffect(() => {
+    setRotation(0)
+    dragX.set(0)
+  }, [currentMode, dragX])
   
   if (!isVisible) return null
 
@@ -33,16 +39,24 @@ export function ModeSelector({ currentMode, onModeChange, isVisible }) {
     if (Math.abs(info.offset.x) > threshold || Math.abs(velocity) > 300) {
       const direction = info.offset.x > 0 ? -1 : 1 // Invert for natural rotation
       const newRotation = rotation + (direction * 120)
-      setRotation(newRotation)
       
       // Calculate which mode should be active based on rotation
       const totalRot = baseRotation + newRotation
       const normalizedRot = ((totalRot % 360) + 360) % 360
       const newModeIndex = Math.round(normalizedRot / 120) % 3
       const newMode = modes[newModeIndex]
+      
       if (newMode.id !== currentMode) {
         onModeChange(newMode.id)
+        // Reset rotation after mode change
+        setRotation(0)
+      } else {
+        // If same mode, just reset rotation
+        setRotation(0)
       }
+    } else {
+      // If drag wasn't enough, reset rotation
+      setRotation(0)
     }
     dragX.set(0)
   }
@@ -53,7 +67,7 @@ export function ModeSelector({ currentMode, onModeChange, isVisible }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="absolute inset-0 bg-black/80 z-50 flex flex-col"
+        className="absolute inset-0 bg-black/80 z-[60] flex flex-col"
         onClick={handleClose}
       >
         {/* Keep bottom navigation visible */}
@@ -62,10 +76,6 @@ export function ModeSelector({ currentMode, onModeChange, isVisible }) {
             {/* Cylinder Container */}
             <motion.div
               initial={{ scale: 1, rotateY: 0 }}
-              animate={{ 
-                scale: 0.6,
-                rotateY: totalRotation
-              }}
               exit={{ scale: 1, rotateY: 0 }}
               transition={{ type: 'spring', stiffness: 200, damping: 25 }}
               drag="x"
@@ -80,7 +90,8 @@ export function ModeSelector({ currentMode, onModeChange, isVisible }) {
                 width: '375px',
                 height: '600px',
                 transformStyle: 'preserve-3d',
-                rotateY: useTransform(dragX, [-200, 200], [totalRotation - 30, totalRotation + 30])
+                scale: 0.6,
+                rotateY: useTransform(dragOffset, (val) => totalRotation + val)
               }}
               onClick={(e) => e.stopPropagation()}
             >

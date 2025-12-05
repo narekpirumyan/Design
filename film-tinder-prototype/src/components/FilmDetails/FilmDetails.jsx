@@ -14,7 +14,7 @@ export function FilmDetails({ movie, onBack, onSwipe, onAddToWatchlist }) {
   const reviews = [
     { user: 'MovieFan123', rating: 5, comment: 'Mind-blowing! One of the best films ever made.' },
     { user: 'CinemaLover', rating: 5, comment: 'Nolan at his finest. The visuals are stunning.' },
-    { name: 'FilmCritic', rating: 4, comment: 'Complex plot but incredibly well executed.' }
+    { user: 'FilmCritic', rating: 4, comment: 'Complex plot but incredibly well executed.' }
   ]
 
   const comments = [

@@ -94,13 +94,13 @@ export function IndividualSwipeScreen() {
 
   return (
     <PhoneFrame>
-      <div className="h-full bg-background flex flex-col overflow-hidden relative">
+      <div className="h-full bg-gradient-to-br from-red-600 via-pink-500 to-red-700 flex flex-col overflow-hidden relative">
         {/* Approach Selector (for testing - remove in production) */}
         <div className="absolute top-2 right-2 z-50">
           <select
             value={selectedApproach}
             onChange={(e) => setSelectedApproach(Number(e.target.value))}
-            className="text-xs bg-surface/90 text-text-primary px-2 py-1 rounded border border-surface"
+            className="text-xs bg-white/90 text-gray-900 px-2 py-1 rounded border border-gray-300"
           >
             <option value={1}>Approach 1: Bottom Sheet</option>
             <option value={2}>Approach 2: Full Overlay</option>

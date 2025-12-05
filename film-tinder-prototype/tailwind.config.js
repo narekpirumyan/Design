@@ -7,14 +7,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: '#6366f1',
-        secondary: '#8b5cf6',
+        primary: '#ec4899',
+        secondary: '#f43f5e',
         accent: '#f59e0b',
         background: '#0f172a',
         surface: '#1e293b',
+        'gradient-start': '#dc2626',
+        'gradient-end': '#ec4899',
         text: {
-          primary: '#f1f5f9',
-          secondary: '#cbd5e1',
+          primary: '#1e293b',
+          secondary: '#64748b',
           muted: '#94a3b8'
         },
         success: '#10b981',

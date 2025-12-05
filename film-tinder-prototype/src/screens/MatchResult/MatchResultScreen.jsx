@@ -58,7 +58,7 @@ export function MatchResultScreen() {
 
   return (
     <PhoneFrame>
-      <div className="h-full bg-background overflow-y-auto">
+      <div className="h-full bg-gradient-to-br from-red-600 via-pink-500 to-red-700 overflow-y-auto">
         {/* Header */}
         <div className="p-4">
         <button

@@ -30,25 +30,25 @@ export function CreateJoinRoomScreen() {
 
   return (
     <PhoneFrame>
-      <div className="h-full bg-background flex flex-col items-center justify-center p-6 overflow-y-auto">
+      <div className="h-full bg-gradient-to-br from-red-600 via-pink-500 to-red-700 flex flex-col items-center justify-center p-6 overflow-y-auto">
         <div className="w-full max-w-md space-y-8">
         {/* Header */}
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold text-text-primary">Film Tinder</h1>
-          <p className="text-text-secondary text-lg">
+          <h1 className="text-4xl font-bold text-white">Film Tinder</h1>
+          <p className="text-white/90 text-lg">
             Find movies your whole group will love
           </p>
         </div>
 
         {/* Create Room Card */}
-        <div className="bg-surface rounded-2xl p-8 space-y-6 border border-surface">
+        <div className="bg-white rounded-2xl p-8 space-y-6 shadow-xl">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
               <FiUsers className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-text-primary">Create Room</h2>
-              <p className="text-sm text-text-secondary">Start a new movie selection session</p>
+              <h2 className="text-xl font-semibold text-gray-900">Create Room</h2>
+              <p className="text-sm text-gray-600">Start a new movie selection session</p>
             </div>
           </div>
           <Button 
@@ -62,20 +62,20 @@ export function CreateJoinRoomScreen() {
 
         {/* Divider */}
         <div className="flex items-center gap-4">
-          <div className="flex-1 h-px bg-surface"></div>
-          <span className="text-text-muted text-sm">OR</span>
-          <div className="flex-1 h-px bg-surface"></div>
+          <div className="flex-1 h-px bg-white/30"></div>
+          <span className="text-white/80 text-sm">OR</span>
+          <div className="flex-1 h-px bg-white/30"></div>
         </div>
 
         {/* Join Room Card */}
-        <div className="bg-surface rounded-2xl p-8 space-y-6 border border-surface">
+        <div className="bg-white rounded-2xl p-8 space-y-6 shadow-xl">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-secondary/20 flex items-center justify-center">
-              <FiLogIn className="w-6 h-6 text-secondary" />
+            <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center">
+              <FiLogIn className="w-6 h-6 text-pink-600" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-text-primary">Join Room</h2>
-              <p className="text-sm text-text-secondary">Enter a room code to join friends</p>
+              <h2 className="text-xl font-semibold text-gray-900">Join Room</h2>
+              <p className="text-sm text-gray-600">Enter a room code to join friends</p>
             </div>
           </div>
           
@@ -88,11 +88,11 @@ export function CreateJoinRoomScreen() {
                 setError('')
               }}
               placeholder="Enter 6-digit code"
-              className="w-full px-4 py-3 bg-background border border-surface rounded-lg text-text-primary placeholder-text-muted focus:outline-none focus:border-primary transition-colors font-mono text-center text-xl tracking-widest"
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:border-pink-500 transition-colors font-mono text-center text-xl tracking-widest"
               maxLength={6}
             />
             {error && (
-              <p className="text-error text-sm">{error}</p>
+              <p className="text-red-600 text-sm">{error}</p>
             )}
           </div>
 
@@ -107,7 +107,7 @@ export function CreateJoinRoomScreen() {
         </div>
 
         {/* Info */}
-        <p className="text-center text-text-muted text-sm">
+        <p className="text-center text-white/80 text-sm">
           Swipe right to like, left to pass. Find movies everyone loves!
         </p>
 

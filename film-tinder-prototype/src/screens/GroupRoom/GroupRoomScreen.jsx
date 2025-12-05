@@ -73,7 +73,7 @@ export function GroupRoomScreen() {
 
   return (
     <PhoneFrame>
-      <div className="h-full bg-background flex flex-col overflow-hidden relative">
+      <div className="h-full bg-gradient-to-br from-red-600 via-pink-500 to-red-700 flex flex-col overflow-hidden relative">
         {/* Header */}
         <div className="p-4 space-y-3">
           <div className="flex items-center justify-between">

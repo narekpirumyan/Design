@@ -11,16 +11,23 @@ export function CreateRoomModal({ isOpen, onClose }) {
   const [error, setError] = useState('')
 
   const handleCreateRoom = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
+    if (e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
     const newRoomCode = generateRoomCode()
-    navigate(`/room/${newRoomCode}`)
     onClose()
+    // Small delay to ensure modal closes before navigation
+    setTimeout(() => {
+      navigate(`/room/${newRoomCode}`)
+    }, 100)
   }
 
   const handleJoinRoom = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
+    if (e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
     const trimmedCode = roomCode.trim().toUpperCase()
     
     if (trimmedCode.length !== 6) {
@@ -29,8 +36,11 @@ export function CreateRoomModal({ isOpen, onClose }) {
     }
 
     setError('')
-    navigate(`/room/${trimmedCode}`)
     onClose()
+    // Small delay to ensure modal closes before navigation
+    setTimeout(() => {
+      navigate(`/room/${trimmedCode}`)
+    }, 100)
   }
 
   return (

@@ -1,15 +1,43 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PhoneFrame } from '../../components/PhoneFrame/PhoneFrame'
 import { BottomNavigation } from '../../components/BottomNavigation/BottomNavigation'
 import { mockGroups } from '../../data/mockGroups'
 import { mockParticipants } from '../../utils/mockGroupState'
-import { motion } from 'framer-motion'
+import { motion, useMotionValue, useTransform } from 'framer-motion'
 import { FiUsers, FiUser, FiMoreVertical, FiPlus } from 'react-icons/fi'
 
 export function GroupsScreen() {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('groupes') // 'amis' or 'groupes'
+  const swipeAreaRef = useRef(null)
+  const dragX = useMotionValue(0)
+  const startX = useRef(0)
+  const startY = useRef(0)
+  
+  // Handle swipe gesture for tab switching
+  const handleDragStart = (event, info) => {
+    startX.current = info.point.x
+    startY.current = info.point.y
+  }
+  
+  const handleDragEnd = (event, info) => {
+    const deltaX = info.point.x - startX.current
+    const deltaY = Math.abs(info.point.y - startY.current)
+    const threshold = 50 // Minimum drag distance to switch tabs
+    
+    // Only switch if horizontal movement is greater than vertical (horizontal swipe)
+    if (Math.abs(deltaX) > threshold && Math.abs(deltaX) > deltaY) {
+      if (deltaX > 0 && activeTab === 'amis') {
+        // Swipe right: switch to groupes
+        setActiveTab('groupes')
+      } else if (deltaX < 0 && activeTab === 'groupes') {
+        // Swipe left: switch to amis
+        setActiveTab('amis')
+      }
+    }
+    dragX.set(0)
+  }
 
   // Mock friends data
   const mockFriends = [
@@ -46,6 +74,23 @@ export function GroupsScreen() {
   return (
     <PhoneFrame>
       <div className="h-full bg-gradient-to-br from-red-600 via-pink-500 to-red-700 overflow-y-auto pb-20 relative">
+        <motion.div 
+          ref={swipeAreaRef}
+          className="h-full"
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.2}
+          dragDirectionLock
+          onDragStart={handleDragStart}
+          onDrag={(event, info) => {
+            // Only track horizontal drags if they're more horizontal than vertical
+            if (Math.abs(info.offset.x) > Math.abs(info.offset.y)) {
+              dragX.set(info.offset.x)
+            }
+          }}
+          onDragEnd={handleDragEnd}
+          style={{ x: useTransform(dragX, (val) => val) }}
+        >
         {/* Header */}
         <div className="px-6 pt-12 pb-4">
           <h1 className="text-3xl font-bold text-white">On partage le pop corn avec qui?</h1>
@@ -87,7 +132,11 @@ export function GroupsScreen() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.05 }}
-                  onClick={() => navigate(`/room/${group.id}`)}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    navigate(`/room/${group.id}`)
+                  }}
                   className="bg-white rounded-xl p-4 flex items-center gap-4 cursor-pointer hover:shadow-lg transition-shadow"
                 >
                   <div
@@ -182,6 +231,7 @@ export function GroupsScreen() {
             </div>
           )}
         </div>
+        </motion.div>
       </div>
       <BottomNavigation />
     </PhoneFrame>

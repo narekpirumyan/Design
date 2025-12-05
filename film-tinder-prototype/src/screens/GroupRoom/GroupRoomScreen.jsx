@@ -29,6 +29,8 @@ export function GroupRoomScreen() {
 
   const modes = ['swipe', 'details', 'shorts']
   const currentModeIndex = modes.indexOf(mode)
+  const nextModeIndex = (currentModeIndex + 1) % modes.length
+  const nextMode = modes[nextModeIndex]
 
   const modeIcons = {
     swipe: FiFilm,
@@ -37,8 +39,7 @@ export function GroupRoomScreen() {
   }
 
   const handleModeToggle = () => {
-    const nextIndex = (currentModeIndex + 1) % modes.length
-    setMode(modes[nextIndex])
+    setMode(nextMode)
   }
 
   const handleSwipe = (direction, movieId) => {
@@ -227,18 +228,18 @@ export function GroupRoomScreen() {
             whileTap={{ scale: 0.9 }}
             whileHover={{ scale: 1.05 }}
             className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-md border-2 border-white/30 flex items-center justify-center transition-all hover:bg-black/70 hover:border-white/50 shadow-lg"
-            aria-label="Switch media mode"
-            title={`Current: ${mode.charAt(0).toUpperCase() + mode.slice(1)}`}
+            aria-label={`Switch to ${nextMode} mode`}
+            title={`Switch to ${nextMode.charAt(0).toUpperCase() + nextMode.slice(1)}`}
           >
             <motion.div
-              key={mode}
+              key={nextMode}
               initial={{ rotate: -180, opacity: 0 }}
               animate={{ rotate: 0, opacity: 1 }}
               exit={{ rotate: 180, opacity: 0 }}
               transition={{ duration: 0.3 }}
             >
               {(() => {
-                const Icon = modeIcons[mode]
+                const Icon = modeIcons[nextMode]
                 return <Icon className="w-6 h-6 text-white" />
               })()}
             </motion.div>

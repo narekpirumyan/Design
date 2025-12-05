@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { FiFilm, FiUsers, FiPlus, FiList, FiUser } from 'react-icons/fi'
+import { FiFilm, FiUsers, FiPlus, FiList, FiUser, FiStar } from 'react-icons/fi'
 import { motion, AnimatePresence } from 'framer-motion'
 import { CreateRoomModal } from '../CreateRoomModal/CreateRoomModal'
 
@@ -45,6 +45,14 @@ export function BottomNavigation() {
       label: 'Profile',
       path: '/profile',
       active: location.pathname === '/profile'
+    },
+    {
+      id: 'anis',
+      icon: FiStar,
+      label: 'ANIS',
+      path: '/anis',
+      active: location.pathname === '/anis',
+      hasPulse: true
     }
   ]
 
@@ -92,12 +100,41 @@ export function BottomNavigation() {
                     />
                   )}
 
+                  {/* Pulsation animation for ANIS */}
+                  {item.hasPulse && !isActive && (
+                    <motion.div
+                      className="absolute inset-0 rounded-xl bg-yellow-400/30"
+                      animate={{
+                        scale: [1, 1.2, 1],
+                        opacity: [0.5, 0.8, 0.5],
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                    />
+                  )}
+
                   {/* Icon */}
                   <div className="relative z-10">
                     {item.isAction ? (
                       <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-red-500 flex items-center justify-center shadow-lg">
                         <Icon className="w-6 h-6 text-white" />
                       </div>
+                    ) : item.hasPulse ? (
+                      <motion.div
+                        animate={{
+                          scale: [1, 1.15, 1],
+                        }}
+                        transition={{
+                          duration: 1.5,
+                          repeat: Infinity,
+                          ease: "easeInOut"
+                        }}
+                      >
+                        <Icon className={`w-6 h-6 ${isActive ? 'text-white' : 'text-yellow-300'}`} />
+                      </motion.div>
                     ) : (
                       <Icon className={`w-6 h-6 ${isActive ? 'text-white' : 'text-white/70'}`} />
                     )}
@@ -105,7 +142,7 @@ export function BottomNavigation() {
 
                   {/* Label */}
                   {!item.isAction && (
-                    <span className={`text-xs relative z-10 ${isActive ? 'text-white font-medium' : 'text-white/60'}`}>
+                    <span className={`text-xs relative z-10 ${isActive ? 'text-white font-medium' : item.hasPulse ? 'text-yellow-300 font-semibold' : 'text-white/60'}`}>
                       {item.label}
                     </span>
                   )}

@@ -2,7 +2,7 @@ import { VibeTag } from '../VibeTag/VibeTag'
 
 export function MovieCard({ movie, className = '' }) {
   return (
-    <div className={`relative w-full h-full rounded-2xl overflow-hidden ${className}`}>
+    <div className={`relative w-full h-full rounded-3xl overflow-hidden ${className}`}>
       <img
         src={movie.poster}
         alt={movie.title}
@@ -12,7 +12,7 @@ export function MovieCard({ movie, className = '' }) {
         }}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
-      <div className="absolute bottom-0 left-0 right-0 p-6">
+      <div className="absolute bottom-0 left-0 right-0 p-4 pb-6">
         <h2 className="text-2xl font-bold text-white mb-2">
           {movie.title}
           <span className="text-lg text-text-secondary ml-2">({movie.year})</span>

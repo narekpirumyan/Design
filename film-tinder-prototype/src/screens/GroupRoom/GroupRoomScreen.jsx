@@ -178,64 +178,77 @@ export function GroupRoomScreen() {
           </div>
         </div>
 
-        {/* Mode-based Content */}
-        {mode === 'swipe' && (
-          <>
-            {/* Swipe Area */}
-            <div 
-              ref={swipeAreaRef}
-              className="flex-1 relative max-w-md mx-auto w-full px-4 pb-24"
-            >
-              <div className="relative w-full" style={{ height: '600px', perspective: '1000px' }}>
-                {nextMovies.map((movie, idx) => (
-                  <SwipeableCard
-                    key={`${movie.id}-${currentIndex}`}
-                    movie={movie}
-                    index={idx}
-                    isTop={idx === 0}
-                    onSwipe={idx === 0 ? handleSwipe : undefined}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Reaction Emojis */}
-            <div className="absolute bottom-16 left-0 right-0 p-4">
-              <div className="max-w-md mx-auto">
-                <div className="flex items-center justify-center gap-2">
-                  {['🔥', '😂', '😴', '🤯'].map(emoji => (
-                    <button
-                      key={emoji}
-                      onClick={() => handleReaction(emoji)}
-                      className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 flex items-center justify-center text-xl transition-all active:scale-95 border-2 border-white/30"
-                      aria-label={`React with ${emoji}`}
-                    >
-                      {emoji}
-                    </button>
+        {/* Mode-based Content with Zoom Animation */}
+        <motion.div
+          animate={{
+            scale: showModeSelector ? 0.6 : 1,
+            opacity: showModeSelector ? 0.3 : 1
+          }}
+          transition={{ type: 'spring', stiffness: 200, damping: 25 }}
+          className="absolute inset-0"
+          style={{ 
+            transformOrigin: 'center center',
+            pointerEvents: showModeSelector ? 'none' : 'auto'
+          }}
+        >
+          {mode === 'swipe' && (
+            <>
+              {/* Swipe Area */}
+              <div 
+                ref={swipeAreaRef}
+                className="flex-1 relative w-full pb-20 h-full"
+              >
+                <div className="relative w-full h-full" style={{ perspective: '1000px' }}>
+                  {nextMovies.map((movie, idx) => (
+                    <SwipeableCard
+                      key={`${movie.id}-${currentIndex}`}
+                      movie={movie}
+                      index={idx}
+                      isTop={idx === 0}
+                      onSwipe={idx === 0 ? handleSwipe : undefined}
+                    />
                   ))}
                 </div>
               </div>
-            </div>
-          </>
-        )}
 
-        {mode === 'details' && (
-          <FilmDetails
-            movie={currentMovie}
-            onBack={() => setMode('swipe')}
-            onSwipe={handleSwipe}
-            onAddToWatchlist={handleAddToWatchlist}
-          />
-        )}
+              {/* Reaction Emojis */}
+              <div className="absolute bottom-16 left-0 right-0 p-4">
+                <div className="max-w-md mx-auto">
+                  <div className="flex items-center justify-center gap-2">
+                    {['🔥', '😂', '😴', '🤯'].map(emoji => (
+                      <button
+                        key={emoji}
+                        onClick={() => handleReaction(emoji)}
+                        className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 flex items-center justify-center text-xl transition-all active:scale-95 border-2 border-white/30"
+                        aria-label={`React with ${emoji}`}
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
 
-        {mode === 'shorts' && (
-          <FilmShorts
-            movie={currentMovie}
-            onBack={() => setMode('swipe')}
-            onSwipe={handleSwipe}
-            onAddToWatchlist={handleAddToWatchlist}
-          />
-        )}
+          {mode === 'details' && (
+            <FilmDetails
+              movie={currentMovie}
+              onBack={() => setMode('swipe')}
+              onSwipe={handleSwipe}
+              onAddToWatchlist={handleAddToWatchlist}
+            />
+          )}
+
+          {mode === 'shorts' && (
+            <FilmShorts
+              movie={currentMovie}
+              onBack={() => setMode('swipe')}
+              onSwipe={handleSwipe}
+              onAddToWatchlist={handleAddToWatchlist}
+            />
+          )}
+        </motion.div>
 
         {/* Mode Selector */}
         {showModeSelector && (

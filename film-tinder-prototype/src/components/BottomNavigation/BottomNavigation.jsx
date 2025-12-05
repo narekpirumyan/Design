@@ -1,10 +1,13 @@
+import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { FiFilm, FiUsers, FiPlus, FiList, FiUser } from 'react-icons/fi'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
+import { CreateRoomModal } from '../CreateRoomModal/CreateRoomModal'
 
 export function BottomNavigation() {
   const navigate = useNavigate()
   const location = useLocation()
+  const [showCreateModal, setShowCreateModal] = useState(false)
 
   const navItems = [
     {
@@ -18,8 +21,8 @@ export function BottomNavigation() {
       id: 'groups',
       icon: FiUsers,
       label: 'Groups',
-      path: '/',
-      active: location.pathname === '/' || location.pathname.startsWith('/room') || location.pathname.startsWith('/match')
+      path: '/groups',
+      active: location.pathname === '/groups' || location.pathname.startsWith('/room') || location.pathname.startsWith('/match')
     },
     {
       id: 'create',
@@ -47,8 +50,8 @@ export function BottomNavigation() {
 
   const handleNavClick = (item) => {
     if (item.isAction) {
-      // For create button, navigate to home to create/join room
-      navigate('/')
+      // Open create room modal
+      setShowCreateModal(true)
     } else {
       navigate(item.path)
     }
@@ -104,6 +107,11 @@ export function BottomNavigation() {
           })}
         </div>
       </div>
+      <AnimatePresence>
+        {showCreateModal && (
+          <CreateRoomModal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} />
+        )}
+      </AnimatePresence>
     </div>
   )
 }

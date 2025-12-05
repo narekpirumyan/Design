@@ -207,7 +207,8 @@ export function IndividualSwipeScreen() {
                 />
               </div>
             )}
-          </motion.div>
+            </motion.div>
+          </AnimatePresence>
         </div>
 
         {/* Mode Switch Button - Camera Switch Style */}

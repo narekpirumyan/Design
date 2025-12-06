@@ -261,7 +261,7 @@ export function TutorialGuide({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="absolute inset-0"
+        className="absolute inset-0 pointer-events-auto"
         style={{ 
           position: 'absolute',
           top: 0,
@@ -270,8 +270,7 @@ export function TutorialGuide({
           bottom: 0,
           width: '100%',
           height: '100%',
-          zIndex: 1000,
-          pointerEvents: 'auto' // Block all interactions
+          zIndex: 1000
         }}
         onClick={(e) => {
           // Prevent clicks from going through to underlying content
@@ -280,8 +279,7 @@ export function TutorialGuide({
         }}
       >
         <div 
-          className="absolute inset-0 bg-black/70"
-          style={{ pointerEvents: 'auto' }}
+          className="absolute inset-0 bg-black/70 pointer-events-auto"
           onClick={(e) => {
             // Block all clicks on the overlay
             e.preventDefault()

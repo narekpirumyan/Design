@@ -48,11 +48,16 @@ export function TutorialGuide({
     if (!isActive || steps.length === 0) {
       // Restore body scroll when tutorial is inactive
       document.body.style.overflow = ''
+      document.documentElement.style.overflow = ''
       return
     }
 
-    // Don't disable body scroll - let the phone frame handle scrolling
-    // document.body.style.overflow = 'hidden'
+    // Prevent page-level scrolling when tutorial is active
+    // This prevents the phone frame from scrolling out of view
+    const originalBodyOverflow = document.body.style.overflow
+    const originalHtmlOverflow = document.documentElement.style.overflow
+    document.body.style.overflow = 'hidden'
+    document.documentElement.style.overflow = 'hidden'
 
     // Reset to first step when tutorial becomes active
     setCurrentStep(0)
@@ -71,8 +76,9 @@ export function TutorialGuide({
     setTimeout(updateHighlightPosition, 100)
 
     return () => {
-      // Restore body scroll when tutorial is inactive
-      document.body.style.overflow = ''
+      // Restore original overflow styles
+      document.body.style.overflow = originalBodyOverflow
+      document.documentElement.style.overflow = originalHtmlOverflow
       if (updatePositionRef.current) {
         window.removeEventListener('scroll', updatePositionRef.current, true)
         window.removeEventListener('resize', updatePositionRef.current)
@@ -117,11 +123,47 @@ export function TutorialGuide({
 
     if (element) {
       setHighlightedElement(element)
-      // Scroll element into view if needed
+      // Update position immediately without scrolling the page
       setTimeout(() => {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        // Update position after scroll
-        setTimeout(updateHighlightPosition, 300)
+        updateHighlightPosition()
+        // Only scroll within the phone frame container, not the entire page
+        const phoneFrame = document.querySelector('.phone-screen-content') || 
+                          element.closest('[class*="overflow"]')
+        if (phoneFrame) {
+          const elementRect = element.getBoundingClientRect()
+          const containerRect = phoneFrame.getBoundingClientRect()
+          
+          // Check if element is visible within container
+          const isVisible = (
+            elementRect.top >= containerRect.top &&
+            elementRect.bottom <= containerRect.bottom &&
+            elementRect.left >= containerRect.left &&
+            elementRect.right <= containerRect.right
+          )
+          
+          // Only scroll if element is not fully visible
+          if (!isVisible) {
+            const scrollTop = phoneFrame.scrollTop
+            const elementTop = element.offsetTop
+            const elementHeight = element.offsetHeight
+            const containerHeight = phoneFrame.clientHeight
+            
+            // Calculate scroll position to center element
+            const targetScroll = elementTop - (containerHeight / 2) + (elementHeight / 2)
+            
+            phoneFrame.scrollTo({
+              top: targetScroll,
+              behavior: 'smooth'
+            })
+            
+            // Update position after scroll
+            setTimeout(updateHighlightPosition, 300)
+          } else {
+            updateHighlightPosition()
+          }
+        } else {
+          updateHighlightPosition()
+        }
       }, 100)
     } else {
       setHighlightedElement(null)
@@ -167,10 +209,6 @@ export function TutorialGuide({
     setHighlightedElement(null)
     setHighlightPosition(null)
     onSkip?.(sectionId)
-  }
-
-  if (!isActive || steps.length === 0 || currentStep >= steps.length) {
-    return null
   }
 
   const step = steps[currentStep]
@@ -245,24 +283,24 @@ export function TutorialGuide({
   }, [highlightedElement, currentStep])
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="absolute inset-0 pointer-events-none"
-        style={{ 
-          overflow: 'hidden',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          width: '100%',
-          height: '100%',
-          zIndex: 1000
-        }}
-      >
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="absolute inset-0 pointer-events-none"
+      style={{ 
+        overflow: 'hidden',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: '100%',
+        height: '100%',
+        zIndex: 1000,
+        contain: 'layout style paint'
+      }}
+    >
         {/* Overlay with cutout for highlighted element */}
         <div className="absolute inset-0 bg-black/70">
           {highlightedElement && highlightPosition && (
@@ -367,7 +405,6 @@ export function TutorialGuide({
           </div>
         </motion.div>
       </motion.div>
-    </AnimatePresence>
   )
 }
 

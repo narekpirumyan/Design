@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { LoginScreen } from './screens/Login/LoginScreen'
 import { PreferencesScreen } from './screens/Preferences/PreferencesScreen'
@@ -11,6 +11,31 @@ import { ProfileScreen } from './screens/Profile/ProfileScreen'
 
 // Protected Route Component
 function ProtectedRoute({ children }) {
+  const { user, isFirstConnection, loading } = useAuth()
+  const location = useLocation()
+
+  if (loading) {
+    return (
+      <div className="h-screen w-screen bg-gradient-to-br from-red-600 via-pink-500 to-red-700 flex items-center justify-center">
+        <div className="text-white text-xl">Loading...</div>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />
+  }
+
+  // Only redirect to preferences if NOT already on preferences route
+  if (isFirstConnection && location.pathname !== '/preferences') {
+    return <Navigate to="/preferences" replace />
+  }
+
+  return children
+}
+
+// Preferences Route Component (allows access when isFirstConnection is true)
+function PreferencesRoute({ children }) {
   const { user, isFirstConnection, loading } = useAuth()
 
   if (loading) {
@@ -25,8 +50,9 @@ function ProtectedRoute({ children }) {
     return <Navigate to="/login" replace />
   }
 
-  if (isFirstConnection) {
-    return <Navigate to="/preferences" replace />
+  // Allow access if first connection, otherwise redirect to groups
+  if (!isFirstConnection) {
+    return <Navigate to="/groups" replace />
   }
 
   return children
@@ -68,9 +94,9 @@ function AppRoutes() {
       <Route 
         path="/preferences" 
         element={
-          <ProtectedRoute>
+          <PreferencesRoute>
             <PreferencesScreen />
-          </ProtectedRoute>
+          </PreferencesRoute>
         } 
       />
 

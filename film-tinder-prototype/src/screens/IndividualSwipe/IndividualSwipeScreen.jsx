@@ -35,7 +35,13 @@ export function IndividualSwipeScreen() {
     // Load saved mood from sessionStorage first
     const savedMood = sessionStorage.getItem('currentMood')
     if (savedMood) {
-      setSelectedMood(JSON.parse(savedMood))
+      try {
+        const parsedMood = JSON.parse(savedMood)
+        setSelectedMood(parsedMood)
+      } catch (e) {
+        // If parsing fails, clear it
+        sessionStorage.removeItem('currentMood')
+      }
     }
     // Always show mood selection modal when entering this screen
     // Small delay to ensure smooth transition

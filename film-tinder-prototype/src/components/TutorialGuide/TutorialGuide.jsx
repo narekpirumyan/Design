@@ -256,30 +256,33 @@ export function TutorialGuide({
     const padding = 20
 
     // Try to position tooltip below first (most common case)
-    if (spaceBelow >= 180) {
+    if (spaceBelow >= 150) {
       const top = relativeTop + elementHeight + 20
       let left = relativeLeft + elementWidth / 2 - tooltipWidth / 2
       // Ensure tooltip doesn't go outside bounds
       left = Math.max(padding, Math.min(left, frameWidth - tooltipWidth - padding))
+      // Calculate available height, ensuring tooltip fits
+      const availableHeight = Math.max(200, spaceBelow - 40)
       return {
         top: `${top}px`,
         left: `${left}px`,
         maxWidth: `${Math.min(340, frameWidth - padding * 2)}px`,
-        maxHeight: `${Math.min(400, spaceBelow - 30)}px`,
-        overflowY: 'auto'
+        maxHeight: `${availableHeight}px`,
+        overflowY: availableHeight < 300 ? 'auto' : 'visible'
       }
     }
     // Try above
-    else if (spaceAbove >= 180) {
+    else if (spaceAbove >= 150) {
       const bottom = frameHeight - relativeTop + 20
       let left = relativeLeft + elementWidth / 2 - tooltipWidth / 2
       left = Math.max(padding, Math.min(left, frameWidth - tooltipWidth - padding))
+      const availableHeight = Math.max(200, spaceAbove - 40)
       return {
         bottom: `${bottom}px`,
         left: `${left}px`,
         maxWidth: `${Math.min(340, frameWidth - padding * 2)}px`,
-        maxHeight: `${Math.min(400, spaceAbove - 30)}px`,
-        overflowY: 'auto'
+        maxHeight: `${availableHeight}px`,
+        overflowY: availableHeight < 300 ? 'auto' : 'visible'
       }
     }
     // Try to the right
@@ -310,13 +313,14 @@ export function TutorialGuide({
     }
     // Fallback: center with constraints - always visible
     else {
+      const centerMaxHeight = frameHeight - padding * 2
       return {
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
         maxWidth: `${frameWidth - padding * 2}px`,
-        maxHeight: `${frameHeight - padding * 2}px`,
-        overflowY: 'auto'
+        maxHeight: `${centerMaxHeight}px`,
+        overflowY: centerMaxHeight < 400 ? 'auto' : 'visible'
       }
     }
   }
@@ -431,7 +435,10 @@ export function TutorialGuide({
             overflowY: tooltipStyle.overflowY || 'auto',
             overflowX: 'hidden',
             zIndex: 10001,
-            boxSizing: 'border-box'
+            boxSizing: 'border-box',
+            // Ensure tooltip is never clipped
+            willChange: 'transform',
+            contain: 'none'
           }}
         >
           {/* Progress Indicator */}

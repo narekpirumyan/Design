@@ -261,13 +261,13 @@ export function TutorialGuide({
         </div>
       </motion.div>
 
-      {/* Tutorial Guide Bottom Sheet - rendered outside phone frame via fixed positioning */}
+      {/* Tutorial Guide Bottom Sheet - positioned absolutely within phone frame */}
       <motion.div
         initial={{ y: '100%' }}
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-        className="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl z-[10001] max-h-[65vh] overflow-hidden shadow-2xl pointer-events-auto"
+        className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl z-[10001] max-h-[60%] overflow-hidden shadow-2xl pointer-events-auto"
         style={{
           boxShadow: '0 -10px 40px rgba(0, 0, 0, 0.3)'
         }}
@@ -278,7 +278,7 @@ export function TutorialGuide({
         </div>
 
         {/* Scrollable Content */}
-        <div className="overflow-y-auto max-h-[calc(65vh-140px)] px-6 pb-6">
+        <div className="overflow-y-auto max-h-[calc(60%-140px)] px-6 pb-6">
           {/* Progress Indicator */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex-1">

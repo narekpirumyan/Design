@@ -216,117 +216,6 @@ export function TutorialGuide({
   const isFirst = currentStep === 0
   const isLast = currentStep === steps.length - 1
 
-  // Get position for tooltip relative to phone frame
-  const getTooltipPosition = () => {
-    if (!highlightedElement || !highlightPosition) {
-      return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)', maxWidth: '90%', maxHeight: '80%' }
-    }
-
-    // Get phone frame for relative positioning
-    const phoneFrame = document.querySelector('[class*="relative"][class*="w-[375px]"]') || 
-                       document.querySelector('.relative.w-\\[375px\\]') ||
-                       highlightedElement.closest('[class*="h-full"]')
-    
-    const frameRect = phoneFrame?.getBoundingClientRect() || { top: 0, left: 0, width: 375, height: 812 }
-    const frameHeight = frameRect.height || 812
-    const frameWidth = frameRect.width || 375
-
-    // Get actual tooltip dimensions if available, otherwise use estimates
-    let tooltipWidth = 320
-    let tooltipHeight = 250
-    if (tooltipRef.current) {
-      const tooltipRect = tooltipRef.current.getBoundingClientRect()
-      tooltipWidth = tooltipRect.width || 320
-      tooltipHeight = tooltipRect.height || 250
-    }
-
-    // Calculate relative positions
-    const relativeTop = highlightPosition.top + 8
-    const relativeLeft = highlightPosition.left + 8
-    const elementHeight = highlightPosition.height - 16
-    const elementWidth = highlightPosition.width - 16
-
-    // Determine available space
-    const spaceBelow = frameHeight - (relativeTop + elementHeight)
-    const spaceAbove = relativeTop
-    const spaceRight = frameWidth - (relativeLeft + elementWidth)
-    const spaceLeft = relativeLeft
-
-    // Calculate positions with padding to ensure tooltip stays within bounds
-    const padding = 20
-
-    // Try to position tooltip below first (most common case)
-    if (spaceBelow >= 150) {
-      const top = relativeTop + elementHeight + 20
-      let left = relativeLeft + elementWidth / 2 - tooltipWidth / 2
-      // Ensure tooltip doesn't go outside bounds
-      left = Math.max(padding, Math.min(left, frameWidth - tooltipWidth - padding))
-      // Calculate available height, ensuring tooltip fits
-      const availableHeight = Math.max(200, spaceBelow - 40)
-      return {
-        top: `${top}px`,
-        left: `${left}px`,
-        maxWidth: `${Math.min(340, frameWidth - padding * 2)}px`,
-        maxHeight: `${availableHeight}px`,
-        overflowY: availableHeight < 300 ? 'auto' : 'visible'
-      }
-    }
-    // Try above
-    else if (spaceAbove >= 150) {
-      const bottom = frameHeight - relativeTop + 20
-      let left = relativeLeft + elementWidth / 2 - tooltipWidth / 2
-      left = Math.max(padding, Math.min(left, frameWidth - tooltipWidth - padding))
-      const availableHeight = Math.max(200, spaceAbove - 40)
-      return {
-        bottom: `${bottom}px`,
-        left: `${left}px`,
-        maxWidth: `${Math.min(340, frameWidth - padding * 2)}px`,
-        maxHeight: `${availableHeight}px`,
-        overflowY: availableHeight < 300 ? 'auto' : 'visible'
-      }
-    }
-    // Try to the right
-    else if (spaceRight >= 340) {
-      let top = relativeTop + elementHeight / 2 - tooltipHeight / 2
-      top = Math.max(padding, Math.min(top, frameHeight - tooltipHeight - padding))
-      const left = relativeLeft + elementWidth + 20
-      return {
-        top: `${top}px`,
-        left: `${left}px`,
-        maxWidth: `${Math.min(340, spaceRight - 40)}px`,
-        maxHeight: `${Math.min(400, frameHeight - padding * 2)}px`,
-        overflowY: 'auto'
-      }
-    }
-    // Try to the left
-    else if (spaceLeft >= 340) {
-      let top = relativeTop + elementHeight / 2 - tooltipHeight / 2
-      top = Math.max(padding, Math.min(top, frameHeight - tooltipHeight - padding))
-      const right = frameWidth - relativeLeft + 20
-      return {
-        top: `${top}px`,
-        right: `${right}px`,
-        maxWidth: `${Math.min(340, spaceLeft - 40)}px`,
-        maxHeight: `${Math.min(400, frameHeight - padding * 2)}px`,
-        overflowY: 'auto'
-      }
-    }
-    // Fallback: center with constraints - always visible
-    else {
-      const centerMaxHeight = frameHeight - padding * 2
-      return {
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        maxWidth: `${frameWidth - padding * 2}px`,
-        maxHeight: `${centerMaxHeight}px`,
-        overflowY: centerMaxHeight < 400 ? 'auto' : 'visible'
-      }
-    }
-  }
-
-  const tooltipStyle = getTooltipPosition()
-
   // Update position when highlight changes
   useEffect(() => {
     if (highlightedElement) {
@@ -334,73 +223,25 @@ export function TutorialGuide({
     }
   }, [highlightedElement, currentStep])
 
-  // Recalculate tooltip position after it renders to ensure it's fully visible
-  useEffect(() => {
-    if (tooltipRef.current && highlightedElement) {
-      const tooltip = tooltipRef.current
-      const phoneFrame = document.querySelector('.phone-screen-content')
-      
-      if (phoneFrame) {
-        const tooltipRect = tooltip.getBoundingClientRect()
-        const frameRect = phoneFrame.getBoundingClientRect()
-        
-        // Check if tooltip is outside bounds and adjust
-        const tooltipStyle = window.getComputedStyle(tooltip)
-        const currentTop = parseFloat(tooltipStyle.top) || 0
-        const currentLeft = parseFloat(tooltipStyle.left) || 0
-        
-        let newTop = currentTop
-        let newLeft = currentLeft
-        
-        // Adjust if tooltip goes outside right edge
-        if (tooltipRect.right > frameRect.right - 20) {
-          newLeft = frameRect.width - tooltipRect.width - 20
-        }
-        // Adjust if tooltip goes outside left edge
-        if (tooltipRect.left < frameRect.left + 20) {
-          newLeft = 20
-        }
-        // Adjust if tooltip goes outside bottom edge
-        if (tooltipRect.bottom > frameRect.bottom - 20) {
-          newTop = frameRect.height - tooltipRect.height - 20
-        }
-        // Adjust if tooltip goes outside top edge
-        if (tooltipRect.top < frameRect.top + 20) {
-          newTop = 20
-        }
-        
-        // Only update if position needs adjustment
-        if (newTop !== currentTop || newLeft !== currentLeft) {
-          tooltip.style.top = `${newTop}px`
-          tooltip.style.left = `${newLeft}px`
-          tooltip.style.right = 'auto'
-          tooltip.style.bottom = 'auto'
-          tooltip.style.transform = 'none'
-        }
-      }
-    }
-  }, [tooltipStyle, highlightedElement, currentStep])
-
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="absolute inset-0 pointer-events-none"
-      style={{ 
-        overflow: 'visible',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        width: '100%',
-        height: '100%',
-        zIndex: 1000,
-        clipPath: 'none'
-      }}
-    >
-        {/* Overlay with cutout for highlighted element */}
+    <>
+      {/* Overlay with cutout for highlighted element - inside phone frame */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="absolute inset-0 pointer-events-none"
+        style={{ 
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          width: '100%',
+          height: '100%',
+          zIndex: 1000
+        }}
+      >
         <div className="absolute inset-0 bg-black/70">
           {highlightedElement && highlightPosition && (
             <motion.div
@@ -418,29 +259,26 @@ export function TutorialGuide({
             />
           )}
         </div>
+      </motion.div>
 
-        {/* Tooltip Card */}
-        <motion.div
-          ref={tooltipRef}
-          initial={{ opacity: 0, scale: 0.9, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.9 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-          className="absolute bg-white rounded-2xl shadow-2xl p-6 pointer-events-auto"
-          style={{
-            ...tooltipStyle,
-            width: tooltipStyle.maxWidth || '320px',
-            maxWidth: tooltipStyle.maxWidth || '320px',
-            maxHeight: tooltipStyle.maxHeight || '400px',
-            overflowY: tooltipStyle.overflowY || 'auto',
-            overflowX: 'hidden',
-            zIndex: 10001,
-            boxSizing: 'border-box',
-            // Ensure tooltip is never clipped
-            willChange: 'transform',
-            contain: 'none'
-          }}
-        >
+      {/* Tutorial Guide Bottom Sheet - rendered outside phone frame via fixed positioning */}
+      <motion.div
+        initial={{ y: '100%' }}
+        animate={{ y: 0 }}
+        exit={{ y: '100%' }}
+        transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+        className="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl z-[10001] max-h-[65vh] overflow-hidden shadow-2xl pointer-events-auto"
+        style={{
+          boxShadow: '0 -10px 40px rgba(0, 0, 0, 0.3)'
+        }}
+      >
+        {/* Drag Handle */}
+        <div className="flex justify-center pt-4 pb-2">
+          <div className="w-12 h-1.5 bg-gray-300 rounded-full"></div>
+        </div>
+
+        {/* Scrollable Content */}
+        <div className="overflow-y-auto max-h-[calc(65vh-140px)] px-6 pb-6">
           {/* Progress Indicator */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex-1">
@@ -468,14 +306,14 @@ export function TutorialGuide({
             {step.icon && (
               <div className="text-4xl mb-3">{step.icon}</div>
             )}
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">
               {step.title}
             </h3>
-            <p className="text-gray-600 leading-relaxed">
+            <p className="text-gray-600 leading-relaxed text-base mb-4">
               {step.description}
             </p>
             {step.action && (
-              <div className="mt-4 p-3 bg-pink-50 rounded-lg border border-pink-200">
+              <div className="mt-4 p-4 bg-pink-50 rounded-lg border border-pink-200">
                 <p className="text-sm text-pink-900 font-medium">
                   💡 {step.action}
                 </p>
@@ -484,11 +322,11 @@ export function TutorialGuide({
           </div>
 
           {/* Navigation Buttons */}
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center justify-between gap-3 pt-4 border-t border-gray-200">
             <button
               onClick={handlePrevious}
               disabled={isFirst}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all ${
+              className={`flex items-center gap-2 px-5 py-3 rounded-xl font-medium transition-all ${
                 isFirst
                   ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -500,7 +338,7 @@ export function TutorialGuide({
 
             <button
               onClick={isLast ? handleComplete : handleNext}
-              className="flex items-center gap-2 px-6 py-2 rounded-xl font-semibold bg-gradient-to-r from-pink-500 to-red-500 text-white hover:opacity-90 transition-opacity shadow-lg"
+              className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-gradient-to-r from-pink-500 to-red-500 text-white hover:opacity-90 transition-opacity shadow-lg"
             >
               {isLast ? (
                 <>
@@ -515,8 +353,9 @@ export function TutorialGuide({
               )}
             </button>
           </div>
-        </motion.div>
+        </div>
       </motion.div>
+    </>
   )
 }
 

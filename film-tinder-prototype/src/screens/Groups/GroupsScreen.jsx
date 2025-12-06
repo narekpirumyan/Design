@@ -1,19 +1,35 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PhoneFrame } from '../../components/PhoneFrame/PhoneFrame'
 import { BottomNavigation } from '../../components/BottomNavigation/BottomNavigation'
+import { TutorialGuide } from '../../components/TutorialGuide/TutorialGuide'
 import { mockGroups } from '../../data/mockGroups'
+import { mockMovies } from '../../data/mockMovies'
 import { mockParticipants } from '../../utils/mockGroupState'
 import { motion, useMotionValue, useTransform } from 'framer-motion'
-import { FiUsers, FiUser, FiMoreVertical, FiPlus } from 'react-icons/fi'
+import { FiUsers, FiUser, FiMoreVertical, FiPlus, FiFilm } from 'react-icons/fi'
+import { useAuth } from '../../contexts/AuthContext'
+import { getTutorialSteps } from '../../data/tutorialSteps'
 
 export function GroupsScreen() {
   const navigate = useNavigate()
+  const { user, hasCompletedTutorial, completeTutorial, skipTutorial } = useAuth()
   const [activeTab, setActiveTab] = useState('groupes') // 'amis' or 'groupes'
+  const [showTutorial, setShowTutorial] = useState(false)
   const swipeAreaRef = useRef(null)
   const dragX = useMotionValue(0)
   const startX = useRef(0)
   const startY = useRef(0)
+
+  // Check if tutorial should be shown
+  useEffect(() => {
+    if (user && !hasCompletedTutorial('groups')) {
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        setShowTutorial(true)
+      }, 500)
+    }
+  }, [user, hasCompletedTutorial])
   
   // Handle swipe gesture for tab switching
   const handleDragStart = (event, info) => {
@@ -106,6 +122,7 @@ export function GroupsScreen() {
                   ? 'text-white border-b-2 border-white'
                   : 'text-white/60'
               }`}
+              data-tutorial-target="friends-tab"
             >
               Amis
             </button>
@@ -126,6 +143,45 @@ export function GroupsScreen() {
         <div className="px-6 pb-6">
           {activeTab === 'groupes' && (
             <div className="space-y-3">
+              {/* Personal Watchlist */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  // Navigate to personal watchlist view
+                  // For now, we'll just show it as a special group
+                }}
+                className="bg-gradient-to-r from-pink-500 to-red-500 rounded-xl p-4 flex items-center gap-4 cursor-pointer hover:shadow-lg transition-shadow text-white"
+              >
+                <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl flex-shrink-0">
+                  <FiFilm className="w-6 h-6" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-white truncate">My Personal Watchlist</h3>
+                  <p className="text-sm text-white/80 truncate">{mockMovies.slice(0, 3).length} movies saved</p>
+                </div>
+                <div className="flex gap-1">
+                  {mockMovies.slice(0, 3).map((movie, idx) => (
+                    <div
+                      key={movie.id}
+                      className="w-8 h-8 rounded overflow-hidden border-2 border-white/30"
+                      style={{ marginLeft: idx > 0 ? '-8px' : '0' }}
+                    >
+                      <img
+                        src={movie.poster}
+                        alt={movie.title}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.src = 'https://via.placeholder.com/400x600/1e293b/94a3b8?text=No+Poster'
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+
               {mockGroups.map((group, idx) => (
                 <motion.div
                   key={group.id}
@@ -137,7 +193,7 @@ export function GroupsScreen() {
                     e.stopPropagation()
                     navigate(`/room/${group.id}`)
                   }}
-                  className="bg-white rounded-xl p-4 flex items-center gap-4 cursor-pointer hover:shadow-lg transition-shadow"
+                  className="group-card bg-white rounded-xl p-4 flex items-center gap-4 cursor-pointer hover:shadow-lg transition-shadow"
                 >
                   <div
                     className="w-12 h-12 rounded-full flex items-center justify-center text-2xl flex-shrink-0"
@@ -167,6 +223,7 @@ export function GroupsScreen() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: mockGroups.length * 0.05 }}
                 className="w-full bg-white rounded-xl p-4 flex items-center gap-4 hover:shadow-lg transition-shadow border-2 border-dashed border-gray-300"
+                data-tutorial-target="create-group"
               >
                 <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center flex-shrink-0">
                   <FiPlus className="w-6 h-6 text-pink-600" />
@@ -234,6 +291,21 @@ export function GroupsScreen() {
         </motion.div>
       </div>
       <BottomNavigation />
+      
+      {/* Tutorial Guide */}
+      <TutorialGuide
+        steps={getTutorialSteps('groups', user)}
+        sectionId="groups"
+        isActive={showTutorial}
+        onComplete={(sectionId) => {
+          completeTutorial(sectionId)
+          setShowTutorial(false)
+        }}
+        onSkip={(sectionId) => {
+          skipTutorial(sectionId)
+          setShowTutorial(false)
+        }}
+      />
     </PhoneFrame>
   )
 }

@@ -1,34 +1,69 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { SwipeableCard } from '../../components/SwipeableCard/SwipeableCard'
+import { ScrollableCardStack } from '../../components/ScrollableCardStack/ScrollableCardStack'
 import { PhoneFrame } from '../../components/PhoneFrame/PhoneFrame'
 import { BottomNavigation } from '../../components/BottomNavigation/BottomNavigation'
 import { FilmDetails } from '../../components/FilmDetails/FilmDetails'
 import { FilmShorts } from '../../components/FilmShorts/FilmShorts'
+import { TutorialGuide } from '../../components/TutorialGuide/TutorialGuide'
+import { MoodSelectionModal } from '../../components/MoodSelectionModal/MoodSelectionModal'
 import { mockMovies } from '../../data/mockMovies'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiCamera, FiFilm, FiInfo, FiVideo } from 'react-icons/fi'
-
-// Import different group selection approaches
+import { FiFilm, FiInfo, FiVideo, FiSmile } from 'react-icons/fi'
+import { useAuth } from '../../contexts/AuthContext'
+import { getTutorialSteps } from '../../data/tutorialSteps'
 import { GroupSelectionApproach1 } from './GroupSelectionApproach1'
-import { GroupSelectionApproach2 } from './GroupSelectionApproach2'
-import { GroupSelectionApproach3 } from './GroupSelectionApproach3'
-import { GroupSelectionApproach4 } from './GroupSelectionApproach4'
-import { GroupSelectionApproach5 } from './GroupSelectionApproach5'
 
 export function IndividualSwipeScreen() {
   const navigate = useNavigate()
+  const { user, hasCompletedTutorial, completeTutorial, skipTutorial } = useAuth()
   const [movies] = useState([...mockMovies].sort(() => Math.random() - 0.5))
   const [currentIndex, setCurrentIndex] = useState(0)
   const [showGroupSelection, setShowGroupSelection] = useState(false)
   const [selectedMovie, setSelectedMovie] = useState(null)
-  const [selectedApproach, setSelectedApproach] = useState(1)
   const [mode, setMode] = useState('swipe') // 'swipe', 'details', 'shorts'
+  const [showTutorial, setShowTutorial] = useState(false)
+  const [showMoodSelection, setShowMoodSelection] = useState(false)
+  const [selectedMood, setSelectedMood] = useState(null)
+  
+  // Get interaction model from user preferences (default to 'swipe')
+  const interactionModel = user?.preferences?.interactionModel || 'swipe'
+
+  // Show mood selection on entry (each time user enters this screen)
+  useEffect(() => {
+    // Load saved mood from sessionStorage first
+    const savedMood = sessionStorage.getItem('currentMood')
+    if (savedMood) {
+      setSelectedMood(JSON.parse(savedMood))
+    }
+    // Always show mood selection modal when entering this screen
+    // Small delay to ensure smooth transition
+    setTimeout(() => {
+      setShowMoodSelection(true)
+    }, 300)
+  }, [])
+
+  // Check if tutorial should be shown
+  useEffect(() => {
+    if (user && !hasCompletedTutorial('swipe') && selectedMood) {
+      // Small delay to ensure DOM is ready, and only after mood is selected
+      setTimeout(() => {
+        setShowTutorial(true)
+      }, 500)
+    }
+  }, [user, hasCompletedTutorial, selectedMood])
 
   // Reset mode to swipe on mount
   useEffect(() => {
     setMode('swipe')
   }, [])
+
+  const handleMoodSelect = (mood) => {
+    setSelectedMood(mood)
+    sessionStorage.setItem('currentMood', JSON.stringify(mood))
+    setShowMoodSelection(false)
+  }
 
   const modes = ['swipe', 'details', 'shorts']
   const currentModeIndex = modes.indexOf(mode)
@@ -60,6 +95,26 @@ export function IndividualSwipeScreen() {
       // In details/shorts mode, swiping goes back to swipe mode
       setMode('swipe')
     }
+  }
+
+  const handleScrollLike = (movieId) => {
+    const movie = movies.find(m => m.id === movieId)
+    setSelectedMovie(movie)
+    setShowGroupSelection(true)
+  }
+
+  const handleScrollPass = (movieId) => {
+    // Just advance to next movie
+    setCurrentIndex(prev => prev + 1)
+  }
+
+  const handleScrollInfo = (movieId) => {
+    // Switch to details mode
+    setMode('details')
+  }
+
+  const handleScrollIndexChange = (newIndex) => {
+    setCurrentIndex(newIndex)
   }
 
   const handleAddToWatchlist = (movieId) => {
@@ -111,40 +166,36 @@ export function IndividualSwipeScreen() {
   const currentMovie = movies[currentIndex]
   const nextMovies = movies.slice(currentIndex, currentIndex + 3)
 
-  // Render different approaches based on selection
-  const renderGroupSelection = () => {
-    switch (selectedApproach) {
-      case 1:
-        return <GroupSelectionApproach1 movie={selectedMovie} onSelect={handleGroupSelected} onClose={handleCloseGroupSelection} />
-      case 2:
-        return <GroupSelectionApproach2 movie={selectedMovie} onSelect={handleGroupSelected} onClose={handleCloseGroupSelection} />
-      case 3:
-        return <GroupSelectionApproach3 movie={selectedMovie} onSelect={handleGroupSelected} onClose={handleCloseGroupSelection} />
-      case 4:
-        return <GroupSelectionApproach4 movie={selectedMovie} onSelect={handleGroupSelected} onClose={handleCloseGroupSelection} />
-      case 5:
-        return <GroupSelectionApproach5 movie={selectedMovie} onSelect={handleGroupSelected} onClose={handleCloseGroupSelection} />
-      default:
-        return <GroupSelectionApproach1 movie={selectedMovie} onSelect={handleGroupSelected} onClose={handleCloseGroupSelection} />
-    }
+  // Don't show content if no mood is selected (first time)
+  if (!selectedMood) {
+    return (
+      <PhoneFrame>
+        <div className="h-full bg-gradient-to-br from-red-600 via-pink-500 to-red-700 flex flex-col overflow-hidden relative">
+          <MoodSelectionModal
+            isOpen={showMoodSelection}
+            onClose={() => {}} // Can't close without selecting on first time
+            onSelectMood={handleMoodSelect}
+            currentMood={null}
+          />
+        </div>
+      </PhoneFrame>
+    )
   }
 
   return (
     <PhoneFrame>
       <div className="h-full bg-gradient-to-br from-red-600 via-pink-500 to-red-700 flex flex-col overflow-hidden relative">
-        {/* Approach Selector (for testing - remove in production) */}
-        <div className="absolute top-2 right-2 z-50">
-          <select
-            value={selectedApproach}
-            onChange={(e) => setSelectedApproach(Number(e.target.value))}
-            className="text-xs bg-white/90 text-gray-900 px-2 py-1 rounded border border-gray-300"
+        {/* Mood Button - Top Right */}
+        <div className="absolute top-4 right-4 z-30">
+          <motion.button
+            onClick={() => setShowMoodSelection(true)}
+            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.05 }}
+            className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-md border-2 border-white/30 flex items-center justify-center transition-all hover:bg-black/70 hover:border-white/50"
+            title={`Current mood: ${selectedMood.name}`}
           >
-            <option value={1}>Approach 1: Bottom Sheet</option>
-            <option value={2}>Approach 2: Full Overlay</option>
-            <option value={3}>Approach 3: Slide Panel</option>
-            <option value={4}>Approach 4: Popup Modal</option>
-            <option value={5}>Approach 5: Quick Chips</option>
-          </select>
+            <span className="text-xl">{selectedMood.emoji}</span>
+          </motion.button>
         </div>
 
         {/* Mode-based Content with Card Flip Animation */}
@@ -170,19 +221,30 @@ export function IndividualSwipeScreen() {
             >
             {mode === 'swipe' && (
               <>
-                {/* Swipe Area */}
-                <div className="flex-1 relative w-full pb-20 h-full">
-                  <div className="relative w-full h-full" style={{ perspective: '1000px' }}>
-                    {nextMovies.map((movie, idx) => (
-                      <SwipeableCard
-                        key={`${movie.id}-${currentIndex}`}
-                        movie={movie}
-                        index={idx}
-                        isTop={idx === 0}
-                        onSwipe={idx === 0 ? handleSwipe : undefined}
-                      />
-                    ))}
-                  </div>
+                {/* Swipe/Scroll Area */}
+                <div className={`flex-1 relative w-full pb-20 h-full ${interactionModel === 'scroll' ? 'scroll-area' : 'swipe-area'}`}>
+                  {interactionModel === 'scroll' ? (
+                    <ScrollableCardStack
+                      movies={movies}
+                      currentIndex={currentIndex}
+                      onLike={handleScrollLike}
+                      onPass={handleScrollPass}
+                      onInfo={handleScrollInfo}
+                      onIndexChange={handleScrollIndexChange}
+                    />
+                  ) : (
+                    <div className="relative w-full h-full" style={{ perspective: '1000px' }}>
+                      {nextMovies.map((movie, idx) => (
+                        <SwipeableCard
+                          key={`${movie.id}-${currentIndex}`}
+                          movie={movie}
+                          index={idx}
+                          isTop={idx === 0}
+                          onSwipe={idx === 0 ? handleSwipe : undefined}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
               </>
             )}
@@ -242,8 +304,37 @@ export function IndividualSwipeScreen() {
 
         {/* Group Selection Overlay */}
         <AnimatePresence>
-          {showGroupSelection && renderGroupSelection()}
+          {showGroupSelection && (
+            <GroupSelectionApproach1 
+              movie={selectedMovie} 
+              onSelect={handleGroupSelected} 
+              onClose={handleCloseGroupSelection} 
+            />
+          )}
         </AnimatePresence>
+
+        {/* Mood Selection Modal */}
+        <MoodSelectionModal
+          isOpen={showMoodSelection}
+          onClose={() => setShowMoodSelection(false)}
+          onSelectMood={handleMoodSelect}
+          currentMood={selectedMood}
+        />
+
+        {/* Tutorial Guide */}
+        <TutorialGuide
+          steps={getTutorialSteps('swipe', user)}
+          sectionId="swipe"
+          isActive={showTutorial}
+          onComplete={(sectionId) => {
+            completeTutorial(sectionId)
+            setShowTutorial(false)
+          }}
+          onSkip={(sectionId) => {
+            skipTutorial(sectionId)
+            setShowTutorial(false)
+          }}
+        />
       </div>
     </PhoneFrame>
   )

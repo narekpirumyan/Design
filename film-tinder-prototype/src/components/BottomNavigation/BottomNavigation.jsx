@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { FiFilm, FiUsers, FiPlus, FiList, FiUser } from 'react-icons/fi'
+import { FiFilm, FiUsers, FiPlus, FiSearch, FiUser } from 'react-icons/fi'
 import { motion, AnimatePresence } from 'framer-motion'
 import { CreateRoomModal } from '../CreateRoomModal/CreateRoomModal'
 
@@ -33,11 +33,11 @@ export function BottomNavigation() {
       active: false
     },
     {
-      id: 'watchlist',
-      icon: FiList,
-      label: 'Watchlist',
-      path: '/watchlist',
-      active: location.pathname === '/watchlist'
+      id: 'search',
+      icon: FiSearch,
+      label: 'Search',
+      path: '/search',
+      active: location.pathname === '/search'
     },
     {
       id: 'profile',

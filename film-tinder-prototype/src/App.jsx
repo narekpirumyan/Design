@@ -1,24 +1,147 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { AuthProvider, useAuth } from './contexts/AuthContext'
+import { LoginScreen } from './screens/Login/LoginScreen'
+import { PreferencesScreen } from './screens/Preferences/PreferencesScreen'
 import { GroupsScreen } from './screens/Groups/GroupsScreen'
 import { GroupRoomScreen } from './screens/GroupRoom/GroupRoomScreen'
 import { MatchResultScreen } from './screens/MatchResult/MatchResultScreen'
 import { IndividualSwipeScreen } from './screens/IndividualSwipe/IndividualSwipeScreen'
-import { WatchlistScreen } from './screens/Watchlist/WatchlistScreen'
+import { SearchScreen } from './screens/Search/SearchScreen'
 import { ProfileScreen } from './screens/Profile/ProfileScreen'
+
+// Protected Route Component
+function ProtectedRoute({ children }) {
+  const { user, isFirstConnection, loading } = useAuth()
+
+  if (loading) {
+    return (
+      <div className="h-screen w-screen bg-gradient-to-br from-red-600 via-pink-500 to-red-700 flex items-center justify-center">
+        <div className="text-white text-xl">Loading...</div>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />
+  }
+
+  if (isFirstConnection) {
+    return <Navigate to="/preferences" replace />
+  }
+
+  return children
+}
+
+// Public Route Component (redirects to app if already logged in)
+function PublicRoute({ children }) {
+  const { user, isFirstConnection, loading } = useAuth()
+
+  if (loading) {
+    return (
+      <div className="h-screen w-screen bg-gradient-to-br from-red-600 via-pink-500 to-red-700 flex items-center justify-center">
+        <div className="text-white text-xl">Loading...</div>
+      </div>
+    )
+  }
+
+  if (user && !isFirstConnection) {
+    return <Navigate to="/groups" replace />
+  }
+
+  return children
+}
+
+function AppRoutes() {
+  return (
+    <Routes>
+      {/* Public Routes */}
+      <Route 
+        path="/login" 
+        element={
+          <PublicRoute>
+            <LoginScreen />
+          </PublicRoute>
+        } 
+      />
+      
+      {/* Preferences (only accessible if first connection) */}
+      <Route 
+        path="/preferences" 
+        element={
+          <ProtectedRoute>
+            <PreferencesScreen />
+          </ProtectedRoute>
+        } 
+      />
+
+      {/* Protected Routes */}
+      <Route 
+        path="/" 
+        element={
+          <ProtectedRoute>
+            <GroupsScreen />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/groups" 
+        element={
+          <ProtectedRoute>
+            <GroupsScreen />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/room/:roomCode" 
+        element={
+          <ProtectedRoute>
+            <GroupRoomScreen />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/match/:roomCode" 
+        element={
+          <ProtectedRoute>
+            <MatchResultScreen />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/swipe" 
+        element={
+          <ProtectedRoute>
+            <IndividualSwipeScreen />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/search" 
+        element={
+          <ProtectedRoute>
+            <SearchScreen />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/profile" 
+        element={
+          <ProtectedRoute>
+            <ProfileScreen />
+          </ProtectedRoute>
+        } 
+      />
+    </Routes>
+  )
+}
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<GroupsScreen />} />
-        <Route path="/groups" element={<GroupsScreen />} />
-        <Route path="/room/:roomCode" element={<GroupRoomScreen />} />
-        <Route path="/match/:roomCode" element={<MatchResultScreen />} />
-        <Route path="/swipe" element={<IndividualSwipeScreen />} />
-        <Route path="/watchlist" element={<WatchlistScreen />} />
-        <Route path="/profile" element={<ProfileScreen />} />
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </AuthProvider>
   )
 }
 

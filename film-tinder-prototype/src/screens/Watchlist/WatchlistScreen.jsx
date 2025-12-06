@@ -1,13 +1,28 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { PhoneFrame } from '../../components/PhoneFrame/PhoneFrame'
 import { BottomNavigation } from '../../components/BottomNavigation/BottomNavigation'
+import { TutorialGuide } from '../../components/TutorialGuide/TutorialGuide'
 import { mockMovies } from '../../data/mockMovies'
 import { mockGroups } from '../../data/mockGroups'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FiUsers, FiPlus, FiChevronRight } from 'react-icons/fi'
+import { useAuth } from '../../contexts/AuthContext'
+import { getTutorialSteps } from '../../data/tutorialSteps'
 
 export function WatchlistScreen() {
+  const { user, hasCompletedTutorial, completeTutorial, skipTutorial } = useAuth()
   const [selectedWatchlist, setSelectedWatchlist] = useState(null)
+  const [showTutorial, setShowTutorial] = useState(false)
+
+  // Check if tutorial should be shown
+  useEffect(() => {
+    if (user && !selectedWatchlist && !hasCompletedTutorial('watchlist')) {
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        setShowTutorial(true)
+      }, 500)
+    }
+  }, [user, selectedWatchlist, hasCompletedTutorial])
 
   // Mock watchlists - each can be shared with different groups
   const watchlists = [
@@ -72,7 +87,7 @@ export function WatchlistScreen() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.1 }}
-                    className="bg-white rounded-xl overflow-hidden shadow-lg"
+                    className="movie-card bg-white rounded-xl overflow-hidden shadow-lg"
                   >
                     <div className="relative aspect-[2/3]">
                       <img
@@ -161,6 +176,23 @@ export function WatchlistScreen() {
         </div>
       </div>
       <BottomNavigation />
+      
+      {/* Tutorial Guide */}
+      {!selectedWatchlist && (
+        <TutorialGuide
+          steps={getTutorialSteps('watchlist', user)}
+          sectionId="watchlist"
+          isActive={showTutorial}
+          onComplete={(sectionId) => {
+            completeTutorial(sectionId)
+            setShowTutorial(false)
+          }}
+          onSkip={(sectionId) => {
+            skipTutorial(sectionId)
+            setShowTutorial(false)
+          }}
+        />
+      )}
     </PhoneFrame>
   )
 }

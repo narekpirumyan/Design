@@ -248,71 +248,75 @@ export function TutorialGuide({
   }, [highlightedElement, highlightPosition, currentStep])
 
   return (
-    <>
-      {/* Overlay with cutout for highlighted element - inside phone frame */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="absolute inset-0 pointer-events-auto"
-        style={{ 
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          width: '100%',
-          height: '100%',
-          zIndex: 1000
-        }}
-        onClick={(e) => {
-          // Prevent clicks from going through to underlying content
-          e.preventDefault()
-          e.stopPropagation()
-        }}
-      >
-        <div 
-          className="absolute inset-0 bg-black/70 pointer-events-auto"
-          onClick={(e) => {
-            // Block all clicks on the overlay
-            e.preventDefault()
-            e.stopPropagation()
-          }}
-        >
-          {highlightedElement && highlightPosition && (
-            <motion.div
-              ref={highlightRef}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="absolute border-4 border-white rounded-xl pointer-events-none"
-              style={{
-                top: `${highlightPosition.top}px`,
-                left: `${highlightPosition.left}px`,
-                width: `${highlightPosition.width}px`,
-                height: `${highlightPosition.height}px`,
-                boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.7), 0 0 20px rgba(255, 255, 255, 0.5)'
+    <AnimatePresence>
+      {isActive && (
+        <>
+          {/* Overlay with cutout for highlighted element - inside phone frame */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0"
+            style={{ 
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              width: '100%',
+              height: '100%',
+              zIndex: 1000,
+              pointerEvents: 'auto'
+            }}
+            onClick={(e) => {
+              // Prevent clicks from going through to underlying content
+              e.preventDefault()
+              e.stopPropagation()
+            }}
+          >
+            <div 
+              className="absolute inset-0 bg-black/70"
+              style={{ pointerEvents: 'auto' }}
+              onClick={(e) => {
+                // Block all clicks on the overlay
+                e.preventDefault()
+                e.stopPropagation()
               }}
-            />
-          )}
-        </div>
-      </motion.div>
+            >
+              {highlightedElement && highlightPosition && (
+                <motion.div
+                  ref={highlightRef}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="absolute border-4 border-white rounded-xl pointer-events-none"
+                  style={{
+                    top: `${highlightPosition.top}px`,
+                    left: `${highlightPosition.left}px`,
+                    width: `${highlightPosition.width}px`,
+                    height: `${highlightPosition.height}px`,
+                    boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.7), 0 0 20px rgba(255, 255, 255, 0.5)'
+                  }}
+                />
+              )}
+            </div>
+          </motion.div>
 
-      {/* Tutorial Guide Bottom/Top Sheet - positioned absolutely within phone frame */}
-      <motion.div
-        initial={{ y: guidePosition === 'bottom' ? '100%' : '-100%' }}
-        animate={{ y: 0 }}
-        exit={{ y: guidePosition === 'bottom' ? '100%' : '-100%' }}
-        transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-        className={`absolute left-0 right-0 bg-white z-[10001] overflow-hidden shadow-2xl pointer-events-auto ${
-          guidePosition === 'bottom' ? 'bottom-0 rounded-t-3xl' : 'top-0 rounded-b-3xl'
-        }`}
-        style={{
-          boxShadow: guidePosition === 'bottom' 
-            ? '0 -10px 40px rgba(0, 0, 0, 0.3)' 
-            : '0 10px 40px rgba(0, 0, 0, 0.3)',
-          maxHeight: '55%'
-        }}
-      >
+          {/* Tutorial Guide Bottom/Top Sheet - positioned absolutely within phone frame */}
+          <motion.div
+            initial={{ y: guidePosition === 'bottom' ? '100%' : '-100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: guidePosition === 'bottom' ? '100%' : '-100%' }}
+            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            className={`absolute left-0 right-0 bg-white z-[10001] overflow-hidden shadow-2xl pointer-events-auto ${
+              guidePosition === 'bottom' ? 'bottom-0 rounded-t-3xl' : 'top-0 rounded-b-3xl'
+            }`}
+            style={{
+              boxShadow: guidePosition === 'bottom' 
+                ? '0 -10px 40px rgba(0, 0, 0, 0.3)' 
+                : '0 10px 40px rgba(0, 0, 0, 0.3)',
+              maxHeight: '55%'
+            }}
+          >
         {/* Drag Handle */}
         <div className={`flex justify-center ${guidePosition === 'bottom' ? 'pt-4 pb-2' : 'pb-4 pt-2'}`}>
           <div className="w-12 h-1.5 bg-gray-300 rounded-full"></div>
@@ -398,7 +402,9 @@ export function TutorialGuide({
           </div>
         </div>
       </motion.div>
-    </>
+        </>
+      )}
+    </AnimatePresence>
   )
 }
 

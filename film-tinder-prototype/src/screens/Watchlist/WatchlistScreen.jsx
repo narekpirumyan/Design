@@ -123,7 +123,7 @@ export function WatchlistScreen() {
       <div className="h-full bg-gradient-to-br from-red-600 via-pink-500 to-red-700 overflow-y-auto pb-20 relative">
         {/* Header */}
         <div className="px-6 pt-12 pb-6">
-          <h1 className="text-3xl font-bold text-white">Ma liste</h1>
+          <h1 className="text-3xl font-bold text-white">My Watchlist</h1>
         </div>
 
         {/* Watchlists List */}

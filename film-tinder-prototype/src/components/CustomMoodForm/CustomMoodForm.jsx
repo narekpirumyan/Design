@@ -37,9 +37,9 @@ export function CustomMoodForm({ onSave, onCancel }) {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full max-h-full">
       {/* Header */}
-      <div className="px-6 pt-6 pb-4 border-b border-gray-200">
+      <div className="px-6 pt-6 pb-4 border-b border-gray-200 flex-shrink-0">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-3">
             <button
@@ -57,7 +57,7 @@ export function CustomMoodForm({ onSave, onCancel }) {
       </div>
 
       {/* Form Content */}
-      <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
+      <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6 min-h-0">
         {/* Mood Name */}
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -68,7 +68,7 @@ export function CustomMoodForm({ onSave, onCancel }) {
             value={moodName}
             onChange={(e) => setMoodName(e.target.value)}
             placeholder="e.g., Cozy Evening"
-            className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+            className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900 placeholder-gray-400"
           />
         </div>
 
@@ -104,7 +104,7 @@ export function CustomMoodForm({ onSave, onCancel }) {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Brief description of this mood"
-            className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+            className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900 placeholder-gray-400"
           />
         </div>
 
@@ -197,7 +197,7 @@ export function CustomMoodForm({ onSave, onCancel }) {
       </div>
 
       {/* Footer */}
-      <div className="px-6 py-4 border-t border-gray-200">
+      <div className="px-6 py-4 border-t border-gray-200 flex-shrink-0">
         <motion.button
           onClick={handleSave}
           whileTap={{ scale: 0.98 }}

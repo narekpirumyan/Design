@@ -125,17 +125,91 @@ export const tutorialSteps = {
       targetSelector: '.stats, [class*="grid grid-cols-3"]'
     },
     {
-      title: 'Settings',
-      description: 'Tap Settings to customize your interaction style, preferences, and app settings.',
+      title: 'Interaction Mode',
+      description: 'Tap Interaction Mode to change how you browse movies - choose between Tinder-like swipe or Instagram-like scroll.',
       icon: '⚙️',
-      action: 'Open Settings to change your interaction model!',
-      targetSelector: 'button:contains("Settings")'
+      action: 'Open Interaction Mode to change your browsing style!',
+      targetSelector: 'button:contains("Interaction Mode")'
     },
     {
-      title: 'My Groups & Search',
-      description: 'Quick access to your groups, watchlist, and movie search from your profile.',
-      icon: '🔗',
-      action: 'Tap to navigate to groups or search!',
+      title: 'Privacy & Terms',
+      description: 'Access Privacy Policy, Terms of Service, and Contact Us options from your profile.',
+      icon: '🔒',
+      action: 'Check out Privacy and Terms options!',
+      targetSelector: null
+    }
+  ],
+  groupDetails: [
+    {
+      title: 'Group Details 📋',
+      description: 'Here you can view group information, manage members, see added movies, and start a movie session together.',
+      icon: '📋',
+      action: null,
+      targetSelector: null
+    },
+    {
+      title: 'Start Movie Session',
+      description: 'Tap "Start Movie Session" to begin swiping movies together with your group. Everyone swipes and you\'ll find matches!',
+      icon: '🎬',
+      action: 'Tap the Start Movie Session button to begin!',
+      targetSelector: '[data-tutorial-target="start-session"]'
+    },
+    {
+      title: 'Movies Tab',
+      description: 'See all movies that have been added to this group. Each movie shows who added it and when.',
+      icon: '🎥',
+      action: 'Check out the movies tab to see what\'s been added!',
+      targetSelector: '[data-tutorial-target="movies-tab"]'
+    },
+    {
+      title: 'Members Tab',
+      description: 'View all group members, see who\'s online, and add new members to the group.',
+      icon: '👥',
+      action: 'Explore the Members tab to see who\'s in your group!',
+      targetSelector: '[data-tutorial-target="members-tab"]'
+    },
+    {
+      title: 'History Tab',
+      description: 'View your group\'s movie watching history - see what movies you\'ve watched together and ratings.',
+      icon: '📜',
+      action: 'Check the History tab to see past sessions!',
+      targetSelector: '[data-tutorial-target="history-tab"]'
+    }
+  ],
+  room: [
+    {
+      title: 'Group Movie Session 🎬',
+      description: 'This is where you swipe movies together with your group. Everyone swipes and the app finds movies you all like!',
+      icon: '🎬',
+      action: null,
+      targetSelector: null
+    },
+    {
+      title: 'Swipe Together',
+      description: 'Swipe right to like a movie, left to pass. Everyone in the group swipes, and you\'ll see matches when you all like the same movie!',
+      icon: '👆',
+      action: 'Try swiping on a movie - your group members will see your choice!',
+      targetSelector: '.swipe-area, [class*="relative w-full h-full"]'
+    },
+    {
+      title: 'Participants',
+      description: 'See who\'s in the session with you. You can see their avatars and activity status.',
+      icon: '👥',
+      action: 'Check who\'s participating in the session!',
+      targetSelector: '[data-tutorial-target="participants"]'
+    },
+    {
+      title: 'Room Code',
+      description: 'Share the room code with friends so they can join the session. They can enter the code to join!',
+      icon: '🔢',
+      action: 'Share the room code to invite more friends!',
+      targetSelector: '[data-tutorial-target="room-code"]'
+    },
+    {
+      title: 'View Matches',
+      description: 'When you\'ve all swiped through movies, you can view matches - movies that everyone (or most people) liked!',
+      icon: '❤️',
+      action: 'Keep swiping to find matches with your group!',
       targetSelector: null
     }
   ]

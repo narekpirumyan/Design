@@ -3,10 +3,11 @@ import { Button } from '../../components/Button/Button'
 import { VibeTag } from '../../components/VibeTag/VibeTag'
 import { PhoneFrame } from '../../components/PhoneFrame/PhoneFrame'
 import { BottomNavigation } from '../../components/BottomNavigation/BottomNavigation'
+import { BackButton } from '../../components/BackButton/BackButton'
 import { mockMovies } from '../../data/mockMovies'
 import { mockParticipants } from '../../utils/mockGroupState'
 import { motion } from 'framer-motion'
-import { FiShare2, FiPlay, FiCalendar, FiArrowLeft, FiExternalLink } from 'react-icons/fi'
+import { FiShare2, FiPlay, FiCalendar, FiExternalLink } from 'react-icons/fi'
 
 export function MatchResultScreen() {
   const { roomCode } = useParams()
@@ -54,7 +55,7 @@ export function MatchResultScreen() {
   }
 
   const handleNewRoom = () => {
-    navigate('/')
+    navigate('/groups')
   }
 
   return (
@@ -62,14 +63,12 @@ export function MatchResultScreen() {
       <div className="h-full bg-gradient-to-br from-red-600 via-pink-500 to-red-700 overflow-y-auto pb-16">
         {/* Header */}
         <div className="p-4">
-        <button
-          onClick={() => navigate(`/room/${roomCode}`)}
-          className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors"
-        >
-          <FiArrowLeft className="w-5 h-5" />
-          <span>Back to Room</span>
-        </button>
-      </div>
+          <BackButton 
+            to={`/room/${roomCode}`} 
+            label="Back to Room"
+            className="text-white/80 hover:text-white"
+          />
+        </div>
 
       <div className="max-w-md mx-auto px-4 pb-8 space-y-6">
         {/* Celebration */}

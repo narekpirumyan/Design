@@ -10,7 +10,7 @@ import { FiX, FiUsers, FiCheck, FiChevronDown, FiChevronUp } from 'react-icons/f
 export function GroupSelectionApproach1({ movie, onSelect, onClose }) {
   const [selectedGroups, setSelectedGroups] = useState(new Set())
   const [showAllGroups, setShowAllGroups] = useState(false)
-  const [activeTab, setActiveTab] = useState('groupes') // 'amis' or 'groupes'
+  const [activeTab, setActiveTab] = useState('groups') // 'friends' or 'groups'
 
   // Show only first 3 groups initially
   const displayedGroups = showAllGroups ? mockGroups : mockGroups.slice(0, 3)
@@ -54,7 +54,7 @@ export function GroupSelectionApproach1({ movie, onSelect, onClose }) {
         {/* Gradient Header */}
         <div className="bg-gradient-to-r from-red-600 via-pink-500 to-red-600 px-6 pt-6 pb-4">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold text-white">On partage le pop corn avec qui?</h2>
+            <h2 className="text-2xl font-bold text-white">Who are we sharing popcorn with?</h2>
             <button
               onClick={onClose}
               className="p-2 hover:bg-white/20 rounded-full transition-colors"
@@ -66,24 +66,24 @@ export function GroupSelectionApproach1({ movie, onSelect, onClose }) {
           {/* Tabs */}
           <div className="flex gap-6 border-b border-white/30">
             <button
-              onClick={() => setActiveTab('amis')}
+              onClick={() => setActiveTab('friends')}
               className={`pb-3 px-2 font-medium transition-colors ${
-                activeTab === 'amis'
+                activeTab === 'friends'
                   ? 'text-white border-b-2 border-white'
                   : 'text-white/60'
               }`}
             >
-              Amis
+              Friends
             </button>
             <button
-              onClick={() => setActiveTab('groupes')}
+              onClick={() => setActiveTab('groups')}
               className={`pb-3 px-2 font-medium transition-colors ${
-                activeTab === 'groupes'
+                activeTab === 'groups'
                   ? 'text-white border-b-2 border-white'
                   : 'text-white/60'
               }`}
             >
-              Groupes
+              Groups
             </button>
           </div>
         </div>
@@ -92,7 +92,7 @@ export function GroupSelectionApproach1({ movie, onSelect, onClose }) {
         <div className="overflow-y-auto max-h-[50vh] bg-white">
           <div className="px-6 py-4">
             <div className="space-y-3">
-              {activeTab === 'groupes' && (
+              {activeTab === 'groups' && (
                 <>
                   {displayedGroups.map((group) => (
                     <motion.button
@@ -114,7 +114,7 @@ export function GroupSelectionApproach1({ movie, onSelect, onClose }) {
                         </div>
                         <div className="flex-1 text-left">
                           <h3 className="font-semibold text-gray-900">{group.name}</h3>
-                          <p className="text-sm text-gray-500 mt-1">description</p>
+                          <p className="text-sm text-gray-500 mt-1">Group description</p>
                         </div>
                         {selectedGroups.has(group.id) && (
                           <motion.div
@@ -151,7 +151,7 @@ export function GroupSelectionApproach1({ movie, onSelect, onClose }) {
                 </>
               )}
 
-              {activeTab === 'amis' && (
+              {activeTab === 'friends' && (
                 <div className="text-center py-8 text-gray-500">
                   <p>No friends available</p>
                 </div>

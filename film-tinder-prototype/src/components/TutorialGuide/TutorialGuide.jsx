@@ -11,10 +11,48 @@ export function TutorialGuide({
 }) {
   const [currentStep, setCurrentStep] = useState(0)
   const [highlightedElement, setHighlightedElement] = useState(null)
+  const [highlightPosition, setHighlightPosition] = useState(null)
   const highlightRef = useRef(null)
+  const updatePositionRef = useRef(null)
+
+  // Update highlight position on scroll/resize
+  const updateHighlightPosition = () => {
+    if (!highlightedElement) return
+    
+    const rect = highlightedElement.getBoundingClientRect()
+    // Get the phone frame container to calculate relative position
+    const phoneFrame = document.querySelector('[class*="relative"][class*="w-[375px]"]') || 
+                       document.querySelector('.relative.w-\\[375px\\]') ||
+                       highlightedElement.closest('[class*="h-full"]')
+    
+    if (phoneFrame) {
+      const frameRect = phoneFrame.getBoundingClientRect()
+      setHighlightPosition({
+        top: rect.top - frameRect.top - 8,
+        left: rect.left - frameRect.left - 8,
+        width: rect.width + 16,
+        height: rect.height + 16
+      })
+    } else {
+      // Fallback to viewport-relative positioning
+      setHighlightPosition({
+        top: rect.top - 8,
+        left: rect.left - 8,
+        width: rect.width + 16,
+        height: rect.height + 16
+      })
+    }
+  }
 
   useEffect(() => {
-    if (!isActive || steps.length === 0) return
+    if (!isActive || steps.length === 0) {
+      // Disable body scroll when tutorial is inactive
+      document.body.style.overflow = ''
+      return
+    }
+
+    // Disable body scroll when tutorial is active
+    document.body.style.overflow = 'hidden'
 
     // Reset to first step when tutorial becomes active
     setCurrentStep(0)
@@ -23,11 +61,28 @@ export function TutorialGuide({
     if (steps[0]?.targetSelector) {
       highlightElement(steps[0].targetSelector)
     }
+
+    // Set up scroll/resize listeners
+    updatePositionRef.current = () => updateHighlightPosition()
+    window.addEventListener('scroll', updatePositionRef.current, true)
+    window.addEventListener('resize', updatePositionRef.current)
+    
+    // Initial position update
+    setTimeout(updateHighlightPosition, 100)
+
+    return () => {
+      document.body.style.overflow = ''
+      if (updatePositionRef.current) {
+        window.removeEventListener('scroll', updatePositionRef.current, true)
+        window.removeEventListener('resize', updatePositionRef.current)
+      }
+    }
   }, [isActive, steps])
 
   const highlightElement = (selector) => {
     if (!selector) {
       setHighlightedElement(null)
+      setHighlightPosition(null)
       return
     }
 
@@ -64,9 +119,12 @@ export function TutorialGuide({
       // Scroll element into view if needed
       setTimeout(() => {
         element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        // Update position after scroll
+        setTimeout(updateHighlightPosition, 300)
       }, 100)
     } else {
       setHighlightedElement(null)
+      setHighlightPosition(null)
     }
   }
 
@@ -78,6 +136,7 @@ export function TutorialGuide({
         highlightElement(steps[nextStep].targetSelector)
       } else {
         setHighlightedElement(null)
+        setHighlightPosition(null)
       }
     } else {
       handleComplete()
@@ -92,17 +151,20 @@ export function TutorialGuide({
         highlightElement(steps[prevStep].targetSelector)
       } else {
         setHighlightedElement(null)
+        setHighlightPosition(null)
       }
     }
   }
 
   const handleComplete = () => {
     setHighlightedElement(null)
+    setHighlightPosition(null)
     onComplete?.(sectionId)
   }
 
   const handleSkip = () => {
     setHighlightedElement(null)
+    setHighlightPosition(null)
     onSkip?.(sectionId)
   }
 
@@ -114,48 +176,59 @@ export function TutorialGuide({
   const isFirst = currentStep === 0
   const isLast = currentStep === steps.length - 1
 
-  // Get position for tooltip
+  // Get position for tooltip relative to phone frame
   const getTooltipPosition = () => {
-    if (!highlightedElement) {
+    if (!highlightedElement || !highlightPosition) {
       return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }
     }
 
-    const rect = highlightedElement.getBoundingClientRect()
-    const viewportHeight = window.innerHeight
-    const viewportWidth = window.innerWidth
+    // Get phone frame for relative positioning
+    const phoneFrame = document.querySelector('[class*="relative"][class*="w-[375px]"]') || 
+                       document.querySelector('.relative.w-\\[375px\\]') ||
+                       highlightedElement.closest('[class*="h-full"]')
+    
+    const frameRect = phoneFrame?.getBoundingClientRect() || { top: 0, left: 0, width: 375, height: 812 }
+    const frameHeight = frameRect.height || 812
+    const frameWidth = frameRect.width || 375
+
+    // Calculate relative positions
+    const relativeTop = highlightPosition.top + 8
+    const relativeLeft = highlightPosition.left + 8
+    const elementHeight = highlightPosition.height - 16
+    const elementWidth = highlightPosition.width - 16
 
     // Determine best position
-    const spaceBelow = viewportHeight - rect.bottom
-    const spaceAbove = rect.top
-    const spaceRight = viewportWidth - rect.right
-    const spaceLeft = rect.left
+    const spaceBelow = frameHeight - (relativeTop + elementHeight)
+    const spaceAbove = relativeTop
+    const spaceRight = frameWidth - (relativeLeft + elementWidth)
+    const spaceLeft = relativeLeft
 
     if (spaceBelow > 200) {
       // Show below
       return {
-        top: `${rect.bottom + 20}px`,
-        left: `${rect.left + rect.width / 2}px`,
+        top: `${relativeTop + elementHeight + 20}px`,
+        left: `${relativeLeft + elementWidth / 2}px`,
         transform: 'translateX(-50%)'
       }
     } else if (spaceAbove > 200) {
       // Show above
       return {
-        bottom: `${viewportHeight - rect.top + 20}px`,
-        left: `${rect.left + rect.width / 2}px`,
+        bottom: `${frameHeight - relativeTop + 20}px`,
+        left: `${relativeLeft + elementWidth / 2}px`,
         transform: 'translateX(-50%)'
       }
     } else if (spaceRight > 300) {
       // Show to the right
       return {
-        top: `${rect.top + rect.height / 2}px`,
-        left: `${rect.right + 20}px`,
+        top: `${relativeTop + elementHeight / 2}px`,
+        left: `${relativeLeft + elementWidth + 20}px`,
         transform: 'translateY(-50%)'
       }
     } else {
       // Show to the left
       return {
-        top: `${rect.top + rect.height / 2}px`,
-        right: `${viewportWidth - rect.left + 20}px`,
+        top: `${relativeTop + elementHeight / 2}px`,
+        right: `${frameWidth - relativeLeft + 20}px`,
         transform: 'translateY(-50%)'
       }
     }
@@ -163,27 +236,35 @@ export function TutorialGuide({
 
   const tooltipStyle = getTooltipPosition()
 
+  // Update position when highlight changes
+  useEffect(() => {
+    if (highlightedElement) {
+      updateHighlightPosition()
+    }
+  }, [highlightedElement, currentStep])
+
   return (
     <AnimatePresence>
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[9999] pointer-events-none"
+        className="absolute inset-0 z-[9999] pointer-events-none"
+        style={{ overflow: 'hidden' }}
       >
         {/* Overlay with cutout for highlighted element */}
         <div className="absolute inset-0 bg-black/70">
-          {highlightedElement && (
+          {highlightedElement && highlightPosition && (
             <motion.div
               ref={highlightRef}
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="absolute border-4 border-white rounded-xl shadow-[0_0_0_9999px_rgba(0,0,0,0.7)] pointer-events-none"
+              className="absolute border-4 border-white rounded-xl pointer-events-none"
               style={{
-                top: highlightedElement.getBoundingClientRect().top - 8,
-                left: highlightedElement.getBoundingClientRect().left - 8,
-                width: highlightedElement.getBoundingClientRect().width + 16,
-                height: highlightedElement.getBoundingClientRect().height + 16,
+                top: `${highlightPosition.top}px`,
+                left: `${highlightPosition.left}px`,
+                width: `${highlightPosition.width}px`,
+                height: `${highlightPosition.height}px`,
                 boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.7), 0 0 20px rgba(255, 255, 255, 0.5)'
               }}
             />

@@ -3,17 +3,26 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { FiFilm, FiUsers, FiPlus, FiSearch, FiUser } from 'react-icons/fi'
 import { motion, AnimatePresence } from 'framer-motion'
 import { CreateRoomModal } from '../CreateRoomModal/CreateRoomModal'
+import { useAuth } from '../../contexts/AuthContext'
 
 export function BottomNavigation() {
   const navigate = useNavigate()
   const location = useLocation()
+  const { user } = useAuth()
   const [showCreateModal, setShowCreateModal] = useState(false)
+
+  // Get interaction model from user preferences (default to 'swipe')
+  const interactionModel = user?.preferences?.interactionModel || 'swipe'
+  
+  // Determine label and icon based on interaction model
+  const swipeLabel = interactionModel === 'scroll' ? 'Scroll' : 'Swipe'
+  const swipeIcon = interactionModel === 'scroll' ? FiFilm : FiFilm // Could use different icon for scroll if desired
 
   const navItems = [
     {
       id: 'swipe',
-      icon: FiFilm,
-      label: 'Swipe',
+      icon: swipeIcon,
+      label: swipeLabel,
       path: '/swipe',
       active: location.pathname === '/swipe'
     },
@@ -22,7 +31,11 @@ export function BottomNavigation() {
       icon: FiUsers,
       label: 'Groups',
       path: '/groups',
-      active: location.pathname === '/groups' || location.pathname.startsWith('/room') || location.pathname.startsWith('/match')
+      active: location.pathname === '/groups' || 
+              location.pathname === '/' || 
+              location.pathname.startsWith('/group/') || 
+              location.pathname.startsWith('/room/') || 
+              location.pathname.startsWith('/match/')
     },
     {
       id: 'create',

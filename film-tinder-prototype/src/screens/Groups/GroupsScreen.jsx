@@ -6,20 +6,24 @@ import { TutorialGuide } from '../../components/TutorialGuide/TutorialGuide'
 import { mockGroups } from '../../data/mockGroups'
 import { mockMovies } from '../../data/mockMovies'
 import { mockParticipants } from '../../utils/mockGroupState'
-import { motion, useMotionValue, useTransform } from 'framer-motion'
-import { FiUsers, FiUser, FiMoreVertical, FiPlus, FiFilm } from 'react-icons/fi'
+import { motion, useMotionValue, useTransform, AnimatePresence } from 'framer-motion'
+import { FiUsers, FiUser, FiMoreVertical, FiPlus, FiFilm, FiX } from 'react-icons/fi'
 import { useAuth } from '../../contexts/AuthContext'
 import { getTutorialSteps } from '../../data/tutorialSteps'
 
 export function GroupsScreen() {
   const navigate = useNavigate()
   const { user, hasCompletedTutorial, completeTutorial, skipTutorial } = useAuth()
-  const [activeTab, setActiveTab] = useState('groupes') // 'amis' or 'groupes'
+  const [activeTab, setActiveTab] = useState('groups') // 'friends' or 'groups'
   const [showTutorial, setShowTutorial] = useState(false)
+  const [showPersonalWatchlist, setShowPersonalWatchlist] = useState(false)
   const swipeAreaRef = useRef(null)
   const dragX = useMotionValue(0)
   const startX = useRef(0)
   const startY = useRef(0)
+
+  // Personal watchlist - use all movies to ensure it's not empty
+  const personalWatchlistMovies = [...mockMovies]
 
   // Check if tutorial should be shown
   useEffect(() => {
@@ -44,12 +48,12 @@ export function GroupsScreen() {
     
     // Only switch if horizontal movement is greater than vertical (horizontal swipe)
     if (Math.abs(deltaX) > threshold && Math.abs(deltaX) > deltaY) {
-      if (deltaX > 0 && activeTab === 'amis') {
-        // Swipe right: switch to groupes
-        setActiveTab('groupes')
-      } else if (deltaX < 0 && activeTab === 'groupes') {
-        // Swipe left: switch to amis
-        setActiveTab('amis')
+      if (deltaX > 0 && activeTab === 'friends') {
+        // Swipe right: switch to groups
+        setActiveTab('groups')
+      } else if (deltaX < 0 && activeTab === 'groups') {
+        // Swipe left: switch to friends
+        setActiveTab('friends')
       }
     }
     dragX.set(0)
@@ -109,39 +113,39 @@ export function GroupsScreen() {
         >
         {/* Header */}
         <div className="px-6 pt-12 pb-4">
-          <h1 className="text-3xl font-bold text-white">On partage le pop corn avec qui?</h1>
+          <h1 className="text-3xl font-bold text-white">Who are we sharing popcorn with?</h1>
         </div>
 
         {/* Tabs */}
         <div className="px-6 pb-4">
           <div className="flex gap-6 border-b border-white/30">
             <button
-              onClick={() => setActiveTab('amis')}
+              onClick={() => setActiveTab('friends')}
               className={`pb-3 px-2 font-medium transition-colors ${
-                activeTab === 'amis'
+                activeTab === 'friends'
                   ? 'text-white border-b-2 border-white'
                   : 'text-white/60'
               }`}
               data-tutorial-target="friends-tab"
             >
-              Amis
+              Friends
             </button>
             <button
-              onClick={() => setActiveTab('groupes')}
+              onClick={() => setActiveTab('groups')}
               className={`pb-3 px-2 font-medium transition-colors ${
-                activeTab === 'groupes'
+                activeTab === 'groups'
                   ? 'text-white border-b-2 border-white'
                   : 'text-white/60'
               }`}
             >
-              Groupes
+              Groups
             </button>
           </div>
         </div>
 
         {/* Content */}
         <div className="px-6 pb-6">
-          {activeTab === 'groupes' && (
+          {activeTab === 'groups' && (
             <div className="space-y-3">
               {/* Personal Watchlist */}
               <motion.div
@@ -150,20 +154,20 @@ export function GroupsScreen() {
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
-                  // Navigate to personal watchlist view
-                  // For now, we'll just show it as a special group
+                  setShowPersonalWatchlist(true)
                 }}
                 className="bg-gradient-to-r from-pink-500 to-red-500 rounded-xl p-4 flex items-center gap-4 cursor-pointer hover:shadow-lg transition-shadow text-white"
+                data-tutorial-target="personal-watchlist"
               >
                 <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl flex-shrink-0">
                   <FiFilm className="w-6 h-6" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-white truncate">My Personal Watchlist</h3>
-                  <p className="text-sm text-white/80 truncate">{mockMovies.slice(0, 3).length} movies saved</p>
+                  <p className="text-sm text-white/80 truncate">{personalWatchlistMovies.length} movies saved</p>
                 </div>
                 <div className="flex gap-1">
-                  {mockMovies.slice(0, 3).map((movie, idx) => (
+                  {personalWatchlistMovies.slice(0, 3).map((movie, idx) => (
                     <div
                       key={movie.id}
                       className="w-8 h-8 rounded overflow-hidden border-2 border-white/30"
@@ -179,6 +183,11 @@ export function GroupsScreen() {
                       />
                     </div>
                   ))}
+                  {personalWatchlistMovies.length > 3 && (
+                    <div className="w-8 h-8 rounded bg-white/20 border-2 border-white/30 flex items-center justify-center text-xs font-semibold">
+                      +{personalWatchlistMovies.length - 3}
+                    </div>
+                  )}
                 </div>
               </motion.div>
 
@@ -191,7 +200,7 @@ export function GroupsScreen() {
                   onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
-                    navigate(`/room/${group.id}`)
+                    navigate(`/group/${group.id}`)
                   }}
                   className="group-card bg-white rounded-xl p-4 flex items-center gap-4 cursor-pointer hover:shadow-lg transition-shadow"
                 >
@@ -203,7 +212,7 @@ export function GroupsScreen() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-gray-900 truncate">{group.name}</h3>
-                    <p className="text-sm text-gray-500 truncate">description</p>
+                    <p className="text-sm text-gray-500 truncate">Group description</p>
                   </div>
                   <button
                     onClick={(e) => {
@@ -236,7 +245,7 @@ export function GroupsScreen() {
             </div>
           )}
 
-          {activeTab === 'amis' && (
+          {activeTab === 'friends' && (
             <div className="space-y-3">
               {mockFriends.map((friend, idx) => (
                 <motion.div
@@ -306,6 +315,86 @@ export function GroupsScreen() {
           setShowTutorial(false)
         }}
       />
+
+      {/* Personal Watchlist Modal */}
+      <AnimatePresence>
+        {showPersonalWatchlist && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[10000] bg-black/70 flex items-center justify-center p-4"
+            onClick={() => setShowPersonalWatchlist(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-2xl w-full max-w-md max-h-[80vh] flex flex-col overflow-hidden"
+            >
+              {/* Header */}
+              <div className="bg-gradient-to-r from-pink-500 to-red-500 p-6 text-white">
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="text-2xl font-bold">My Personal Watchlist</h2>
+                  <button
+                    onClick={() => setShowPersonalWatchlist(false)}
+                    className="p-2 hover:bg-white/20 rounded-full transition-colors"
+                  >
+                    <FiX className="w-5 h-5" />
+                  </button>
+                </div>
+                <p className="text-white/80 text-sm">{personalWatchlistMovies.length} movies</p>
+              </div>
+
+              {/* Movies List */}
+              <div className="flex-1 overflow-y-auto p-4">
+                {personalWatchlistMovies.length > 0 ? (
+                  <div className="space-y-3">
+                    {personalWatchlistMovies.map((movie) => (
+                      <motion.div
+                        key={movie.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="flex items-center gap-4 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors"
+                      >
+                        <img
+                          src={movie.poster}
+                          alt={movie.title}
+                          className="w-16 h-24 rounded-lg object-cover flex-shrink-0"
+                          onError={(e) => {
+                            e.target.src = 'https://via.placeholder.com/400x600/1e293b/94a3b8?text=No+Poster'
+                          }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-gray-900 truncate">
+                            {movie.title}
+                          </h3>
+                          <p className="text-sm text-gray-600">{movie.year}</p>
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {movie.vibeTags.slice(0, 2).map((tag) => (
+                              <span
+                                key={tag}
+                                className="text-xs px-2 py-1 bg-pink-100 text-pink-700 rounded-full"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <p className="text-gray-500">No movies in your watchlist yet</p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </PhoneFrame>
   )
 }

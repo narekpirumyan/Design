@@ -4,7 +4,7 @@ import { PhoneFrame } from '../../components/PhoneFrame/PhoneFrame'
 import { BottomNavigation } from '../../components/BottomNavigation/BottomNavigation'
 import { TutorialGuide } from '../../components/TutorialGuide/TutorialGuide'
 import { motion } from 'framer-motion'
-import { FiUser, FiSettings, FiUsers, FiSearch, FiLogOut } from 'react-icons/fi'
+import { FiUser, FiSettings, FiLogOut, FiShield, FiFileText, FiMail } from 'react-icons/fi'
 import { useAuth } from '../../contexts/AuthContext'
 import { getTutorialSteps } from '../../data/tutorialSteps'
 
@@ -88,29 +88,56 @@ export function ProfileScreen() {
             {/* Menu Items */}
             <div className="space-y-2">
               <button 
-                onClick={() => navigate('/groups')}
-                className="w-full p-4 rounded-xl bg-gray-50 hover:bg-gray-100 flex items-center gap-3 transition-colors"
-              >
-                <FiUsers className="w-5 h-5 text-pink-500" />
-                <span className="font-medium text-gray-900">My Groups & Watchlist</span>
-              </button>
-              <button 
-                onClick={() => navigate('/search')}
-                className="w-full p-4 rounded-xl bg-gray-50 hover:bg-gray-100 flex items-center gap-3 transition-colors"
-              >
-                <FiSearch className="w-5 h-5 text-pink-500" />
-                <span className="font-medium text-gray-900">Search Movies</span>
-              </button>
-              <button 
                 onClick={() => setShowSettings(!showSettings)}
                 className="w-full p-4 rounded-xl bg-gray-50 hover:bg-gray-100 flex items-center gap-3 transition-colors"
               >
                 <FiSettings className="w-5 h-5 text-pink-500" />
-                <span className="font-medium text-gray-900">Settings</span>
+                <span className="font-medium text-gray-900">Interaction Mode</span>
+              </button>
+              
+              <button 
+                onClick={() => {
+                  // Open privacy policy (could be a modal or external link)
+                  alert('Privacy Policy - This would open the privacy policy page')
+                }}
+                className="w-full p-4 rounded-xl bg-gray-50 hover:bg-gray-100 flex items-center gap-3 transition-colors"
+              >
+                <FiShield className="w-5 h-5 text-pink-500" />
+                <span className="font-medium text-gray-900">Privacy</span>
+              </button>
+              
+              <button 
+                onClick={() => {
+                  // Open terms of service (could be a modal or external link)
+                  alert('Terms of Service - This would open the terms page')
+                }}
+                className="w-full p-4 rounded-xl bg-gray-50 hover:bg-gray-100 flex items-center gap-3 transition-colors"
+              >
+                <FiFileText className="w-5 h-5 text-pink-500" />
+                <span className="font-medium text-gray-900">Terms</span>
+              </button>
+              
+              <button 
+                onClick={() => {
+                  // Open contact us (could be a modal or email)
+                  window.location.href = 'mailto:support@filmtinder.com?subject=Contact Us'
+                }}
+                className="w-full p-4 rounded-xl bg-gray-50 hover:bg-gray-100 flex items-center gap-3 transition-colors"
+              >
+                <FiMail className="w-5 h-5 text-pink-500" />
+                <span className="font-medium text-gray-900">Contact Us</span>
+              </button>
+              
+              <button
+                onClick={handleLogout}
+                className="w-full p-4 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 font-medium flex items-center gap-3 transition-colors"
+              >
+                <FiLogOut className="w-5 h-5" />
+                <span>Logout</span>
               </button>
             </div>
 
-            {/* Settings Panel */}
+            {/* Interaction Mode Panel */}
             {showSettings && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
@@ -178,20 +205,6 @@ export function ProfileScreen() {
                         />
                       </div>
                     </div>
-                  </div>
-
-                  {/* Logout Button */}
-                  <div className="mt-6 pt-4 border-t border-gray-200">
-                    <button
-                      onClick={handleLogout}
-                      className="w-full p-3 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 font-medium flex items-center justify-center gap-2 transition-colors"
-                    >
-                      <FiLogOut className="w-4 h-4" />
-                      Logout
-                    </button>
-                    <p className="text-xs text-gray-500 text-center mt-2">
-                      This will reset all data for demo purposes
-                    </p>
                   </div>
                 </div>
               </motion.div>

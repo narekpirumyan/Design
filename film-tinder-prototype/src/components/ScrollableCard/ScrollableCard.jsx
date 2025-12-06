@@ -28,6 +28,10 @@ export function ScrollableCard({
     }, 300)
   }
 
+  if (!movie) {
+    return null
+  }
+
   return (
     <motion.div
       className="relative w-full h-full flex-shrink-0"
@@ -39,6 +43,7 @@ export function ScrollableCard({
       }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3 }}
+      style={{ pointerEvents: isVisible ? 'auto' : 'none' }}
     >
       <MovieCard movie={movie} />
       

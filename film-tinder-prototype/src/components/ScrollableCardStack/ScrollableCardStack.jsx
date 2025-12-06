@@ -63,10 +63,13 @@ export function ScrollableCardStack({
     onPass?.(movieId)
   }
 
+  // Calculate container height to fit all cards
+  const containerHeight = movies.length * 100
+
   return (
     <motion.div 
       ref={containerRef}
-      className="relative w-full h-full overflow-hidden"
+      className="relative w-full overflow-hidden"
       drag="y"
       dragConstraints={{ 
         top: -(movies.length - 1) * 100,
@@ -76,15 +79,19 @@ export function ScrollableCardStack({
       onDragEnd={handleDragEnd}
       style={{ 
         y: springY,
-        cursor: 'grab'
+        cursor: 'grab',
+        height: `${containerHeight}%`
       }}
     >
       {movies.map((movie, idx) => (
         <div
           key={`${movie.id}-${idx}`}
-          className="absolute inset-0 w-full h-full"
+          className="absolute w-full"
           style={{
             top: `${idx * 100}%`,
+            left: 0,
+            right: 0,
+            height: '100%',
             zIndex: movies.length - idx
           }}
         >

@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { LoginScreen } from './screens/Login/LoginScreen'
 import { PreferencesScreen } from './screens/Preferences/PreferencesScreen'
 import { GroupsScreen } from './screens/Groups/GroupsScreen'
+import { GroupDetailsScreen } from './screens/GroupDetails/GroupDetailsScreen'
 import { GroupRoomScreen } from './screens/GroupRoom/GroupRoomScreen'
 import { MatchResultScreen } from './screens/MatchResult/MatchResultScreen'
 import { IndividualSwipeScreen } from './screens/IndividualSwipe/IndividualSwipeScreen'
@@ -114,6 +115,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <GroupsScreen />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/group/:groupId" 
+        element={
+          <ProtectedRoute>
+            <GroupDetailsScreen />
           </ProtectedRoute>
         } 
       />

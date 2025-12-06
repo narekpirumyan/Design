@@ -157,7 +157,7 @@ export function IndividualSwipeScreen() {
               You've seen all the movies. Check your watchlists!
             </p>
             <button
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/groups')}
               className="px-6 py-3 bg-gradient-to-r from-pink-500 to-red-500 rounded-full text-white font-medium hover:opacity-90 transition-opacity shadow-lg"
             >
               Go Home

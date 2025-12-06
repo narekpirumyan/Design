@@ -6,21 +6,36 @@ import { RoomCodeDisplay } from '../../components/RoomCodeDisplay/RoomCodeDispla
 import { Button } from '../../components/Button/Button'
 import { PhoneFrame } from '../../components/PhoneFrame/PhoneFrame'
 import { BottomNavigation } from '../../components/BottomNavigation/BottomNavigation'
+import { TutorialGuide } from '../../components/TutorialGuide/TutorialGuide'
 import { FilmDetails } from '../../components/FilmDetails/FilmDetails'
 import { FilmShorts } from '../../components/FilmShorts/FilmShorts'
 import { mockMovies } from '../../data/mockMovies'
 import { mockParticipants } from '../../utils/mockGroupState'
 import { FiX, FiFilm, FiInfo, FiVideo } from 'react-icons/fi'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useAuth } from '../../contexts/AuthContext'
+import { getTutorialSteps } from '../../data/tutorialSteps'
 
 export function GroupRoomScreen() {
   const { roomCode } = useParams()
   const navigate = useNavigate()
+  const { user, hasCompletedTutorial, completeTutorial, skipTutorial } = useAuth()
   
   const [movies] = useState([...mockMovies].sort(() => Math.random() - 0.5))
   const [currentIndex, setCurrentIndex] = useState(0)
   const [participants] = useState(mockParticipants.slice(0, 4))
   const [mode, setMode] = useState('swipe') // 'swipe', 'details', 'shorts'
+  const [showTutorial, setShowTutorial] = useState(false)
+
+  // Check if tutorial should be shown
+  useEffect(() => {
+    if (user && !hasCompletedTutorial('room')) {
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        setShowTutorial(true)
+      }, 500)
+    }
+  }, [user, hasCompletedTutorial])
 
   // Reset mode to swipe on mount
   useEffect(() => {
@@ -67,7 +82,7 @@ export function GroupRoomScreen() {
 
   const handleLeaveRoom = () => {
     if (window.confirm('Leave this room?')) {
-      navigate('/')
+      navigate('/groups')
     }
   }
 
@@ -93,7 +108,7 @@ export function GroupRoomScreen() {
               })}>
                 View Matches
               </Button>
-              <Button onClick={() => navigate('/')} variant="secondary">
+              <Button onClick={() => navigate('/groups')} variant="secondary">
                 New Room
               </Button>
             </div>
@@ -113,7 +128,9 @@ export function GroupRoomScreen() {
         {/* Header */}
         <div className="p-4 space-y-3 relative z-10">
           <div className="flex items-center justify-between">
-            <RoomCodeDisplay roomCode={roomCode} />
+            <div data-tutorial-target="room-code">
+              <RoomCodeDisplay roomCode={roomCode} />
+            </div>
             <button
               onClick={handleLeaveRoom}
               className="p-2 hover:bg-white/20 rounded-lg transition-colors"
@@ -124,7 +141,7 @@ export function GroupRoomScreen() {
           </div>
 
           {/* Participants */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4" data-tutorial-target="participants">
             <span className="text-sm text-white/80">Participants:</span>
             <div className="flex gap-2">
               {participants.map((participant) => (
@@ -163,7 +180,7 @@ export function GroupRoomScreen() {
                 <>
                   {/* Swipe Area */}
                   <div className="relative w-full h-full pb-20">
-                    <div className="relative w-full h-full" style={{ perspective: '1000px' }}>
+                    <div className="relative w-full h-full swipe-area" style={{ perspective: '1000px' }}>
                       {nextMovies.length > 0 ? (
                         nextMovies.map((movie, idx) => (
                           <SwipeableCard
@@ -253,6 +270,21 @@ export function GroupRoomScreen() {
         </div>
       </div>
       <BottomNavigation />
+      
+      {/* Tutorial Guide */}
+      <TutorialGuide
+        steps={getTutorialSteps('room', user)}
+        sectionId="room"
+        isActive={showTutorial}
+        onComplete={(sectionId) => {
+          completeTutorial(sectionId)
+          setShowTutorial(false)
+        }}
+        onSkip={(sectionId) => {
+          skipTutorial(sectionId)
+          setShowTutorial(false)
+        }}
+      />
     </PhoneFrame>
   )
 }

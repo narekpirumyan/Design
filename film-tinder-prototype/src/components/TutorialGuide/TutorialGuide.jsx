@@ -265,8 +265,9 @@ export function TutorialGuide({
               bottom: 0,
               width: '100%',
               height: '100%',
-              zIndex: 1000,
-              pointerEvents: 'auto'
+              zIndex: 999,
+              pointerEvents: 'auto',
+              isolation: 'isolate'
             }}
             onClick={(e) => {
               // Prevent clicks from going through to underlying content

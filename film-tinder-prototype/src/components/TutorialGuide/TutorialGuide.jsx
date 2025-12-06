@@ -218,7 +218,7 @@ export function TutorialGuide({
   // Get position for tooltip relative to phone frame
   const getTooltipPosition = () => {
     if (!highlightedElement || !highlightPosition) {
-      return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }
+      return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)', maxWidth: '90%', maxHeight: '80%' }
     }
 
     // Get phone frame for relative positioning
@@ -230,45 +230,82 @@ export function TutorialGuide({
     const frameHeight = frameRect.height || 812
     const frameWidth = frameRect.width || 375
 
+    // Estimate tooltip dimensions (max-w-sm is ~384px, but we'll use 320px for calculations)
+    const tooltipWidth = 320
+    const tooltipHeight = 250 // Estimated height for tooltip content
+
     // Calculate relative positions
     const relativeTop = highlightPosition.top + 8
     const relativeLeft = highlightPosition.left + 8
     const elementHeight = highlightPosition.height - 16
     const elementWidth = highlightPosition.width - 16
 
-    // Determine best position
+    // Determine available space
     const spaceBelow = frameHeight - (relativeTop + elementHeight)
     const spaceAbove = relativeTop
     const spaceRight = frameWidth - (relativeLeft + elementWidth)
     const spaceLeft = relativeLeft
 
-    if (spaceBelow > 200) {
-      // Show below
+    // Calculate positions with padding to ensure tooltip stays within bounds
+    const padding = 16
+
+    // Try to position tooltip below first
+    if (spaceBelow >= tooltipHeight + padding) {
+      const top = relativeTop + elementHeight + 20
+      const left = Math.max(padding, Math.min(relativeLeft + elementWidth / 2 - tooltipWidth / 2, frameWidth - tooltipWidth - padding))
       return {
-        top: `${relativeTop + elementHeight + 20}px`,
-        left: `${relativeLeft + elementWidth / 2}px`,
-        transform: 'translateX(-50%)'
+        top: `${top}px`,
+        left: `${left}px`,
+        maxWidth: `${Math.min(tooltipWidth, frameWidth - padding * 2)}px`,
+        maxHeight: `${Math.min(tooltipHeight, spaceBelow - 40)}px`,
+        overflowY: 'auto'
       }
-    } else if (spaceAbove > 200) {
-      // Show above
+    }
+    // Try above
+    else if (spaceAbove >= tooltipHeight + padding) {
+      const bottom = frameHeight - relativeTop + 20
+      const left = Math.max(padding, Math.min(relativeLeft + elementWidth / 2 - tooltipWidth / 2, frameWidth - tooltipWidth - padding))
       return {
-        bottom: `${frameHeight - relativeTop + 20}px`,
-        left: `${relativeLeft + elementWidth / 2}px`,
-        transform: 'translateX(-50%)'
+        bottom: `${bottom}px`,
+        left: `${left}px`,
+        maxWidth: `${Math.min(tooltipWidth, frameWidth - padding * 2)}px`,
+        maxHeight: `${Math.min(tooltipHeight, spaceAbove - 40)}px`,
+        overflowY: 'auto'
       }
-    } else if (spaceRight > 300) {
-      // Show to the right
+    }
+    // Try to the right
+    else if (spaceRight >= tooltipWidth + padding) {
+      const top = Math.max(padding, Math.min(relativeTop + elementHeight / 2 - tooltipHeight / 2, frameHeight - tooltipHeight - padding))
+      const left = relativeLeft + elementWidth + 20
       return {
-        top: `${relativeTop + elementHeight / 2}px`,
-        left: `${relativeLeft + elementWidth + 20}px`,
-        transform: 'translateY(-50%)'
+        top: `${top}px`,
+        left: `${left}px`,
+        maxWidth: `${Math.min(tooltipWidth, spaceRight - 40)}px`,
+        maxHeight: `${Math.min(tooltipHeight, frameHeight - padding * 2)}px`,
+        overflowY: 'auto'
       }
-    } else {
-      // Show to the left
+    }
+    // Try to the left
+    else if (spaceLeft >= tooltipWidth + padding) {
+      const top = Math.max(padding, Math.min(relativeTop + elementHeight / 2 - tooltipHeight / 2, frameHeight - tooltipHeight - padding))
+      const right = frameWidth - relativeLeft + 20
       return {
-        top: `${relativeTop + elementHeight / 2}px`,
-        right: `${frameWidth - relativeLeft + 20}px`,
-        transform: 'translateY(-50%)'
+        top: `${top}px`,
+        right: `${right}px`,
+        maxWidth: `${Math.min(tooltipWidth, spaceLeft - 40)}px`,
+        maxHeight: `${Math.min(tooltipHeight, frameHeight - padding * 2)}px`,
+        overflowY: 'auto'
+      }
+    }
+    // Fallback: center with constraints
+    else {
+      return {
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        maxWidth: `${frameWidth - padding * 2}px`,
+        maxHeight: `${frameHeight - padding * 2}px`,
+        overflowY: 'auto'
       }
     }
   }
@@ -289,7 +326,7 @@ export function TutorialGuide({
       exit={{ opacity: 0 }}
       className="absolute inset-0 pointer-events-none"
       style={{ 
-        overflow: 'hidden',
+        overflow: 'visible',
         position: 'absolute',
         top: 0,
         left: 0,
@@ -297,8 +334,7 @@ export function TutorialGuide({
         bottom: 0,
         width: '100%',
         height: '100%',
-        zIndex: 1000,
-        contain: 'layout style paint'
+        zIndex: 1000
       }}
     >
         {/* Overlay with cutout for highlighted element */}
@@ -326,8 +362,13 @@ export function TutorialGuide({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9 }}
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-          className="absolute bg-white rounded-2xl shadow-2xl p-6 max-w-sm pointer-events-auto"
-          style={tooltipStyle}
+          className="absolute bg-white rounded-2xl shadow-2xl p-6 pointer-events-auto"
+          style={{
+            ...tooltipStyle,
+            width: tooltipStyle.maxWidth || '320px',
+            maxHeight: tooltipStyle.maxHeight || '400px',
+            overflowY: tooltipStyle.overflowY || 'auto'
+          }}
         >
           {/* Progress Indicator */}
           <div className="flex items-center justify-between mb-4">

@@ -19,11 +19,11 @@ export function PhoneFrame({ children, showNavigation = true }) {
             
             {/* Screen Content */}
             <div 
-              className="relative w-[375px] h-[812px] bg-white overflow-hidden phone-screen-content" 
+              className="relative w-[375px] h-[812px] bg-white phone-screen-content" 
               style={{ 
                 position: 'relative', 
                 zIndex: 1,
-                isolation: 'isolate'
+                overflow: 'hidden'
               }}
             >
               {children}

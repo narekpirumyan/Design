@@ -13,6 +13,7 @@ export function TutorialGuide({
   const [highlightedElement, setHighlightedElement] = useState(null)
   const [highlightPosition, setHighlightPosition] = useState(null)
   const highlightRef = useRef(null)
+  const tooltipRef = useRef(null)
   const updatePositionRef = useRef(null)
 
   // Update highlight position on scroll/resize
@@ -230,9 +231,14 @@ export function TutorialGuide({
     const frameHeight = frameRect.height || 812
     const frameWidth = frameRect.width || 375
 
-    // Estimate tooltip dimensions (max-w-sm is ~384px, but we'll use 320px for calculations)
-    const tooltipWidth = 320
-    const tooltipHeight = 250 // Estimated height for tooltip content
+    // Get actual tooltip dimensions if available, otherwise use estimates
+    let tooltipWidth = 320
+    let tooltipHeight = 250
+    if (tooltipRef.current) {
+      const tooltipRect = tooltipRef.current.getBoundingClientRect()
+      tooltipWidth = tooltipRect.width || 320
+      tooltipHeight = tooltipRect.height || 250
+    }
 
     // Calculate relative positions
     const relativeTop = highlightPosition.top + 8
@@ -247,57 +253,62 @@ export function TutorialGuide({
     const spaceLeft = relativeLeft
 
     // Calculate positions with padding to ensure tooltip stays within bounds
-    const padding = 16
+    const padding = 20
 
-    // Try to position tooltip below first
-    if (spaceBelow >= tooltipHeight + padding) {
+    // Try to position tooltip below first (most common case)
+    if (spaceBelow >= 180) {
       const top = relativeTop + elementHeight + 20
-      const left = Math.max(padding, Math.min(relativeLeft + elementWidth / 2 - tooltipWidth / 2, frameWidth - tooltipWidth - padding))
+      let left = relativeLeft + elementWidth / 2 - tooltipWidth / 2
+      // Ensure tooltip doesn't go outside bounds
+      left = Math.max(padding, Math.min(left, frameWidth - tooltipWidth - padding))
       return {
         top: `${top}px`,
         left: `${left}px`,
-        maxWidth: `${Math.min(tooltipWidth, frameWidth - padding * 2)}px`,
-        maxHeight: `${Math.min(tooltipHeight, spaceBelow - 40)}px`,
+        maxWidth: `${Math.min(340, frameWidth - padding * 2)}px`,
+        maxHeight: `${Math.min(400, spaceBelow - 30)}px`,
         overflowY: 'auto'
       }
     }
     // Try above
-    else if (spaceAbove >= tooltipHeight + padding) {
+    else if (spaceAbove >= 180) {
       const bottom = frameHeight - relativeTop + 20
-      const left = Math.max(padding, Math.min(relativeLeft + elementWidth / 2 - tooltipWidth / 2, frameWidth - tooltipWidth - padding))
+      let left = relativeLeft + elementWidth / 2 - tooltipWidth / 2
+      left = Math.max(padding, Math.min(left, frameWidth - tooltipWidth - padding))
       return {
         bottom: `${bottom}px`,
         left: `${left}px`,
-        maxWidth: `${Math.min(tooltipWidth, frameWidth - padding * 2)}px`,
-        maxHeight: `${Math.min(tooltipHeight, spaceAbove - 40)}px`,
+        maxWidth: `${Math.min(340, frameWidth - padding * 2)}px`,
+        maxHeight: `${Math.min(400, spaceAbove - 30)}px`,
         overflowY: 'auto'
       }
     }
     // Try to the right
-    else if (spaceRight >= tooltipWidth + padding) {
-      const top = Math.max(padding, Math.min(relativeTop + elementHeight / 2 - tooltipHeight / 2, frameHeight - tooltipHeight - padding))
+    else if (spaceRight >= 340) {
+      let top = relativeTop + elementHeight / 2 - tooltipHeight / 2
+      top = Math.max(padding, Math.min(top, frameHeight - tooltipHeight - padding))
       const left = relativeLeft + elementWidth + 20
       return {
         top: `${top}px`,
         left: `${left}px`,
-        maxWidth: `${Math.min(tooltipWidth, spaceRight - 40)}px`,
-        maxHeight: `${Math.min(tooltipHeight, frameHeight - padding * 2)}px`,
+        maxWidth: `${Math.min(340, spaceRight - 40)}px`,
+        maxHeight: `${Math.min(400, frameHeight - padding * 2)}px`,
         overflowY: 'auto'
       }
     }
     // Try to the left
-    else if (spaceLeft >= tooltipWidth + padding) {
-      const top = Math.max(padding, Math.min(relativeTop + elementHeight / 2 - tooltipHeight / 2, frameHeight - tooltipHeight - padding))
+    else if (spaceLeft >= 340) {
+      let top = relativeTop + elementHeight / 2 - tooltipHeight / 2
+      top = Math.max(padding, Math.min(top, frameHeight - tooltipHeight - padding))
       const right = frameWidth - relativeLeft + 20
       return {
         top: `${top}px`,
         right: `${right}px`,
-        maxWidth: `${Math.min(tooltipWidth, spaceLeft - 40)}px`,
-        maxHeight: `${Math.min(tooltipHeight, frameHeight - padding * 2)}px`,
+        maxWidth: `${Math.min(340, spaceLeft - 40)}px`,
+        maxHeight: `${Math.min(400, frameHeight - padding * 2)}px`,
         overflowY: 'auto'
       }
     }
-    // Fallback: center with constraints
+    // Fallback: center with constraints - always visible
     else {
       return {
         top: '50%',
@@ -319,6 +330,53 @@ export function TutorialGuide({
     }
   }, [highlightedElement, currentStep])
 
+  // Recalculate tooltip position after it renders to ensure it's fully visible
+  useEffect(() => {
+    if (tooltipRef.current && highlightedElement) {
+      const tooltip = tooltipRef.current
+      const phoneFrame = document.querySelector('.phone-screen-content')
+      
+      if (phoneFrame) {
+        const tooltipRect = tooltip.getBoundingClientRect()
+        const frameRect = phoneFrame.getBoundingClientRect()
+        
+        // Check if tooltip is outside bounds and adjust
+        const tooltipStyle = window.getComputedStyle(tooltip)
+        const currentTop = parseFloat(tooltipStyle.top) || 0
+        const currentLeft = parseFloat(tooltipStyle.left) || 0
+        
+        let newTop = currentTop
+        let newLeft = currentLeft
+        
+        // Adjust if tooltip goes outside right edge
+        if (tooltipRect.right > frameRect.right - 20) {
+          newLeft = frameRect.width - tooltipRect.width - 20
+        }
+        // Adjust if tooltip goes outside left edge
+        if (tooltipRect.left < frameRect.left + 20) {
+          newLeft = 20
+        }
+        // Adjust if tooltip goes outside bottom edge
+        if (tooltipRect.bottom > frameRect.bottom - 20) {
+          newTop = frameRect.height - tooltipRect.height - 20
+        }
+        // Adjust if tooltip goes outside top edge
+        if (tooltipRect.top < frameRect.top + 20) {
+          newTop = 20
+        }
+        
+        // Only update if position needs adjustment
+        if (newTop !== currentTop || newLeft !== currentLeft) {
+          tooltip.style.top = `${newTop}px`
+          tooltip.style.left = `${newLeft}px`
+          tooltip.style.right = 'auto'
+          tooltip.style.bottom = 'auto'
+          tooltip.style.transform = 'none'
+        }
+      }
+    }
+  }, [tooltipStyle, highlightedElement, currentStep])
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -334,7 +392,8 @@ export function TutorialGuide({
         bottom: 0,
         width: '100%',
         height: '100%',
-        zIndex: 1000
+        zIndex: 1000,
+        clipPath: 'none'
       }}
     >
         {/* Overlay with cutout for highlighted element */}
@@ -358,6 +417,7 @@ export function TutorialGuide({
 
         {/* Tooltip Card */}
         <motion.div
+          ref={tooltipRef}
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9 }}
@@ -366,8 +426,12 @@ export function TutorialGuide({
           style={{
             ...tooltipStyle,
             width: tooltipStyle.maxWidth || '320px',
+            maxWidth: tooltipStyle.maxWidth || '320px',
             maxHeight: tooltipStyle.maxHeight || '400px',
-            overflowY: tooltipStyle.overflowY || 'auto'
+            overflowY: tooltipStyle.overflowY || 'auto',
+            overflowX: 'hidden',
+            zIndex: 10001,
+            boxSizing: 'border-box'
           }}
         >
           {/* Progress Indicator */}

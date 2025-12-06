@@ -273,8 +273,21 @@ export function TutorialGuide({
           zIndex: 1000,
           pointerEvents: 'auto' // Block all interactions
         }}
+        onClick={(e) => {
+          // Prevent clicks from going through to underlying content
+          e.preventDefault()
+          e.stopPropagation()
+        }}
       >
-        <div className="absolute inset-0 bg-black/70 pointer-events-auto">
+        <div 
+          className="absolute inset-0 bg-black/70"
+          style={{ pointerEvents: 'auto' }}
+          onClick={(e) => {
+            // Block all clicks on the overlay
+            e.preventDefault()
+            e.stopPropagation()
+          }}
+        >
           {highlightedElement && highlightPosition && (
             <motion.div
               ref={highlightRef}

@@ -12,6 +12,7 @@ export function TutorialGuide({
   const [currentStep, setCurrentStep] = useState(0)
   const [highlightedElement, setHighlightedElement] = useState(null)
   const [highlightPosition, setHighlightPosition] = useState(null)
+  const [guidePosition, setGuidePosition] = useState('bottom') // 'bottom' or 'top'
   const highlightRef = useRef(null)
   const tooltipRef = useRef(null)
   const updatePositionRef = useRef(null)
@@ -50,6 +51,11 @@ export function TutorialGuide({
       // Restore body scroll when tutorial is inactive
       document.body.style.overflow = ''
       document.documentElement.style.overflow = ''
+      // Reset state when tutorial becomes inactive
+      setCurrentStep(0)
+      setHighlightedElement(null)
+      setHighlightPosition(null)
+      setGuidePosition('bottom')
       return
     }
 
@@ -203,25 +209,50 @@ export function TutorialGuide({
   const handleComplete = () => {
     setHighlightedElement(null)
     setHighlightPosition(null)
+    setCurrentStep(0)
     onComplete?.(sectionId)
   }
 
   const handleSkip = () => {
     setHighlightedElement(null)
     setHighlightPosition(null)
+    setCurrentStep(0)
     onSkip?.(sectionId)
+  }
+
+  // Return null if not active or no steps
+  if (!isActive || steps.length === 0 || currentStep >= steps.length) {
+    return null
   }
 
   const step = steps[currentStep]
   const isFirst = currentStep === 0
   const isLast = currentStep === steps.length - 1
 
-  // Update position when highlight changes
+  // Update position when highlight changes and determine guide position
   useEffect(() => {
-    if (highlightedElement) {
+    if (highlightedElement && highlightPosition) {
       updateHighlightPosition()
+      
+      // Check if highlighted element is in the bottom area where guide would cover it
+      const phoneFrame = document.querySelector('.phone-screen-content')
+      if (phoneFrame) {
+        const frameRect = phoneFrame.getBoundingClientRect()
+        const frameHeight = frameRect.height || 812
+        const guideHeight = frameHeight * 0.55 // 55% of screen height
+        
+        // If highlighted element is in bottom 60% of screen, move guide to top
+        const elementBottom = highlightPosition.top + highlightPosition.height
+        const threshold = frameHeight * 0.6
+        
+        if (elementBottom > threshold) {
+          setGuidePosition('top')
+        } else {
+          setGuidePosition('bottom')
+        }
+      }
     }
-  }, [highlightedElement, currentStep])
+  }, [highlightedElement, highlightPosition, currentStep])
 
   return (
     <>
@@ -230,7 +261,7 @@ export function TutorialGuide({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="absolute inset-0 pointer-events-none"
+        className="absolute inset-0"
         style={{ 
           position: 'absolute',
           top: 0,
@@ -239,10 +270,11 @@ export function TutorialGuide({
           bottom: 0,
           width: '100%',
           height: '100%',
-          zIndex: 1000
+          zIndex: 1000,
+          pointerEvents: 'auto' // Block all interactions
         }}
       >
-        <div className="absolute inset-0 bg-black/70">
+        <div className="absolute inset-0 bg-black/70 pointer-events-auto">
           {highlightedElement && highlightPosition && (
             <motion.div
               ref={highlightRef}
@@ -261,20 +293,24 @@ export function TutorialGuide({
         </div>
       </motion.div>
 
-      {/* Tutorial Guide Bottom Sheet - positioned absolutely within phone frame */}
+      {/* Tutorial Guide Bottom/Top Sheet - positioned absolutely within phone frame */}
       <motion.div
-        initial={{ y: '100%' }}
+        initial={{ y: guidePosition === 'bottom' ? '100%' : '-100%' }}
         animate={{ y: 0 }}
-        exit={{ y: '100%' }}
+        exit={{ y: guidePosition === 'bottom' ? '100%' : '-100%' }}
         transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-        className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl z-[10001] overflow-hidden shadow-2xl pointer-events-auto"
+        className={`absolute left-0 right-0 bg-white z-[10001] overflow-hidden shadow-2xl pointer-events-auto ${
+          guidePosition === 'bottom' ? 'bottom-0 rounded-t-3xl' : 'top-0 rounded-b-3xl'
+        }`}
         style={{
-          boxShadow: '0 -10px 40px rgba(0, 0, 0, 0.3)',
+          boxShadow: guidePosition === 'bottom' 
+            ? '0 -10px 40px rgba(0, 0, 0, 0.3)' 
+            : '0 10px 40px rgba(0, 0, 0, 0.3)',
           maxHeight: '55%'
         }}
       >
         {/* Drag Handle */}
-        <div className="flex justify-center pt-4 pb-2">
+        <div className={`flex justify-center ${guidePosition === 'bottom' ? 'pt-4 pb-2' : 'pb-4 pt-2'}`}>
           <div className="w-12 h-1.5 bg-gray-300 rounded-full"></div>
         </div>
 

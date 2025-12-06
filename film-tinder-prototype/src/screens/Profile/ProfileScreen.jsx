@@ -4,15 +4,20 @@ import { PhoneFrame } from '../../components/PhoneFrame/PhoneFrame'
 import { BottomNavigation } from '../../components/BottomNavigation/BottomNavigation'
 import { TutorialGuide } from '../../components/TutorialGuide/TutorialGuide'
 import { motion } from 'framer-motion'
-import { FiUser, FiSettings, FiUsers, FiSearch } from 'react-icons/fi'
+import { FiUser, FiSettings, FiUsers, FiSearch, FiLogOut } from 'react-icons/fi'
 import { useAuth } from '../../contexts/AuthContext'
 import { getTutorialSteps } from '../../data/tutorialSteps'
 
 export function ProfileScreen() {
-  const { user, updateInteractionModel, hasCompletedTutorial, completeTutorial, skipTutorial } = useAuth()
+  const { user, updateInteractionModel, hasCompletedTutorial, completeTutorial, skipTutorial, logout } = useAuth()
   const navigate = useNavigate()
   const [showSettings, setShowSettings] = useState(false)
   const [showTutorial, setShowTutorial] = useState(false)
+
+  const handleLogout = () => {
+    logout()
+    navigate('/login')
+  }
 
   // Check if tutorial should be shown
   useEffect(() => {
@@ -173,6 +178,20 @@ export function ProfileScreen() {
                         />
                       </div>
                     </div>
+                  </div>
+
+                  {/* Logout Button */}
+                  <div className="mt-6 pt-4 border-t border-gray-200">
+                    <button
+                      onClick={handleLogout}
+                      className="w-full p-3 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 font-medium flex items-center justify-center gap-2 transition-colors"
+                    >
+                      <FiLogOut className="w-4 h-4" />
+                      Logout
+                    </button>
+                    <p className="text-xs text-gray-500 text-center mt-2">
+                      This will reset all data for demo purposes
+                    </p>
                   </div>
                 </div>
               </motion.div>

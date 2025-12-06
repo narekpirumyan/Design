@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiArrowRight, FiArrowLeft, FiCheck } from 'react-icons/fi'
+import { FiArrowRight, FiArrowLeft, FiCheck, FiLogOut } from 'react-icons/fi'
 import { PhoneFrame } from '../../components/PhoneFrame/PhoneFrame'
 import { useAuth } from '../../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
@@ -80,8 +80,13 @@ export function PreferencesScreen() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [answers, setAnswers] = useState({})
   const [loading, setLoading] = useState(false)
-  const { completePreferences } = useAuth()
+  const { completePreferences, logout } = useAuth()
   const navigate = useNavigate()
+
+  const handleLogout = () => {
+    logout()
+    navigate('/login')
+  }
 
   const currentQuestion = questions[currentQuestionIndex]
   const isFirstQuestion = currentQuestionIndex === 0
@@ -146,7 +151,16 @@ export function PreferencesScreen() {
 
   return (
     <PhoneFrame>
-      <div className="h-full bg-gradient-to-br from-red-600 via-pink-500 to-red-700 flex flex-col">
+      <div className="h-full bg-gradient-to-br from-red-600 via-pink-500 to-red-700 flex flex-col relative">
+        {/* Logout Button (for demo purposes) */}
+        <button
+          onClick={handleLogout}
+          className="absolute top-4 right-4 z-10 p-2 rounded-lg bg-white/20 text-white hover:bg-white/30 transition-colors"
+          title="Logout (for demo)"
+        >
+          <FiLogOut className="w-5 h-5" />
+        </button>
+
         {/* Progress Bar */}
         {!isWelcomeScreen && !isCompletionScreen && (
           <div className="px-6 pt-12 pb-4">
@@ -165,101 +179,103 @@ export function PreferencesScreen() {
         )}
 
         {/* Content */}
-        <div className="flex-1 flex items-center justify-center px-6">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentQuestionIndex}
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              transition={{ duration: 0.3 }}
-              className="w-full max-w-sm"
-            >
-              {/* Welcome/Completion Screen */}
-              {(isWelcomeScreen || isCompletionScreen) && (
-                <div className="text-center">
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.2, type: 'spring' }}
-                    className="text-6xl mb-6"
-                  >
-                    {currentQuestion.icon}
-                  </motion.div>
-                  <h2 className="text-3xl font-bold text-white mb-4">
-                    {currentQuestion.title}
-                  </h2>
-                  <p className="text-white/80 text-lg">
-                    {currentQuestion.description}
-                  </p>
-                </div>
-              )}
-
-              {/* Question Screen */}
-              {!isWelcomeScreen && !isCompletionScreen && (
-                <>
-                  <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-white mb-2">
+        <div className="flex-1 overflow-y-auto px-6 py-4">
+          <div className="flex items-center justify-center min-h-full">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentQuestionIndex}
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -50 }}
+                transition={{ duration: 0.3 }}
+                className="w-full max-w-sm py-4"
+              >
+                {/* Welcome/Completion Screen */}
+                {(isWelcomeScreen || isCompletionScreen) && (
+                  <div className="text-center">
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 0.2, type: 'spring' }}
+                      className="text-6xl mb-6"
+                    >
+                      {currentQuestion.icon}
+                    </motion.div>
+                    <h2 className="text-3xl font-bold text-white mb-4">
                       {currentQuestion.title}
                     </h2>
-                    <p className="text-white/70 text-sm">
+                    <p className="text-white/80 text-lg">
                       {currentQuestion.description}
                     </p>
                   </div>
+                )}
 
-                  <div className="space-y-3">
-                    {currentQuestion.options.map((option) => {
-                      const isSelected = currentQuestion.type === 'multi-select'
-                        ? (answers[currentQuestion.id] || []).includes(option.id)
-                        : answers[currentQuestion.id] === option.id
+                {/* Question Screen */}
+                {!isWelcomeScreen && !isCompletionScreen && (
+                  <>
+                    <div className="mb-6">
+                      <h2 className="text-2xl font-bold text-white mb-2">
+                        {currentQuestion.title}
+                      </h2>
+                      <p className="text-white/70 text-sm">
+                        {currentQuestion.description}
+                      </p>
+                    </div>
 
-                      return (
-                        <motion.button
-                          key={option.id}
-                          onClick={() => {
-                            if (currentQuestion.type === 'multi-select') {
-                              handleMultiSelect(option.id)
-                            } else {
-                              handleSingleSelect(option.id)
-                            }
-                          }}
-                          whileTap={{ scale: 0.98 }}
-                          className={`w-full p-4 rounded-xl text-left transition-all ${
-                            isSelected
-                              ? 'bg-white text-gray-900 shadow-lg'
-                              : 'bg-white/20 text-white hover:bg-white/30'
-                          }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <span className="text-2xl">{option.emoji}</span>
-                            <div className="flex-1">
-                              <div className="font-semibold">{option.label}</div>
-                              {option.description && (
-                                <div className={`text-xs mt-1 ${
-                                  isSelected ? 'text-gray-600' : 'text-white/70'
-                                }`}>
-                                  {option.description}
-                                </div>
+                    <div className="space-y-3">
+                      {currentQuestion.options.map((option) => {
+                        const isSelected = currentQuestion.type === 'multi-select'
+                          ? (answers[currentQuestion.id] || []).includes(option.id)
+                          : answers[currentQuestion.id] === option.id
+
+                        return (
+                          <motion.button
+                            key={option.id}
+                            onClick={() => {
+                              if (currentQuestion.type === 'multi-select') {
+                                handleMultiSelect(option.id)
+                              } else {
+                                handleSingleSelect(option.id)
+                              }
+                            }}
+                            whileTap={{ scale: 0.98 }}
+                            className={`w-full p-4 rounded-xl text-left transition-all ${
+                              isSelected
+                                ? 'bg-white text-gray-900 shadow-lg'
+                                : 'bg-white/20 text-white hover:bg-white/30'
+                            }`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="text-2xl">{option.emoji}</span>
+                              <div className="flex-1">
+                                <div className="font-semibold">{option.label}</div>
+                                {option.description && (
+                                  <div className={`text-xs mt-1 ${
+                                    isSelected ? 'text-gray-600' : 'text-white/70'
+                                  }`}>
+                                    {option.description}
+                                  </div>
+                                )}
+                              </div>
+                              {isSelected && (
+                                <motion.div
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center"
+                                >
+                                  <FiCheck className="w-4 h-4 text-white" />
+                                </motion.div>
                               )}
                             </div>
-                            {isSelected && (
-                              <motion.div
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center"
-                              >
-                                <FiCheck className="w-4 h-4 text-white" />
-                              </motion.div>
-                            )}
-                          </div>
-                        </motion.button>
-                      )
-                    })}
-                  </div>
-                </>
-              )}
-            </motion.div>
-          </AnimatePresence>
+                          </motion.button>
+                        )
+                      })}
+                    </div>
+                  </>
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </div>
 
         {/* Navigation Buttons */}

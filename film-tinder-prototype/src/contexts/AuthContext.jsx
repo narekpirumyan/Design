@@ -56,10 +56,35 @@ export function AuthProvider({ children }) {
   }
 
   const logout = () => {
+    // Get user email before clearing user data
+    const userEmail = user?.email
+    
+    // Clear user state
     setUser(null)
     setIsFirstConnection(false)
+    setCompletedTutorials({})
+    
+    // Clear all localStorage items
     localStorage.removeItem('user')
     localStorage.removeItem('isFirstConnection')
+    localStorage.removeItem('completedTutorials')
+    
+    // Clear user-specific data if email exists
+    if (userEmail) {
+      localStorage.removeItem(`user_${userEmail}_preferences`)
+      localStorage.removeItem(`user_${userEmail}_tutorials`)
+    }
+    
+    // Clear all user-specific preferences (fallback for any email)
+    // This ensures complete cleanup for demo purposes
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('user_') && (key.endsWith('_preferences') || key.endsWith('_tutorials'))) {
+        localStorage.removeItem(key)
+      }
+    })
+    
+    // Clear sessionStorage (for mood selection, etc.)
+    sessionStorage.clear()
   }
 
   const completePreferences = (preferences) => {

@@ -93,7 +93,7 @@ export function GroupsScreen() {
 
   return (
     <PhoneFrame>
-      <div className="h-full bg-gradient-to-br from-red-600 via-pink-500 to-red-700 overflow-y-auto pb-20 relative">
+      <div className="h-full bg-gradient-to-br from-red-600 via-pink-500 to-red-700 overflow-y-auto pb-20 relative" style={{ position: 'relative', zIndex: 1 }}>
         <motion.div 
           ref={swipeAreaRef}
           className="h-full"

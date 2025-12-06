@@ -295,8 +295,13 @@ export function TutorialGuide({
               </p>
             </div>
             <button
-              onClick={handleSkip}
-              className="ml-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                handleSkip()
+              }}
+              className="ml-4 p-2 hover:bg-gray-100 rounded-full transition-colors pointer-events-auto z-10"
+              type="button"
             >
               <FiX className="w-5 h-5 text-gray-400" />
             </button>
@@ -304,19 +309,16 @@ export function TutorialGuide({
 
           {/* Step Content */}
           <div className="mb-6">
-            {step.icon && (
-              <div className="text-4xl mb-3">{step.icon}</div>
-            )}
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
               {step.title}
             </h3>
-            <p className="text-gray-600 leading-relaxed text-base mb-4">
+            <p className="text-gray-600 leading-relaxed text-sm mb-3">
               {step.description}
             </p>
             {step.action && (
-              <div className="mt-4 p-4 bg-pink-50 rounded-lg border border-pink-200">
-                <p className="text-sm text-pink-900 font-medium">
-                  💡 {step.action}
+              <div className="mt-3 p-3 bg-pink-50 rounded-lg border border-pink-200">
+                <p className="text-xs text-pink-900 font-medium">
+                  {step.action}
                 </p>
               </div>
             )}

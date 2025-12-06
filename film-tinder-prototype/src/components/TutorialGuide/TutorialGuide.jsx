@@ -267,9 +267,10 @@ export function TutorialGuide({
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-        className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl z-[10001] max-h-[60%] overflow-hidden shadow-2xl pointer-events-auto"
+        className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl z-[10001] overflow-hidden shadow-2xl pointer-events-auto"
         style={{
-          boxShadow: '0 -10px 40px rgba(0, 0, 0, 0.3)'
+          boxShadow: '0 -10px 40px rgba(0, 0, 0, 0.3)',
+          maxHeight: '55%'
         }}
       >
         {/* Drag Handle */}
@@ -278,7 +279,7 @@ export function TutorialGuide({
         </div>
 
         {/* Scrollable Content */}
-        <div className="overflow-y-auto max-h-[calc(60%-140px)] px-6 pb-6">
+        <div className="overflow-y-auto px-6 pb-6" style={{ maxHeight: 'calc(55% - 60px)' }}>
           {/* Progress Indicator */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex-1">

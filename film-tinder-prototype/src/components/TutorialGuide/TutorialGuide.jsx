@@ -46,13 +46,13 @@ export function TutorialGuide({
 
   useEffect(() => {
     if (!isActive || steps.length === 0) {
-      // Disable body scroll when tutorial is inactive
+      // Restore body scroll when tutorial is inactive
       document.body.style.overflow = ''
       return
     }
 
-    // Disable body scroll when tutorial is active
-    document.body.style.overflow = 'hidden'
+    // Don't disable body scroll - let the phone frame handle scrolling
+    // document.body.style.overflow = 'hidden'
 
     // Reset to first step when tutorial becomes active
     setCurrentStep(0)
@@ -71,6 +71,7 @@ export function TutorialGuide({
     setTimeout(updateHighlightPosition, 100)
 
     return () => {
+      // Restore body scroll when tutorial is inactive
       document.body.style.overflow = ''
       if (updatePositionRef.current) {
         window.removeEventListener('scroll', updatePositionRef.current, true)
@@ -249,8 +250,18 @@ export function TutorialGuide({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="absolute inset-0 z-[9999] pointer-events-none"
-        style={{ overflow: 'hidden' }}
+        className="absolute inset-0 pointer-events-none"
+        style={{ 
+          overflow: 'hidden',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          width: '100%',
+          height: '100%',
+          zIndex: 1000
+        }}
       >
         {/* Overlay with cutout for highlighted element */}
         <div className="absolute inset-0 bg-black/70">

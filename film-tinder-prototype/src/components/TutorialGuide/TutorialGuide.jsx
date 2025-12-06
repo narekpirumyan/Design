@@ -48,9 +48,6 @@ export function TutorialGuide({
 
   useEffect(() => {
     if (!isActive || steps.length === 0) {
-      // Restore body scroll when tutorial is inactive
-      document.body.style.overflow = ''
-      document.documentElement.style.overflow = ''
       // Reset state when tutorial becomes inactive
       setCurrentStep(0)
       setHighlightedElement(null)
@@ -58,13 +55,6 @@ export function TutorialGuide({
       setGuidePosition('bottom')
       return
     }
-
-    // Prevent page-level scrolling when tutorial is active
-    // This prevents the phone frame from scrolling out of view
-    const originalBodyOverflow = document.body.style.overflow
-    const originalHtmlOverflow = document.documentElement.style.overflow
-    document.body.style.overflow = 'hidden'
-    document.documentElement.style.overflow = 'hidden'
 
     // Reset to first step when tutorial becomes active
     setCurrentStep(0)
@@ -76,18 +66,21 @@ export function TutorialGuide({
 
     // Set up scroll/resize listeners
     updatePositionRef.current = () => updateHighlightPosition()
-    window.addEventListener('scroll', updatePositionRef.current, true)
+    const phoneFrame = document.querySelector('.phone-screen-content')
+    if (phoneFrame) {
+      phoneFrame.addEventListener('scroll', updatePositionRef.current, true)
+    }
     window.addEventListener('resize', updatePositionRef.current)
     
     // Initial position update
     setTimeout(updateHighlightPosition, 100)
 
     return () => {
-      // Restore original overflow styles
-      document.body.style.overflow = originalBodyOverflow
-      document.documentElement.style.overflow = originalHtmlOverflow
       if (updatePositionRef.current) {
-        window.removeEventListener('scroll', updatePositionRef.current, true)
+        const phoneFrame = document.querySelector('.phone-screen-content')
+        if (phoneFrame) {
+          phoneFrame.removeEventListener('scroll', updatePositionRef.current, true)
+        }
         window.removeEventListener('resize', updatePositionRef.current)
       }
     }

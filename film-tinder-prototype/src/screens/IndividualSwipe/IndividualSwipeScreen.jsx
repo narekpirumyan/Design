@@ -29,6 +29,7 @@ export function IndividualSwipeScreen() {
   const [selectedMood, setSelectedMood] = useState(null)
   const [showComments, setShowComments] = useState(false)
   const [selectedMovieForComments, setSelectedMovieForComments] = useState(null)
+  const [isSaveAction, setIsSaveAction] = useState(false)
   
   // Get interaction model from user preferences (default to 'swipe')
   const interactionModel = user?.preferences?.interactionModel || 'swipe'
@@ -85,6 +86,7 @@ export function IndividualSwipeScreen() {
         // Show group selection
         const movie = movies.find(m => m.id === movieId)
         setSelectedMovie(movie)
+        setIsSaveAction(false) // This is a like action, should advance
         setShowGroupSelection(true)
       } else {
         // Just advance to next movie
@@ -99,6 +101,7 @@ export function IndividualSwipeScreen() {
   const handleScrollLike = (movieId) => {
     const movie = movies.find(m => m.id === movieId)
     setSelectedMovie(movie)
+    setIsSaveAction(false) // This is a like action, should advance
     setShowGroupSelection(true)
   }
 
@@ -119,9 +122,10 @@ export function IndividualSwipeScreen() {
   }
 
   const handleScrollSave = (movie) => {
-    // Save movie without advancing to next one
-    console.log('Saving movie:', movie.title)
-    // Here you would add the movie to saved/watchlist
+    // Open group selection screen (same as swiping right, but without advancing)
+    setSelectedMovie(movie)
+    setIsSaveAction(true) // This is a save action, should NOT advance
+    setShowGroupSelection(true)
   }
 
   const handleScrollIndexChange = (newIndex) => {
@@ -140,12 +144,17 @@ export function IndividualSwipeScreen() {
     console.log(`Adding ${selectedMovie?.title} to group ${groupId}`)
     setShowGroupSelection(false)
     setSelectedMovie(null)
-    setCurrentIndex(prev => prev + 1)
+    // Only advance if it's not a save action
+    if (!isSaveAction) {
+      setCurrentIndex(prev => prev + 1)
+    }
+    setIsSaveAction(false) // Reset flag
   }
 
   const handleCloseGroupSelection = () => {
     setShowGroupSelection(false)
     setSelectedMovie(null)
+    setIsSaveAction(false) // Reset flag
   }
 
   if (currentIndex >= movies.length) {

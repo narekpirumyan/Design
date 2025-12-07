@@ -87,19 +87,31 @@ export function FilmShorts({ movie, onBack, onSwipe, onAddToWatchlist }) {
 
   const currentShort = shorts[currentShortIndex]
 
+  const handleDrag = (event, info) => {
+    // Update position during drag
+    y.set(info.offset.y)
+  }
+
   const handleDragEnd = (event, info) => {
-    const threshold = 100
+    const threshold = 50 // Lower threshold for more sensitive swipes
     const velocity = info.velocity.y
 
-    if (Math.abs(info.offset.y) > threshold || Math.abs(velocity) > 500) {
+    if (Math.abs(info.offset.y) > threshold || Math.abs(velocity) > 300) {
       if (info.offset.y > 0 || velocity > 0) {
         // Swipe down - previous short
-        setCurrentShortIndex((prev) => (prev - 1 + shorts.length) % shorts.length)
+        setCurrentShortIndex((prev) => {
+          const newIndex = (prev - 1 + shorts.length) % shorts.length
+          return newIndex
+        })
       } else {
         // Swipe up - next short
-        setCurrentShortIndex((prev) => (prev + 1) % shorts.length)
+        setCurrentShortIndex((prev) => {
+          const newIndex = (prev + 1) % shorts.length
+          return newIndex
+        })
       }
     }
+    // Reset drag position
     y.set(0)
   }
 
@@ -116,7 +128,28 @@ export function FilmShorts({ movie, onBack, onSwipe, onAddToWatchlist }) {
       </button>
 
       {/* Shorts Container - Vertical Scrollable */}
-      <div ref={containerRef} className="h-full relative overflow-hidden">
+      <motion.div 
+        ref={containerRef} 
+        className="h-full relative overflow-hidden"
+        drag="y"
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={0.2}
+        dragMomentum={false}
+        onDragStart={(event) => {
+          // Prevent text selection during drag
+          if (event.target.tagName !== 'BUTTON') {
+            event.preventDefault()
+          }
+        }}
+        onDrag={handleDrag}
+        onDragEnd={handleDragEnd}
+        style={{ 
+          userSelect: 'none',
+          WebkitUserSelect: 'none',
+          touchAction: 'pan-y',
+          y: useTransform(y, (val) => val)
+        }}
+      >
         {shorts.map((short, index) => {
           const isActive = index === currentShortIndex
           const offset = index - currentShortIndex
@@ -124,21 +157,15 @@ export function FilmShorts({ movie, onBack, onSwipe, onAddToWatchlist }) {
           return (
             <motion.div
               key={short.id}
-              drag="y"
-              dragConstraints={{ top: 0, bottom: 0 }}
-              dragElastic={0.1}
-              onDrag={(event, info) => {
-                if (isActive) {
-                  y.set(info.offset.y)
-                }
-              }}
-              onDragEnd={handleDragEnd}
               style={{
                 y: useTransform(y, (val) => {
                   const baseY = offset * containerHeight
-                  return isActive ? baseY + val : baseY
+                  return baseY + val
                 }),
-                zIndex: shorts.length - Math.abs(offset)
+                zIndex: shorts.length - Math.abs(offset),
+                userSelect: 'none',
+                WebkitUserSelect: 'none',
+                pointerEvents: 'auto'
               }}
               className="absolute inset-0 w-full h-full"
               animate={{
@@ -149,7 +176,7 @@ export function FilmShorts({ movie, onBack, onSwipe, onAddToWatchlist }) {
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             >
               {/* Video Player - Instagram Reels Style with YouTube Embed */}
-              <div className="relative w-full h-full bg-black" style={{ overflow: 'hidden' }}>
+              <div className="relative w-full h-full bg-black" style={{ overflow: 'hidden', userSelect: 'none', pointerEvents: isActive ? 'auto' : 'none' }}>
                 {isActive ? (
                   <iframe
                     ref={(el) => {
@@ -160,7 +187,8 @@ export function FilmShorts({ movie, onBack, onSwipe, onAddToWatchlist }) {
                     style={{
                       width: '100%',
                       height: '100%',
-                      border: 'none'
+                      border: 'none',
+                      pointerEvents: 'none' // Allow drag gestures to pass through
                     }}
                     frameBorder="0"
                     referrerPolicy="strict-origin-when-cross-origin"
@@ -197,7 +225,7 @@ export function FilmShorts({ movie, onBack, onSwipe, onAddToWatchlist }) {
             </motion.div>
           )
         })}
-      </div>
+      </motion.div>
 
       {/* Shorts Indicator */}
       <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex gap-2 z-20">

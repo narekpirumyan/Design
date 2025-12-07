@@ -2,6 +2,18 @@ import { motion } from 'framer-motion'
 import { FiPlay, FiStar, FiMessageCircle, FiExternalLink, FiChevronLeft } from 'react-icons/fi'
 import { VibeTag } from '../VibeTag/VibeTag'
 
+// Get trailer video ID for each movie
+const getTrailerVideoId = (movieTitle) => {
+  const trailerIds = {
+    'Inception': 'YoHD9XEInc0',
+    'The Grand Budapest Hotel': '1Fg5iWmB5c0',
+    'Parasite': '5xH0HfJHsaY',
+    'Spirited Away': 'ByXuk9QqQkk',
+    'Mad Max: Fury Road': 'hEJnMQG9ev8'
+  }
+  return trailerIds[movieTitle] || 'YoHD9XEInc0' // Default to Inception if not found
+}
+
 export function FilmDetails({ movie, onBack, onSwipe, onAddToWatchlist }) {
   // Mock data for details
   const cast = [
@@ -36,14 +48,32 @@ export function FilmDetails({ movie, onBack, onSwipe, onAddToWatchlist }) {
         </button>
       </div>
 
-      {/* Poster Hero Section */}
-      <div className="relative h-96">
+      {/* Trailer Hero Section */}
+      <div className="relative h-96" style={{ overflow: 'hidden' }}>
+        {/* YouTube Trailer - Autoplay */}
+        <iframe
+          src={`https://www.youtube-nocookie.com/embed/${getTrailerVideoId(movie.title)}?autoplay=1&mute=1&loop=1&playlist=${getTrailerVideoId(movie.title)}&controls=0&modestbranding=1&rel=0&playsinline=1`}
+          className="absolute inset-0 w-full h-full"
+          style={{
+            width: '100%',
+            height: '100%',
+            border: 'none',
+            objectFit: 'cover'
+          }}
+          frameBorder="0"
+          referrerPolicy="strict-origin-when-cross-origin"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+          title={`${movie.title} Trailer`}
+        />
+        {/* Fallback poster if video fails */}
         <img
           src={movie.poster}
           alt={movie.title}
-          className="w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover opacity-0 pointer-events-none"
           onError={(e) => {
             e.target.src = 'https://via.placeholder.com/400x600/1e293b/94a3b8?text=No+Poster'
+            e.target.style.opacity = '1'
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-red-700 via-red-600/50 to-transparent" />
@@ -68,14 +98,6 @@ export function FilmDetails({ movie, onBack, onSwipe, onAddToWatchlist }) {
 
       {/* Content */}
       <div className="px-6 py-6 space-y-6">
-        {/* Trailer Button */}
-        <motion.button
-          whileTap={{ scale: 0.95 }}
-          className="w-full bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-xl p-4 flex items-center justify-center gap-3 text-white font-semibold transition-colors border-2 border-white/30"
-        >
-          <FiPlay className="w-6 h-6" />
-          <span>Watch Trailer</span>
-        </motion.button>
 
         {/* Description */}
         <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">

@@ -9,11 +9,11 @@ export function PhoneFrame({ children, showNavigation = true }) {
         zIndex: 1
       }}
     >
-      <div className="relative" style={{ zIndex: 10, isolation: 'isolate' }}>
+      <div className="relative z-10">
         {/* Phone Frame */}
-        <div className="relative bg-black rounded-[3rem] p-2 shadow-2xl" style={{ zIndex: 10 }}>
+        <div className="relative bg-black rounded-[3rem] p-2 shadow-2xl" style={{ zIndex: 1 }}>
           {/* Screen Bezel */}
-          <div className="bg-black rounded-[2.5rem] relative" style={{ overflow: 'hidden', zIndex: 10 }}>
+          <div className="bg-black rounded-[2.5rem] relative" style={{ overflow: 'hidden' }}>
             {/* Notch */}
             <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-black rounded-b-2xl z-10"></div>
             
@@ -22,9 +22,8 @@ export function PhoneFrame({ children, showNavigation = true }) {
               className="relative w-[375px] h-[812px] bg-white phone-screen-content" 
               style={{ 
                 position: 'relative', 
-                overflow: 'hidden',
                 zIndex: 1,
-                isolation: 'isolate'
+                overflow: 'hidden'
               }}
             >
               {children}

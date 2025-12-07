@@ -34,9 +34,12 @@ export function IndividualSwipeScreen() {
   // Get interaction model from user preferences (default to 'swipe')
   const interactionModel = user?.preferences?.interactionModel || 'swipe'
 
-  // Show mood selection on entry (each time user enters this screen)
+  // Show mood selection only once per session (after login/connection)
   useEffect(() => {
-    // Load saved mood from sessionStorage first
+    // Check if mood has been selected in this session
+    const moodSelectedInSession = sessionStorage.getItem('moodSelectedInSession')
+    
+    // Load saved mood from sessionStorage
     const savedMood = sessionStorage.getItem('currentMood')
     if (savedMood) {
       try {
@@ -47,11 +50,14 @@ export function IndividualSwipeScreen() {
         sessionStorage.removeItem('currentMood')
       }
     }
-    // Always show mood selection modal when entering this screen
-    // Small delay to ensure smooth transition
-    setTimeout(() => {
-      setShowMoodSelection(true)
-    }, 300)
+    
+    // Only show mood selection if it hasn't been selected in this session
+    if (!moodSelectedInSession) {
+      // Small delay to ensure smooth transition
+      setTimeout(() => {
+        setShowMoodSelection(true)
+      }, 300)
+    }
   }, [])
 
   // Reset mode to swipe on mount
@@ -62,6 +68,7 @@ export function IndividualSwipeScreen() {
   const handleMoodSelect = (mood) => {
     setSelectedMood(mood)
     sessionStorage.setItem('currentMood', JSON.stringify(mood))
+    sessionStorage.setItem('moodSelectedInSession', 'true') // Mark mood as selected in this session
     setShowMoodSelection(false)
   }
 

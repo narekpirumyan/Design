@@ -121,6 +121,12 @@ export function IndividualSwipeScreen() {
     setShowComments(true)
   }
 
+  const handleSwipeComment = (movie) => {
+    // Open comments modal (same as scroll mode)
+    setSelectedMovieForComments(movie)
+    setShowComments(true)
+  }
+
   const handleScrollSave = (movie) => {
     // Open group selection screen (same as swiping right, but without advancing)
     setSelectedMovie(movie)
@@ -263,6 +269,7 @@ export function IndividualSwipeScreen() {
                           index={idx}
                           isTop={idx === 0}
                           onSwipe={idx === 0 ? handleSwipe : undefined}
+                          onComment={idx === 0 ? handleSwipeComment : undefined}
                         />
                       ))}
                     </div>

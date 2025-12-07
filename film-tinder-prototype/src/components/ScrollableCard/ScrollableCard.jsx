@@ -9,16 +9,18 @@ export function ScrollableCard({
   onPass,
   onInfo,
   onComment,
+  onSave,
   index = 0,
   isVisible = true
 }) {
   const [isSaved, setIsSaved] = useState(false)
 
   const handleSave = () => {
-    setIsSaved(!isSaved)
-    // Save functionality - could trigger onLike callback
-    if (!isSaved) {
-      onLike?.(movie.id)
+    const newSavedState = !isSaved
+    setIsSaved(newSavedState)
+    // Save functionality - only trigger onSave callback (not onLike which advances the movie)
+    if (newSavedState) {
+      onSave?.(movie)
     }
   }
 

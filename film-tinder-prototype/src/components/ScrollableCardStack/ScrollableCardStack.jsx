@@ -8,6 +8,7 @@ export function ScrollableCardStack({
   onPass,
   onInfo,
   onComment,
+  onSave,
   currentIndex = 0,
   onIndexChange
 }) {
@@ -134,6 +135,7 @@ export function ScrollableCardStack({
               onPass={handlePass}
               onInfo={onInfo}
               onComment={onComment}
+              onSave={onSave}
               index={idx}
               isVisible={isVisible}
             />

@@ -118,6 +118,12 @@ export function IndividualSwipeScreen() {
     setShowComments(true)
   }
 
+  const handleScrollSave = (movie) => {
+    // Save movie without advancing to next one
+    console.log('Saving movie:', movie.title)
+    // Here you would add the movie to saved/watchlist
+  }
+
   const handleScrollIndexChange = (newIndex) => {
     setCurrentIndex(newIndex)
   }
@@ -236,6 +242,7 @@ export function IndividualSwipeScreen() {
                       onPass={handleScrollPass}
                       onInfo={handleScrollInfo}
                       onComment={handleScrollComment}
+                      onSave={handleScrollSave}
                       onIndexChange={handleScrollIndexChange}
                     />
                   ) : (

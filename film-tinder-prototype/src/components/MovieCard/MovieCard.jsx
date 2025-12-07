@@ -9,9 +9,9 @@ export function MovieCard({ movie, className = '', variant = 'default' }) {
       <img
         src={movie.poster}
         alt={movie.title}
-        className={`w-full h-full ${isScrollMode ? 'object-cover' : 'object-contain'}`}
+        className="w-full h-full object-contain"
         style={{
-          objectFit: isScrollMode ? 'cover' : 'contain',
+          objectFit: 'contain',
           backgroundColor: '#1e293b'
         }}
         onError={(e) => {

@@ -18,16 +18,6 @@ export function ProfileScreen() {
     logout()
     navigate('/login')
   }
-
-  // Check if tutorial should be shown
-  useEffect(() => {
-    if (user && !hasCompletedTutorial('profile')) {
-      // Small delay to ensure DOM is ready
-      setTimeout(() => {
-        setShowTutorial(true)
-      }, 500)
-    }
-  }, [user, hasCompletedTutorial])
   
   // Get current interaction model (default to 'swipe')
   const currentModel = user?.preferences?.interactionModel || 'swipe'

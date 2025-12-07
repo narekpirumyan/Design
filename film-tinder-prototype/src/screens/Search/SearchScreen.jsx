@@ -30,15 +30,6 @@ export function SearchScreen() {
   const moods = ['Energetic', 'Relaxed', 'Thoughtful', 'Adventurous', 'Social']
   const streamingServices = ['Netflix', 'HBO Max', 'Disney+', 'Hulu', 'Amazon Prime']
 
-  // Check if tutorial should be shown
-  useEffect(() => {
-    if (user && !hasCompletedTutorial('search')) {
-      setTimeout(() => {
-        setShowTutorial(true)
-      }, 500)
-    }
-  }, [user, hasCompletedTutorial])
-
   // Perform search
   useEffect(() => {
     if (searchQuery.trim() || Object.keys(filters).some(key => {

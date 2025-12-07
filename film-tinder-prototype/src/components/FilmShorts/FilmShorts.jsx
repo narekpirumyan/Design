@@ -16,104 +16,65 @@ export function FilmShorts({ movie, onBack, onSwipe, onAddToWatchlist }) {
     }
   }, [])
 
-  // Auto-play current video and pause others when index changes
-  useEffect(() => {
-    Object.keys(videoRefs.current).forEach((key) => {
-      const video = videoRefs.current[key]
-      if (video) {
-        if (parseInt(key) === currentShortIndex && isPlaying) {
-          video.play().catch(() => {
-            // Autoplay might be blocked, handle gracefully
-            setIsPlaying(false)
-          })
-        } else {
-          video.pause()
-        }
-      }
-    })
-  }, [currentShortIndex, isPlaying])
+  // YouTube iframes autoplay via URL parameters, no need for manual play/pause
+  // The iframe src already includes autoplay=1 for active videos
 
-  // Movie-specific shorts with GIFs from Giphy - Instagram Reels style
+  // Movie-specific shorts with real movie trailer clips - Instagram Reels style
   const getMovieShorts = () => {
-    // Using actual Giphy video URLs (MP4 format) for movie-related GIFs
-    // These are popular movie GIFs that auto-play like Instagram Reels
-    const movieGifs = {
+    // Using YouTube video IDs for actual movie trailers/clips
+    // These are real movie trailers that can be embedded
+    const movieClips = {
       'Inception': [
-        'https://media.giphy.com/media/3o7aCTPPb4OHbRLhv6/giphy.mp4',
-        'https://media.giphy.com/media/3o7abldur0Y0jQj3R6/giphy.mp4',
-        'https://media.giphy.com/media/3o7abnDuVuJc4D4W6E/giphy.mp4',
-        'https://media.giphy.com/media/l0MYC0LajboID0xBu/giphy.mp4'
+        { videoId: 'YoHD9XEInc0', title: 'Official Trailer', startTime: 0 },
+        { videoId: 'YoHD9XEInc0', title: 'Action Scenes', startTime: 45 },
+        { videoId: 'YoHD9XEInc0', title: 'Dream Sequences', startTime: 90 },
+        { videoId: 'YoHD9XEInc0', title: 'Best Moments', startTime: 120 }
       ],
       'The Grand Budapest Hotel': [
-        'https://media.giphy.com/media/3o7abldur0Y0jQj3R6/giphy.mp4',
-        'https://media.giphy.com/media/3o7abnDuVuJc4D4W6E/giphy.mp4',
-        'https://media.giphy.com/media/3o7aCTPPb4OHbRLhv6/giphy.mp4',
-        'https://media.giphy.com/media/l0MYC0LajboID0xBu/giphy.mp4'
+        { videoId: '1Fg5iWmB5c0', title: 'Official Trailer', startTime: 0 },
+        { videoId: '1Fg5iWmB5c0', title: 'Comedy Moments', startTime: 30 },
+        { videoId: '1Fg5iWmB5c0', title: 'Stylish Scenes', startTime: 60 },
+        { videoId: '1Fg5iWmB5c0', title: 'Character Highlights', startTime: 90 }
       ],
       'Parasite': [
-        'https://media.giphy.com/media/3o7abnDuVuJc4D4W6E/giphy.mp4',
-        'https://media.giphy.com/media/3o7aCTPPb4OHbRLhv6/giphy.mp4',
-        'https://media.giphy.com/media/3o7abldur0Y0jQj3R6/giphy.mp4',
-        'https://media.giphy.com/media/l0MYC0LajboID0xBu/giphy.mp4'
+        { videoId: '5xH0HfJHsaY', title: 'Official Trailer', startTime: 0 },
+        { videoId: '5xH0HfJHsaY', title: 'Intense Moments', startTime: 40 },
+        { videoId: '5xH0HfJHsaY', title: 'Social Commentary', startTime: 80 },
+        { videoId: '5xH0HfJHsaY', title: 'Best Scenes', startTime: 120 }
       ],
       'Spirited Away': [
-        'https://media.giphy.com/media/3o7abldur0Y0jQj3R6/giphy.mp4',
-        'https://media.giphy.com/media/3o7abnDuVuJc4D4W6E/giphy.mp4',
-        'https://media.giphy.com/media/3o7aCTPPb4OHbRLhv6/giphy.mp4',
-        'https://media.giphy.com/media/l0MYC0LajboID0xBu/giphy.mp4'
+        { videoId: 'ByXuk9QqQkk', title: 'Official Trailer', startTime: 0 },
+        { videoId: 'ByXuk9QqQkk', title: 'Magical Moments', startTime: 30 },
+        { videoId: 'ByXuk9QqQkk', title: 'Beautiful Animation', startTime: 60 },
+        { videoId: 'ByXuk9QqQkk', title: 'Character Scenes', startTime: 90 }
       ],
       'Mad Max: Fury Road': [
-        'https://media.giphy.com/media/3o7aCTPPb4OHbRLhv6/giphy.mp4',
-        'https://media.giphy.com/media/3o7abldur0Y0jQj3R6/giphy.mp4',
-        'https://media.giphy.com/media/3o7abnDuVuJc4D4W6E/giphy.mp4',
-        'https://media.giphy.com/media/l0MYC0LajboID0xBu/giphy.mp4'
+        { videoId: 'hEJnMQG9ev8', title: 'Official Trailer', startTime: 0 },
+        { videoId: 'hEJnMQG9ev8', title: 'Action Sequences', startTime: 30 },
+        { videoId: 'hEJnMQG9ev8', title: 'Chase Scenes', startTime: 60 },
+        { videoId: 'hEJnMQG9ev8', title: 'Best Stunts', startTime: 90 }
       ]
     }
 
-    // Default GIFs if movie not found
-    const defaultGifs = [
-      'https://media.giphy.com/media/3o7aCTPPb4OHbRLhv6/giphy.mp4',
-      'https://media.giphy.com/media/3o7abldur0Y0jQj3R6/giphy.mp4',
-      'https://media.giphy.com/media/3o7abnDuVuJc4D4W6E/giphy.mp4',
-      'https://media.giphy.com/media/l0MYC0LajboID0xBu/giphy.mp4'
+    // Default clips if movie not found
+    const defaultClips = [
+      { videoId: 'YoHD9XEInc0', title: 'Movie Clip', startTime: 0 },
+      { videoId: 'YoHD9XEInc0', title: 'Action Scene', startTime: 30 },
+      { videoId: 'YoHD9XEInc0', title: 'Best Moment', startTime: 60 },
+      { videoId: 'YoHD9XEInc0', title: 'Trailer Extract', startTime: 90 }
     ]
 
-    const gifUrls = movieGifs[movie.title] || defaultGifs
+    const clips = movieClips[movie.title] || defaultClips
 
-    return [
-      {
-        id: '1',
-        title: 'Best Moments',
-        videoUrl: gifUrls[0],
-        thumbnail: movie.poster,
-        duration: '0:30',
-        views: '1.2M'
-      },
-      {
-        id: '2',
-        title: 'Behind the Scenes',
-        videoUrl: gifUrls[1],
-        thumbnail: movie.poster,
-        duration: '0:45',
-        views: '856K'
-      },
-      {
-        id: '3',
-        title: 'Action Scenes',
-        videoUrl: gifUrls[2],
-        thumbnail: movie.poster,
-        duration: '0:25',
-        views: '2.1M'
-      },
-      {
-        id: '4',
-        title: 'Memorable Quotes',
-        videoUrl: gifUrls[3],
-        thumbnail: movie.poster,
-        duration: '0:35',
-        views: '623K'
-      }
-    ]
+    return clips.map((clip, index) => ({
+      id: String(index + 1),
+      title: clip.title,
+      videoId: clip.videoId,
+      startTime: clip.startTime,
+      thumbnail: movie.poster,
+      duration: '0:30',
+      views: `${(Math.random() * 2 + 0.5).toFixed(1)}M`
+    }))
   }
 
   const shorts = getMovieShorts()
@@ -137,27 +98,18 @@ export function FilmShorts({ movie, onBack, onSwipe, onAddToWatchlist }) {
   }
 
   const togglePlayPause = () => {
-    const video = videoRefs.current[currentShortIndex]
-    if (video) {
-      if (isPlaying) {
-        video.pause()
-        setIsPlaying(false)
-      } else {
-        video.play()
-        setIsPlaying(true)
-      }
+    const iframe = videoRefs.current[currentShortIndex]
+    if (iframe && iframe.contentWindow) {
+      // YouTube iframe API would be needed for play/pause
+      // For now, just toggle the playing state
+      setIsPlaying(!isPlaying)
     }
   }
 
   const handleVideoRef = (index, element) => {
     if (element) {
       videoRefs.current[index] = element
-      // Auto-play the first video on mount
-      if (index === currentShortIndex && isPlaying) {
-        element.play().catch(() => {
-          setIsPlaying(false)
-        })
-      }
+      // YouTube iframe will autoplay via URL parameters
     }
   }
 
@@ -204,45 +156,39 @@ export function FilmShorts({ movie, onBack, onSwipe, onAddToWatchlist }) {
               }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             >
-              {/* Video Player - Instagram Reels Style */}
-              <div className="relative w-full h-full bg-black">
-                {/* Try video first, fallback to GIF if video fails */}
-                <video
-                  ref={(el) => handleVideoRef(index, el)}
-                  src={short.videoUrl}
-                  poster={short.thumbnail}
-                  className="w-full h-full object-cover"
-                  loop
-                  muted
-                  playsInline
-                  onLoadedData={() => {
-                    // Auto-play when video is loaded and it's the active one
-                    if (index === currentShortIndex && isPlaying) {
-                      const video = videoRefs.current[index]
-                      if (video) {
-                        video.play().catch(() => {
-                          setIsPlaying(false)
-                        })
-                      }
-                    }
-                  }}
-                  onError={(e) => {
-                    // If video fails, try to show GIF instead
-                    const videoElement = e.target
-                    const gifUrl = short.videoUrl.replace('.mp4', '.gif').replace('/giphy.mp4', '/giphy.gif')
-                    // Create img element as fallback
-                    const img = document.createElement('img')
-                    img.src = gifUrl
-                    img.className = 'w-full h-full object-cover'
-                    img.onerror = () => {
-                      // Final fallback to poster
-                      videoElement.style.display = 'none'
-                    }
-                    if (videoElement.parentNode) {
-                      videoElement.parentNode.insertBefore(img, videoElement)
-                    }
-                  }}
-                />
+              {/* Video Player - Instagram Reels Style with YouTube Embed */}
+              <div className="relative w-full h-full bg-black" style={{ overflow: 'hidden' }}>
+                {isActive ? (
+                  <iframe
+                    ref={(el) => handleVideoRef(index, el)}
+                    src={`https://www.youtube.com/embed/${short.videoId}?autoplay=1&mute=1&loop=1&playlist=${short.videoId}&start=${short.startTime}&controls=0&modestbranding=1&rel=0&playsinline=1&enablejsapi=1`}
+                    className="absolute inset-0"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      border: 'none',
+                      objectFit: 'cover'
+                    }}
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    title={short.title}
+                  />
+                ) : (
+                  <div className="relative w-full h-full">
+                    <img
+                      src={short.thumbnail}
+                      alt={short.title}
+                      className="w-full h-full object-cover"
+                      style={{ filter: 'brightness(0.5)' }}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                        <div className="w-0 h-0 border-l-[20px] border-l-white border-t-[12px] border-t-transparent border-b-[12px] border-b-transparent ml-1"></div>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 
                 {/* Play/Pause Overlay */}
                 {!isPlaying && index === currentShortIndex && (

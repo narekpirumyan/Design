@@ -46,7 +46,7 @@ export function ScrollableCard({
       }}
     >
       <div className="w-full h-full">
-        <MovieCard movie={movie} />
+        <MovieCard movie={movie} variant="scroll" />
       </div>
       
       {/* Action Buttons - Bottom Right (Instagram style) */}

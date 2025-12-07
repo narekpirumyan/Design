@@ -12,18 +12,29 @@ export function ScrollableCardStack({
 }) {
   const containerRef = useRef(null)
   const [snapIndex, setSnapIndex] = useState(currentIndex)
-  const y = useMotionValue(-currentIndex * 100)
+  
+  // Use viewport height for positioning
+  const getViewportHeight = () => {
+    if (containerRef.current) {
+      return containerRef.current.clientHeight
+    }
+    return window.innerHeight
+  }
+  
+  const y = useMotionValue(-currentIndex * getViewportHeight())
   const springY = useSpring(y, { stiffness: 300, damping: 30 })
 
   // Update snap index when currentIndex prop changes
   useEffect(() => {
     setSnapIndex(currentIndex)
-    y.set(-currentIndex * 100)
+    const vh = getViewportHeight()
+    y.set(-currentIndex * vh)
   }, [currentIndex, y])
 
   const handleDragEnd = (event, info) => {
     const threshold = 50
     const velocity = info.velocity.y
+    const vh = getViewportHeight()
 
     let newIndex = snapIndex
 
@@ -40,7 +51,7 @@ export function ScrollableCardStack({
     setSnapIndex(newIndex)
     onIndexChange?.(newIndex)
     // Update the motion value to snap to the new position
-    y.set(-newIndex * 100)
+    y.set(-newIndex * vh)
   }
 
   const handleLike = (movieId) => {
@@ -49,6 +60,8 @@ export function ScrollableCardStack({
       const newIndex = snapIndex + 1
       setSnapIndex(newIndex)
       onIndexChange?.(newIndex)
+      const vh = getViewportHeight()
+      y.set(-newIndex * vh)
     }
     onLike?.(movieId)
   }
@@ -59,20 +72,19 @@ export function ScrollableCardStack({
       const newIndex = snapIndex + 1
       setSnapIndex(newIndex)
       onIndexChange?.(newIndex)
+      const vh = getViewportHeight()
+      y.set(-newIndex * vh)
     }
     onPass?.(movieId)
   }
 
-  // Calculate container height to fit all cards
-  const containerHeight = movies.length * 100
-
   return (
     <motion.div 
       ref={containerRef}
-      className="relative w-full overflow-hidden"
+      className="relative w-full h-full overflow-hidden"
       drag="y"
       dragConstraints={{ 
-        top: -(movies.length - 1) * 100,
+        top: -(movies.length - 1) * (containerRef.current?.clientHeight || window.innerHeight),
         bottom: 0
       }}
       dragElastic={0.1}
@@ -80,31 +92,37 @@ export function ScrollableCardStack({
       style={{ 
         y: springY,
         cursor: 'grab',
-        height: `${containerHeight}%`
+        height: `${movies.length * 100}%`
       }}
     >
-      {movies.map((movie, idx) => (
-        <div
-          key={`${movie.id}-${idx}`}
-          className="absolute w-full"
-          style={{
-            top: `${idx * 100}%`,
-            left: 0,
-            right: 0,
-            height: '100%',
-            zIndex: movies.length - idx
-          }}
-        >
-          <ScrollableCard
-            movie={movie}
-            onLike={handleLike}
-            onPass={handlePass}
-            onInfo={onInfo}
-            index={idx}
-            isVisible={idx === snapIndex}
-          />
-        </div>
-      ))}
+      {movies.map((movie, idx) => {
+        const vh = containerRef.current?.clientHeight || window.innerHeight
+        // Show card if it's within viewport (current, previous, or next)
+        const isVisible = Math.abs(idx - snapIndex) <= 1
+        
+        return (
+          <div
+            key={`${movie.id}-${idx}`}
+            className="absolute w-full"
+            style={{
+              top: `${idx * 100}%`,
+              left: 0,
+              right: 0,
+              height: '100%',
+              zIndex: movies.length - idx
+            }}
+          >
+            <ScrollableCard
+              movie={movie}
+              onLike={handleLike}
+              onPass={handlePass}
+              onInfo={onInfo}
+              index={idx}
+              isVisible={isVisible}
+            />
+          </div>
+        )
+      })}
     </motion.div>
   )
 }

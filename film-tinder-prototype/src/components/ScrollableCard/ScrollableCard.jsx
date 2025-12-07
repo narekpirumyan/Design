@@ -35,17 +35,18 @@ export function ScrollableCard({
   return (
     <motion.div
       className="relative w-full h-full flex-shrink-0"
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0 }}
       animate={{ 
-        opacity: isVisible ? 1 : 0,
-        y: isVisible ? 0 : -20,
-        scale: isLiked ? 1.1 : isPassed ? 0.9 : 1
+        opacity: isVisible ? 1 : 0.3,
+        scale: isLiked ? 1.05 : isPassed ? 0.95 : 1
       }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.3 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
       style={{ pointerEvents: isVisible ? 'auto' : 'none' }}
     >
-      <MovieCard movie={movie} />
+      <div className="w-full h-full">
+        <MovieCard movie={movie} />
+      </div>
       
       {/* Action Buttons - Bottom Right */}
       <div className="absolute bottom-20 right-4 flex flex-col gap-4 z-20">

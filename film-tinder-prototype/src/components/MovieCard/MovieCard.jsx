@@ -6,7 +6,11 @@ export function MovieCard({ movie, className = '' }) {
       <img
         src={movie.poster}
         alt={movie.title}
-        className="w-full h-full object-cover"
+        className="w-full h-full object-contain"
+        style={{
+          objectFit: 'contain',
+          backgroundColor: '#1e293b'
+        }}
         onError={(e) => {
           e.target.src = 'https://via.placeholder.com/400x600/1e293b/94a3b8?text=No+Poster'
         }}

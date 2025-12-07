@@ -97,7 +97,11 @@ export function MoodSelectionModal({ isOpen, onClose, onSelectMood, currentMood 
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 20 }}
           onClick={(e) => e.stopPropagation()}
-          className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col"
+          className="bg-white rounded-2xl w-full max-w-[340px] max-h-[600px] overflow-hidden flex flex-col"
+          style={{
+            maxWidth: '340px',
+            maxHeight: '600px'
+          }}
         >
           {!showCustomForm ? (
             <>
@@ -127,7 +131,7 @@ export function MoodSelectionModal({ isOpen, onClose, onSelectMood, currentMood 
                         key={mood.id}
                         onClick={() => handleSelectMood(mood)}
                         whileTap={{ scale: 0.95 }}
-                        className={`relative p-4 rounded-xl border-2 transition-all text-left ${
+                        className={`relative p-3 rounded-lg border-2 transition-all text-left ${
                           isSelected
                             ? 'border-pink-500 bg-pink-50'
                             : 'border-gray-200 hover:border-pink-300 hover:bg-pink-50/50'
@@ -137,20 +141,20 @@ export function MoodSelectionModal({ isOpen, onClose, onSelectMood, currentMood 
                         }}
                       >
                         {isSelected && (
-                          <div className="absolute top-2 right-2">
+                          <div className="absolute top-1.5 right-1.5">
                             <div
-                              className="w-6 h-6 rounded-full flex items-center justify-center"
+                              className="w-5 h-5 rounded-full flex items-center justify-center"
                               style={{ backgroundColor: mood.color }}
                             >
-                              <FiCheck className="w-4 h-4 text-white" />
+                              <FiCheck className="w-3 h-3 text-white" />
                             </div>
                           </div>
                         )}
-                        <div className="text-3xl mb-2">{mood.emoji}</div>
-                        <div className="font-semibold text-gray-900">{mood.name}</div>
-                        <div className="text-xs text-gray-500 mt-1">{mood.description}</div>
+                        <div className="text-2xl mb-1">{mood.emoji}</div>
+                        <div className="font-semibold text-gray-900 text-sm">{mood.name}</div>
+                        <div className="text-xs text-gray-500 mt-0.5 leading-tight">{mood.description}</div>
                         {mood.isCustom && (
-                          <div className="text-xs text-pink-600 mt-1 font-medium">Custom</div>
+                          <div className="text-xs text-pink-600 mt-0.5 font-medium">Custom</div>
                         )}
                       </motion.button>
                     )
@@ -160,13 +164,13 @@ export function MoodSelectionModal({ isOpen, onClose, onSelectMood, currentMood 
                   <motion.button
                     onClick={() => setShowCustomForm(true)}
                     whileTap={{ scale: 0.95 }}
-                    className="p-4 rounded-xl border-2 border-dashed border-gray-300 hover:border-pink-400 hover:bg-pink-50/50 transition-all flex flex-col items-center justify-center min-h-[120px]"
+                    className="p-3 rounded-lg border-2 border-dashed border-gray-300 hover:border-pink-400 hover:bg-pink-50/50 transition-all flex flex-col items-center justify-center min-h-[100px]"
                   >
-                    <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center mb-2">
-                      <FiPlus className="w-6 h-6 text-pink-600" />
+                    <div className="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center mb-1.5">
+                      <FiPlus className="w-5 h-5 text-pink-600" />
                     </div>
-                    <div className="font-semibold text-gray-900 text-sm">Create Custom</div>
-                    <div className="text-xs text-gray-500 mt-1">New mood</div>
+                    <div className="font-semibold text-gray-900 text-xs">Create Custom</div>
+                    <div className="text-xs text-gray-500 mt-0.5">New mood</div>
                   </motion.button>
                 </div>
               </div>

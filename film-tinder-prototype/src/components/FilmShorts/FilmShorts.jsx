@@ -161,16 +161,16 @@ export function FilmShorts({ movie, onBack, onSwipe, onAddToWatchlist }) {
                 {isActive ? (
                   <iframe
                     ref={(el) => handleVideoRef(index, el)}
-                    src={`https://www.youtube.com/embed/${short.videoId}?autoplay=1&mute=1&loop=1&playlist=${short.videoId}&start=${short.startTime}&controls=0&modestbranding=1&rel=0&playsinline=1&enablejsapi=1`}
+                    src={`https://www.youtube-nocookie.com/embed/${short.videoId}?autoplay=1&mute=1&loop=1&playlist=${short.videoId}&start=${short.startTime}&controls=0&modestbranding=1&rel=0&playsinline=1`}
                     className="absolute inset-0"
                     style={{
                       width: '100%',
                       height: '100%',
-                      border: 'none',
-                      objectFit: 'cover'
+                      border: 'none'
                     }}
                     frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowFullScreen
                     title={short.title}
                   />

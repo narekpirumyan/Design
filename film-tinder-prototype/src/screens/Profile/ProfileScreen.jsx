@@ -214,20 +214,6 @@ export function ProfileScreen() {
       </div>
       <BottomNavigation />
       
-      {/* Tutorial Guide */}
-      <TutorialGuide
-        steps={getTutorialSteps('profile', user)}
-        sectionId="profile"
-        isActive={showTutorial}
-        onComplete={(sectionId) => {
-          completeTutorial(sectionId)
-          setShowTutorial(false)
-        }}
-        onSkip={(sectionId) => {
-          skipTutorial(sectionId)
-          setShowTutorial(false)
-        }}
-      />
     </PhoneFrame>
   )
 }

@@ -301,20 +301,6 @@ export function GroupsScreen() {
       </div>
       <BottomNavigation />
       
-      {/* Tutorial Guide */}
-      <TutorialGuide
-        steps={getTutorialSteps('groups', user)}
-        sectionId="groups"
-        isActive={showTutorial}
-        onComplete={(sectionId) => {
-          completeTutorial(sectionId)
-          setShowTutorial(false)
-        }}
-        onSkip={(sectionId) => {
-          skipTutorial(sectionId)
-          setShowTutorial(false)
-        }}
-      />
 
       {/* Personal Watchlist Modal */}
       <AnimatePresence>

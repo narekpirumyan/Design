@@ -397,20 +397,6 @@ export function GroupDetailsScreen() {
       </div>
       <BottomNavigation />
       
-      {/* Tutorial Guide */}
-      <TutorialGuide
-        steps={getTutorialSteps('groupDetails', user)}
-        sectionId="groupDetails"
-        isActive={showTutorial}
-        onComplete={(sectionId) => {
-          completeTutorial(sectionId)
-          setShowTutorial(false)
-        }}
-        onSkip={(sectionId) => {
-          skipTutorial(sectionId)
-          setShowTutorial(false)
-        }}
-      />
     </PhoneFrame>
   )
 }

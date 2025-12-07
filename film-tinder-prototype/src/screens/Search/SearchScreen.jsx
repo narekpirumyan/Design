@@ -338,20 +338,6 @@ export function SearchScreen() {
       </div>
       <BottomNavigation />
 
-      {/* Tutorial Guide */}
-      <TutorialGuide
-        steps={getTutorialSteps('search', user)}
-        sectionId="search"
-        isActive={showTutorial}
-        onComplete={(sectionId) => {
-          completeTutorial(sectionId)
-          setShowTutorial(false)
-        }}
-        onSkip={(sectionId) => {
-          skipTutorial(sectionId)
-          setShowTutorial(false)
-        }}
-      />
     </PhoneFrame>
   )
 }

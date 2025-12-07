@@ -271,20 +271,6 @@ export function GroupRoomScreen() {
       </div>
       <BottomNavigation />
       
-      {/* Tutorial Guide */}
-      <TutorialGuide
-        steps={getTutorialSteps('room', user)}
-        sectionId="room"
-        isActive={showTutorial}
-        onComplete={(sectionId) => {
-          completeTutorial(sectionId)
-          setShowTutorial(false)
-        }}
-        onSkip={(sectionId) => {
-          skipTutorial(sectionId)
-          setShowTutorial(false)
-        }}
-      />
     </PhoneFrame>
   )
 }

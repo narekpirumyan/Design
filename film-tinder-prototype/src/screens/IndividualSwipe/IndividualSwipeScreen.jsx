@@ -327,20 +327,6 @@ export function IndividualSwipeScreen() {
           currentMood={selectedMood}
         />
 
-        {/* Tutorial Guide */}
-        <TutorialGuide
-          steps={getTutorialSteps('swipe', user)}
-          sectionId="swipe"
-          isActive={showTutorial}
-          onComplete={(sectionId) => {
-            completeTutorial(sectionId)
-            setShowTutorial(false)
-          }}
-          onSkip={(sectionId) => {
-            skipTutorial(sectionId)
-            setShowTutorial(false)
-          }}
-        />
       </div>
     </PhoneFrame>
   )

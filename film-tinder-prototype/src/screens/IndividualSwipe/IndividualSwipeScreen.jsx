@@ -50,16 +50,6 @@ export function IndividualSwipeScreen() {
     }, 300)
   }, [])
 
-  // Check if tutorial should be shown
-  useEffect(() => {
-    if (user && !hasCompletedTutorial('swipe') && selectedMood) {
-      // Small delay to ensure DOM is ready, and only after mood is selected
-      setTimeout(() => {
-        setShowTutorial(true)
-      }, 500)
-    }
-  }, [user, hasCompletedTutorial, selectedMood])
-
   // Reset mode to swipe on mount
   useEffect(() => {
     setMode('swipe')

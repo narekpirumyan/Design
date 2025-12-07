@@ -106,24 +106,24 @@ export function MoodSelectionModal({ isOpen, onClose, onSelectMood, currentMood 
           {!showCustomForm ? (
             <>
               {/* Header */}
-              <div className="px-6 pt-6 pb-4 border-b border-gray-200">
-                <div className="flex items-center justify-between mb-2">
-                  <h2 className="text-2xl font-bold text-gray-900">Choose Your Mood</h2>
+              <div className="px-4 pt-4 pb-3 border-b border-gray-200">
+                <div className="flex items-center justify-between mb-1">
+                  <h2 className="text-xl font-bold text-gray-900">Choose Your Mood</h2>
                   <button
                     onClick={onClose}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                    className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
                   >
-                    <FiX className="w-5 h-5 text-gray-500" />
+                    <FiX className="w-4 h-4 text-gray-500" />
                   </button>
                 </div>
-                <p className="text-gray-600 text-sm">
+                <p className="text-gray-600 text-xs">
                   Select a mood to personalize your movie recommendations
                 </p>
               </div>
 
               {/* Moods Grid */}
-              <div className="flex-1 overflow-y-auto px-6 py-4">
-                <div className="grid grid-cols-2 gap-3">
+              <div className="flex-1 overflow-y-auto px-4 py-3">
+                <div className="grid grid-cols-2 gap-2">
                   {allMoods.map((mood) => {
                     const isSelected = currentMood?.id === mood.id
                     return (

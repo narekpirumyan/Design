@@ -154,6 +154,7 @@ export function ProfileScreen() {
                       </div>
                     </div>
                   </div>
+                </div>
                 </motion.div>
                 )}
               </div>

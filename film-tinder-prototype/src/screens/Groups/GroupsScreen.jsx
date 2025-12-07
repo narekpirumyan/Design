@@ -13,9 +13,8 @@ import { getTutorialSteps } from '../../data/tutorialSteps'
 
 export function GroupsScreen() {
   const navigate = useNavigate()
-  const { user, hasCompletedTutorial, completeTutorial, skipTutorial } = useAuth()
+  const { user } = useAuth()
   const [activeTab, setActiveTab] = useState('groups') // 'friends' or 'groups'
-  const [showTutorial, setShowTutorial] = useState(false)
   const [showPersonalWatchlist, setShowPersonalWatchlist] = useState(false)
   const swipeAreaRef = useRef(null)
   const dragX = useMotionValue(0)

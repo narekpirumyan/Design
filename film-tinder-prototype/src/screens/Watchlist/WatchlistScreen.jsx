@@ -10,19 +10,8 @@ import { useAuth } from '../../contexts/AuthContext'
 import { getTutorialSteps } from '../../data/tutorialSteps'
 
 export function WatchlistScreen() {
-  const { user, hasCompletedTutorial, completeTutorial, skipTutorial } = useAuth()
+  const { user } = useAuth()
   const [selectedWatchlist, setSelectedWatchlist] = useState(null)
-  const [showTutorial, setShowTutorial] = useState(false)
-
-  // Check if tutorial should be shown
-  useEffect(() => {
-    if (user && !selectedWatchlist && !hasCompletedTutorial('watchlist')) {
-      // Small delay to ensure DOM is ready
-      setTimeout(() => {
-        setShowTutorial(true)
-      }, 500)
-    }
-  }, [user, selectedWatchlist, hasCompletedTutorial])
 
   // Mock watchlists - each can be shared with different groups
   const watchlists = [

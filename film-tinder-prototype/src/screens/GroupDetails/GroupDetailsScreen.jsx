@@ -79,19 +79,8 @@ const mockFilmSessions = [
 export function GroupDetailsScreen() {
   const { groupId } = useParams()
   const navigate = useNavigate()
-  const { user, hasCompletedTutorial, completeTutorial, skipTutorial } = useAuth()
+  const { user } = useAuth()
   const [activeTab, setActiveTab] = useState('movies') // 'movies', 'members', 'sessions'
-  const [showTutorial, setShowTutorial] = useState(false)
-
-  // Check if tutorial should be shown
-  useEffect(() => {
-    if (user && !hasCompletedTutorial('groupDetails')) {
-      // Small delay to ensure DOM is ready
-      setTimeout(() => {
-        setShowTutorial(true)
-      }, 500)
-    }
-  }, [user, hasCompletedTutorial])
 
   // Find the group
   const group = mockGroups.find(g => g.id === groupId)

@@ -23,16 +23,6 @@ export function GroupsScreen() {
 
   // Personal watchlist - use all movies to ensure it's not empty
   const personalWatchlistMovies = [...mockMovies]
-
-  // Check if tutorial should be shown
-  useEffect(() => {
-    if (user && !hasCompletedTutorial('groups')) {
-      // Small delay to ensure DOM is ready
-      setTimeout(() => {
-        setShowTutorial(true)
-      }, 500)
-    }
-  }, [user, hasCompletedTutorial])
   
   // Handle swipe gesture for tab switching
   const handleDragStart = (event, info) => {

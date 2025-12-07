@@ -25,17 +25,6 @@ export function GroupRoomScreen() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [participants] = useState(mockParticipants.slice(0, 4))
   const [mode, setMode] = useState('swipe') // 'swipe', 'details', 'shorts'
-  const [showTutorial, setShowTutorial] = useState(false)
-
-  // Check if tutorial should be shown
-  useEffect(() => {
-    if (user && !hasCompletedTutorial('room')) {
-      // Small delay to ensure DOM is ready
-      setTimeout(() => {
-        setShowTutorial(true)
-      }, 500)
-    }
-  }, [user, hasCompletedTutorial])
 
   // Reset mode to swipe on mount
   useEffect(() => {

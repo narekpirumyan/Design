@@ -42,12 +42,14 @@ export function ScrollableCardStack({
   }, [currentIndex, containerHeight, y])
 
   const handleDragEnd = (event, info) => {
-    const threshold = 50
+    // Lower threshold for more sensitive swipes (like Instagram/TikTok)
+    const threshold = 30
     const velocity = info.velocity.y
 
     let newIndex = snapIndex
 
-    if (Math.abs(info.offset.y) > threshold || Math.abs(velocity) > 500) {
+    // More sensitive to velocity and offset for Instagram-like behavior
+    if (Math.abs(info.offset.y) > threshold || Math.abs(velocity) > 300) {
       if (info.offset.y > 0 && snapIndex > 0) {
         // Swipe down - go to previous
         newIndex = snapIndex - 1
@@ -59,7 +61,7 @@ export function ScrollableCardStack({
 
     setSnapIndex(newIndex)
     onIndexChange?.(newIndex)
-    // Update the motion value to snap to the new position
+    // Always snap to exact position (no partial scrolling)
     if (containerHeight > 0) {
       y.set(-newIndex * containerHeight)
     }
@@ -100,7 +102,8 @@ export function ScrollableCardStack({
         top: containerHeight > 0 ? -(movies.length - 1) * containerHeight : 0,
         bottom: 0
       }}
-      dragElastic={0.1}
+      dragElastic={0.2}
+      dragMomentum={false}
       onDragEnd={handleDragEnd}
       style={{ 
         y: springY,
@@ -109,8 +112,8 @@ export function ScrollableCardStack({
       }}
     >
       {movies.map((movie, idx) => {
-        // Show card if it's within viewport (current, previous, or next)
-        const isVisible = Math.abs(idx - snapIndex) <= 1
+        // Only show the current card (Instagram/TikTok style - one at a time)
+        const isVisible = idx === snapIndex
         
         return (
           <div

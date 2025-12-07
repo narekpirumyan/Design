@@ -37,12 +37,15 @@ export function ScrollableCard({
       className="relative w-full h-full flex-shrink-0"
       initial={{ opacity: 0 }}
       animate={{ 
-        opacity: isVisible ? 1 : 0.3,
+        opacity: isVisible ? 1 : 0,
         scale: isLiked ? 1.05 : isPassed ? 0.95 : 1
       }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
-      style={{ pointerEvents: isVisible ? 'auto' : 'none' }}
+      style={{ 
+        pointerEvents: isVisible ? 'auto' : 'none',
+        display: isVisible ? 'block' : 'none'
+      }}
     >
       <div className="w-full h-full">
         <MovieCard movie={movie} />

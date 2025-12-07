@@ -12,29 +12,38 @@ export function ScrollableCardStack({
 }) {
   const containerRef = useRef(null)
   const [snapIndex, setSnapIndex] = useState(currentIndex)
+  const [containerHeight, setContainerHeight] = useState(0)
   
-  // Use viewport height for positioning
-  const getViewportHeight = () => {
-    if (containerRef.current) {
-      return containerRef.current.clientHeight
+  // Get container height for positioning
+  useEffect(() => {
+    const updateHeight = () => {
+      if (containerRef.current) {
+        const parent = containerRef.current.parentElement
+        if (parent) {
+          setContainerHeight(parent.clientHeight)
+        }
+      }
     }
-    return window.innerHeight
-  }
+    
+    updateHeight()
+    window.addEventListener('resize', updateHeight)
+    return () => window.removeEventListener('resize', updateHeight)
+  }, [])
   
-  const y = useMotionValue(-currentIndex * getViewportHeight())
+  const y = useMotionValue(-currentIndex * containerHeight)
   const springY = useSpring(y, { stiffness: 300, damping: 30 })
 
   // Update snap index when currentIndex prop changes
   useEffect(() => {
     setSnapIndex(currentIndex)
-    const vh = getViewportHeight()
-    y.set(-currentIndex * vh)
-  }, [currentIndex, y])
+    if (containerHeight > 0) {
+      y.set(-currentIndex * containerHeight)
+    }
+  }, [currentIndex, containerHeight, y])
 
   const handleDragEnd = (event, info) => {
     const threshold = 50
     const velocity = info.velocity.y
-    const vh = getViewportHeight()
 
     let newIndex = snapIndex
 
@@ -51,7 +60,9 @@ export function ScrollableCardStack({
     setSnapIndex(newIndex)
     onIndexChange?.(newIndex)
     // Update the motion value to snap to the new position
-    y.set(-newIndex * vh)
+    if (containerHeight > 0) {
+      y.set(-newIndex * containerHeight)
+    }
   }
 
   const handleLike = (movieId) => {
@@ -60,8 +71,9 @@ export function ScrollableCardStack({
       const newIndex = snapIndex + 1
       setSnapIndex(newIndex)
       onIndexChange?.(newIndex)
-      const vh = getViewportHeight()
-      y.set(-newIndex * vh)
+      if (containerHeight > 0) {
+        y.set(-newIndex * containerHeight)
+      }
     }
     onLike?.(movieId)
   }
@@ -72,8 +84,9 @@ export function ScrollableCardStack({
       const newIndex = snapIndex + 1
       setSnapIndex(newIndex)
       onIndexChange?.(newIndex)
-      const vh = getViewportHeight()
-      y.set(-newIndex * vh)
+      if (containerHeight > 0) {
+        y.set(-newIndex * containerHeight)
+      }
     }
     onPass?.(movieId)
   }
@@ -81,10 +94,10 @@ export function ScrollableCardStack({
   return (
     <motion.div 
       ref={containerRef}
-      className="relative w-full h-full overflow-hidden"
+      className="relative w-full overflow-hidden"
       drag="y"
       dragConstraints={{ 
-        top: -(movies.length - 1) * (containerRef.current?.clientHeight || window.innerHeight),
+        top: containerHeight > 0 ? -(movies.length - 1) * containerHeight : 0,
         bottom: 0
       }}
       dragElastic={0.1}
@@ -92,11 +105,10 @@ export function ScrollableCardStack({
       style={{ 
         y: springY,
         cursor: 'grab',
-        height: `${movies.length * 100}%`
+        height: containerHeight > 0 ? `${movies.length * containerHeight}px` : 'auto'
       }}
     >
       {movies.map((movie, idx) => {
-        const vh = containerRef.current?.clientHeight || window.innerHeight
         // Show card if it's within viewport (current, previous, or next)
         const isVisible = Math.abs(idx - snapIndex) <= 1
         
@@ -105,10 +117,10 @@ export function ScrollableCardStack({
             key={`${movie.id}-${idx}`}
             className="absolute w-full"
             style={{
-              top: `${idx * 100}%`,
+              top: containerHeight > 0 ? `${idx * containerHeight}px` : `${idx * 100}%`,
               left: 0,
               right: 0,
-              height: '100%',
+              height: containerHeight > 0 ? `${containerHeight}px` : '100%',
               zIndex: movies.length - idx
             }}
           >

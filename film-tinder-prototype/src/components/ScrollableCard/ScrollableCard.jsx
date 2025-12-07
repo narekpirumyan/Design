@@ -8,6 +8,7 @@ export function ScrollableCard({
   onLike, 
   onPass,
   onInfo,
+  onComment,
   index = 0,
   isVisible = true
 }) {
@@ -22,8 +23,8 @@ export function ScrollableCard({
   }
 
   const handleComment = () => {
-    // Open comment section or modal
-    onInfo?.(movie.id)
+    // Open comment modal
+    onComment?.(movie)
   }
 
   if (!movie) {

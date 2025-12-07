@@ -8,6 +8,7 @@ import { FilmDetails } from '../../components/FilmDetails/FilmDetails'
 import { FilmShorts } from '../../components/FilmShorts/FilmShorts'
 import { TutorialGuide } from '../../components/TutorialGuide/TutorialGuide'
 import { MoodSelectionModal } from '../../components/MoodSelectionModal/MoodSelectionModal'
+import { CommentsModal } from '../../components/CommentsModal/CommentsModal'
 import { mockMovies } from '../../data/mockMovies'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FiFilm, FiInfo, FiVideo, FiSmile } from 'react-icons/fi'
@@ -26,6 +27,8 @@ export function IndividualSwipeScreen() {
   const [showTutorial, setShowTutorial] = useState(false)
   const [showMoodSelection, setShowMoodSelection] = useState(false)
   const [selectedMood, setSelectedMood] = useState(null)
+  const [showComments, setShowComments] = useState(false)
+  const [selectedMovieForComments, setSelectedMovieForComments] = useState(null)
   
   // Get interaction model from user preferences (default to 'swipe')
   const interactionModel = user?.preferences?.interactionModel || 'swipe'
@@ -107,6 +110,12 @@ export function IndividualSwipeScreen() {
   const handleScrollInfo = (movieId) => {
     // Switch to details mode
     setMode('details')
+  }
+
+  const handleScrollComment = (movie) => {
+    // Open comments modal
+    setSelectedMovieForComments(movie)
+    setShowComments(true)
   }
 
   const handleScrollIndexChange = (newIndex) => {
@@ -226,6 +235,7 @@ export function IndividualSwipeScreen() {
                       onLike={handleScrollLike}
                       onPass={handleScrollPass}
                       onInfo={handleScrollInfo}
+                      onComment={handleScrollComment}
                       onIndexChange={handleScrollIndexChange}
                     />
                   ) : (
@@ -315,6 +325,16 @@ export function IndividualSwipeScreen() {
           onClose={() => setShowMoodSelection(false)}
           onSelectMood={handleMoodSelect}
           currentMood={selectedMood}
+        />
+
+        {/* Comments Modal */}
+        <CommentsModal
+          isOpen={showComments}
+          onClose={() => {
+            setShowComments(false)
+            setSelectedMovieForComments(null)
+          }}
+          movie={selectedMovieForComments}
         />
 
       </div>

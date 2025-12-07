@@ -136,7 +136,7 @@ export function CommentsModal({ isOpen, onClose, movie }) {
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
                   placeholder="Add a comment..."
-                  className="w-full px-4 py-2.5 pr-10 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent text-sm"
+                  className="w-full px-4 py-2.5 pr-10 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent text-sm text-gray-900 placeholder:text-gray-400"
                 />
                 <button
                   type="button"

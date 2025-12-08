@@ -27,11 +27,19 @@ export function GroupsScreen() {
   
   // Check if tutorial should be shown on first visit
   useEffect(() => {
-    if (user && !hasCompletedTutorial('groups')) {
+    if (!user) {
+      setShowTutorial(false)
+      return
+    }
+    
+    if (!hasCompletedTutorial('groups')) {
       // Small delay to ensure smooth screen transition
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         setShowTutorial(true)
       }, 500)
+      return () => clearTimeout(timer)
+    } else {
+      setShowTutorial(false)
     }
   }, [user, hasCompletedTutorial])
   
@@ -383,19 +391,21 @@ export function GroupsScreen() {
       </AnimatePresence>
 
       {/* Tutorial Guide */}
-      <TutorialGuide
-        steps={getTutorialSteps('groups', user)}
-        sectionId="groups"
-        isActive={showTutorial}
-        onComplete={(sectionId) => {
-          completeTutorial(sectionId)
-          setShowTutorial(false)
-        }}
-        onSkip={(sectionId) => {
-          skipTutorial(sectionId)
-          setShowTutorial(false)
-        }}
-      />
+      {showTutorial && (
+        <TutorialGuide
+          steps={getTutorialSteps('groups', user)}
+          sectionId="groups"
+          isActive={showTutorial}
+          onComplete={(sectionId) => {
+            completeTutorial(sectionId)
+            setShowTutorial(false)
+          }}
+          onSkip={(sectionId) => {
+            skipTutorial(sectionId)
+            setShowTutorial(false)
+          }}
+        />
+      )}
     </PhoneFrame>
   )
 }

@@ -297,27 +297,27 @@ export function TutorialGuide({
 
   // Update position when highlight changes and determine guide position
   useEffect(() => {
-    if (highlightedElement && highlightPosition) {
-      updateHighlightPosition()
+    if (!highlightedElement || !highlightPosition) return
+    
+    // Check if highlighted element is in the bottom area where guide would cover it
+    const phoneFrame = document.querySelector('.phone-screen-content')
+    if (phoneFrame) {
+      const frameRect = phoneFrame.getBoundingClientRect()
+      const frameHeight = frameRect.height || 812
+      const guideHeight = frameHeight * 0.55 // 55% of screen height
       
-      // Check if highlighted element is in the bottom area where guide would cover it
-      const phoneFrame = document.querySelector('.phone-screen-content')
-      if (phoneFrame) {
-        const frameRect = phoneFrame.getBoundingClientRect()
-        const frameHeight = frameRect.height || 812
-        const guideHeight = frameHeight * 0.55 // 55% of screen height
-        
-        // If highlighted element is in bottom 60% of screen, move guide to top
-        const elementBottom = highlightPosition.top + highlightPosition.height
-        const threshold = frameHeight * 0.6
-        
-        if (elementBottom > threshold) {
-          setGuidePosition('top')
-        } else {
-          setGuidePosition('bottom')
-        }
+      // If highlighted element is in bottom 60% of screen, move guide to top
+      const elementBottom = highlightPosition.top + highlightPosition.height
+      const threshold = frameHeight * 0.6
+      
+      if (elementBottom > threshold) {
+        setGuidePosition('top')
+      } else {
+        setGuidePosition('bottom')
       }
     }
+    // Note: We don't call updateHighlightPosition here to avoid infinite loop
+    // Position updates are handled in highlightElement function
   }, [highlightedElement, highlightPosition, currentStep])
 
   return (

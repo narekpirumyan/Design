@@ -59,12 +59,12 @@ export function TutorialGuide({
     // Reset to first step when tutorial becomes active
     setCurrentStep(0)
     
-    // Highlight the first element with a delay to ensure DOM is ready
+    // Highlight the first element with a delay to ensure DOM is ready and animations complete
     setTimeout(() => {
       if (steps[0]?.targetSelector) {
-        highlightElement(steps[0].targetSelector)
+        highlightElement(steps[0].targetSelector, 0)
       }
-    }, 200)
+    }, 400) // Increased delay to ensure all animations have completed
 
     // Set up scroll/resize listeners
     updatePositionRef.current = () => updateHighlightPosition()
@@ -124,14 +124,27 @@ export function TutorialGuide({
     }
 
     // If element not found and we haven't exceeded retry limit, retry after a delay
-    if (!element && retryCount < 5) {
+    if (!element && retryCount < 8) {
       setTimeout(() => {
         highlightElement(selector, retryCount + 1)
-      }, 200 * (retryCount + 1)) // Exponential backoff: 200ms, 400ms, 600ms, 800ms, 1000ms
+      }, 150 * (retryCount + 1)) // Exponential backoff: 150ms, 300ms, 450ms, 600ms, 750ms, 900ms, 1050ms, 1200ms
       return
     }
 
     if (element) {
+      // Check if element is actually visible and has dimensions (not still animating)
+      const rect = element.getBoundingClientRect()
+      const isElementReady = rect.width > 0 && rect.height > 0 && 
+                            (element.offsetHeight > 0 || element.offsetWidth > 0)
+      
+      // If element exists but isn't ready yet, retry
+      if (!isElementReady && retryCount < 8) {
+        setTimeout(() => {
+          highlightElement(selector, retryCount + 1)
+        }, 150 * (retryCount + 1))
+        return
+      }
+
       setHighlightedElement(element)
       // Update position immediately without scrolling the page
       setTimeout(() => {
@@ -174,7 +187,7 @@ export function TutorialGuide({
         } else {
           updateHighlightPosition()
         }
-      }, 150) // Slightly increased delay to ensure element is fully rendered
+      }, 200) // Increased delay to ensure element is fully rendered and animated
     } else {
       setHighlightedElement(null)
       setHighlightPosition(null)
@@ -185,15 +198,18 @@ export function TutorialGuide({
     if (currentStep < steps.length - 1) {
       const nextStep = currentStep + 1
       setCurrentStep(nextStep)
-      // Small delay before highlighting to ensure DOM is ready
+      // Clear previous highlight first
+      setHighlightedElement(null)
+      setHighlightPosition(null)
+      // Longer delay before highlighting to ensure DOM is ready and animations complete
       setTimeout(() => {
         if (steps[nextStep]?.targetSelector) {
-          highlightElement(steps[nextStep].targetSelector)
+          highlightElement(steps[nextStep].targetSelector, 0)
         } else {
           setHighlightedElement(null)
           setHighlightPosition(null)
         }
-      }, 100)
+      }, 300) // Increased delay to allow animations to complete
     } else {
       handleComplete()
     }
@@ -203,15 +219,18 @@ export function TutorialGuide({
     if (currentStep > 0) {
       const prevStep = currentStep - 1
       setCurrentStep(prevStep)
-      // Small delay before highlighting to ensure DOM is ready
+      // Clear previous highlight first
+      setHighlightedElement(null)
+      setHighlightPosition(null)
+      // Longer delay before highlighting to ensure DOM is ready and animations complete
       setTimeout(() => {
         if (steps[prevStep]?.targetSelector) {
-          highlightElement(steps[prevStep].targetSelector)
+          highlightElement(steps[prevStep].targetSelector, 0)
         } else {
           setHighlightedElement(null)
           setHighlightPosition(null)
         }
-      }, 100)
+      }, 300) // Increased delay to allow animations to complete
     }
   }
 

@@ -45,7 +45,7 @@ export function ScrollableCard({
       </div>
       
       {/* Action Buttons - Bottom Right (Instagram style) */}
-      <div className="absolute bottom-20 right-4 flex flex-col gap-4 z-20">
+      <div className="absolute bottom-20 right-4 flex flex-col gap-4 z-20" data-tutorial-target="scroll-actions">
         {/* Save Button (Instagram bookmark style) */}
         <motion.button
           onClick={handleSave}

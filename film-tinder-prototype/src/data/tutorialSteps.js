@@ -3,43 +3,76 @@
 export const tutorialSteps = {
   swipe: [
     {
-      title: 'Welcome to Movie Discovery',
-      description: 'This is where you discover movies by swiping or scrolling through recommendations.',
+      title: 'Welcome to Swipe Mode',
+      description: 'Discover movies by swiping left or right, just like Tinder! Swipe right to like, left to pass.',
       icon: null,
       action: null,
       targetSelector: null
     },
     {
-      title: 'Swipe or Scroll',
-      description: userModel => {
-        const model = userModel || 'swipe'
-        if (model === 'scroll') {
-          return 'Scroll up and down to browse movies. Tap the heart to like, X to pass, or info for details.'
-        }
-        return 'Swipe right to like a movie, or swipe left to pass. You can also use the buttons on screen.'
-      },
+      title: 'Swipe to Browse',
+      description: 'Swipe right on movies you like, or swipe left to pass. The card will show "LIKE" or "PASS" as you swipe.',
       icon: null,
-      action: userModel => {
-        if (userModel === 'scroll') {
-          return 'Try scrolling up to see the next movie!'
-        }
-        return 'Try swiping right on a movie you like!'
-      },
-      targetSelector: '.swipe-area, .scroll-area, [class*="relative w-full h-full"]'
+      action: 'Try swiping right on a movie you like!',
+      targetSelector: '[data-tutorial-target="swipe-area"]'
     },
     {
       title: 'Mode Switch Button',
       description: 'Tap this button to switch between different viewing modes: swipe cards, details, or trailers.',
       icon: null,
       action: 'Try tapping the mode button to explore different views!',
-      targetSelector: 'button[aria-label*="Switch"], button[title*="Switch"]'
+      targetSelector: '[data-tutorial-target="mode-switch"]'
+    },
+    {
+      title: 'Mood Button',
+      description: 'Change your current mood to get personalized movie recommendations that match how you\'re feeling.',
+      icon: null,
+      action: 'Tap the mood button to see available moods!',
+      targetSelector: '[data-tutorial-target="mood-button"]'
     },
     {
       title: 'Add to Watchlist',
-      description: 'When you like a movie, you can add it to a group watchlist to watch with friends later.',
+      description: 'When you swipe right on a movie, you can add it to a group watchlist to watch with friends later.',
       icon: null,
       action: 'Swipe right on a movie to see the watchlist options!',
       targetSelector: null
+    }
+  ],
+  scroll: [
+    {
+      title: 'Welcome to Scroll Mode',
+      description: 'Browse movies by scrolling up and down, just like Instagram or TikTok! Each movie fills the screen.',
+      icon: null,
+      action: null,
+      targetSelector: null
+    },
+    {
+      title: 'Scroll to Browse',
+      description: 'Scroll up to see the next movie, or scroll down to go back. Each movie is full-screen for an immersive experience.',
+      icon: null,
+      action: 'Try scrolling up to see the next movie!',
+      targetSelector: '[data-tutorial-target="scroll-area"]'
+    },
+    {
+      title: 'Action Buttons',
+      description: 'Use the buttons on the right side: bookmark to save, comment to discuss, or tap the movie card for more options.',
+      icon: null,
+      action: 'Try tapping the bookmark button to save a movie!',
+      targetSelector: '[data-tutorial-target="scroll-actions"]'
+    },
+    {
+      title: 'Mode Switch Button',
+      description: 'Tap this button to switch between different viewing modes: scroll cards, details, or trailers.',
+      icon: null,
+      action: 'Try tapping the mode button to explore different views!',
+      targetSelector: '[data-tutorial-target="mode-switch"]'
+    },
+    {
+      title: 'Mood Button',
+      description: 'Change your current mood to get personalized movie recommendations that match how you\'re feeling.',
+      icon: null,
+      action: 'Tap the mood button to see available moods!',
+      targetSelector: '[data-tutorial-target="mood-button"]'
     }
   ],
   groups: [

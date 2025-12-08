@@ -65,6 +65,16 @@ export function IndividualSwipeScreen() {
     setMode('swipe')
   }, [])
 
+  // Show tutorial guide for first-time users
+  useEffect(() => {
+    if (user && !hasCompletedTutorial(interactionModel === 'scroll' ? 'scroll' : 'swipe')) {
+      const timer = setTimeout(() => {
+        setShowTutorial(true)
+      }, 500)
+      return () => clearTimeout(timer)
+    }
+  }, [user, interactionModel, hasCompletedTutorial])
+
   const handleMoodSelect = (mood) => {
     setSelectedMood(mood)
     sessionStorage.setItem('currentMood', JSON.stringify(mood))
@@ -226,6 +236,7 @@ export function IndividualSwipeScreen() {
             whileHover={{ scale: 1.05 }}
             className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-md border-2 border-white/30 flex items-center justify-center transition-all hover:bg-black/70 hover:border-white/50"
             title={`Current mood: ${selectedMood.name}`}
+            data-tutorial-target="mood-button"
           >
             <span className="text-xl">{selectedMood.emoji}</span>
           </motion.button>
@@ -255,7 +266,10 @@ export function IndividualSwipeScreen() {
             {mode === 'swipe' && (
               <>
                 {/* Swipe/Scroll Area */}
-                <div className={`flex-1 relative w-full pb-20 h-full ${interactionModel === 'scroll' ? 'scroll-area' : 'swipe-area'}`}>
+                <div 
+                  className={`flex-1 relative w-full pb-20 h-full ${interactionModel === 'scroll' ? 'scroll-area' : 'swipe-area'}`}
+                  data-tutorial-target={interactionModel === 'scroll' ? 'scroll-area' : 'swipe-area'}
+                >
                   {interactionModel === 'scroll' ? (
                     <ScrollableCardStack
                       movies={movies}
@@ -319,6 +333,7 @@ export function IndividualSwipeScreen() {
             className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-md border-2 border-white/30 flex items-center justify-center transition-all hover:bg-black/70 hover:border-white/50"
             aria-label={`Switch to ${nextMode} mode`}
             title={`Switch to ${nextMode.charAt(0).toUpperCase() + nextMode.slice(1)}`}
+            data-tutorial-target="mode-switch"
           >
             <motion.div
               key={nextMode}
@@ -366,6 +381,23 @@ export function IndividualSwipeScreen() {
           }}
           movie={selectedMovieForComments}
         />
+
+        {/* Tutorial Guide */}
+        {showTutorial && (
+          <TutorialGuide
+            steps={getTutorialSteps(interactionModel === 'scroll' ? 'scroll' : 'swipe', user)}
+            sectionId={interactionModel === 'scroll' ? 'scroll' : 'swipe'}
+            isActive={showTutorial}
+            onComplete={() => {
+              completeTutorial(interactionModel === 'scroll' ? 'scroll' : 'swipe')
+              setShowTutorial(false)
+            }}
+            onSkip={() => {
+              skipTutorial(interactionModel === 'scroll' ? 'scroll' : 'swipe')
+              setShowTutorial(false)
+            }}
+          />
+        )}
 
       </div>
     </PhoneFrame>

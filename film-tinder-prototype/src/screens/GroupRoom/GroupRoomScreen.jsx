@@ -70,6 +70,16 @@ export function GroupRoomScreen() {
       // Simply advance to next movie
       setCurrentIndex(prev => {
         const nextIndex = prev + 1
+        // If we've swiped through all movies, navigate to matches
+        if (nextIndex >= movies.length) {
+          navigate(`/match/${roomCode}`, { 
+            state: { 
+              matchMovieId: mockMovies[0].id,
+              matches: [{ movieId: mockMovies[0].id, likedBy: true, likedByCount: participants.length, matchPercentage: 100 }]
+            } 
+          })
+          return prev // Keep current index to prevent re-render
+        }
         return nextIndex
       })
     } else {
@@ -94,41 +104,10 @@ export function GroupRoomScreen() {
     }
   }
 
-  if (currentIndex >= movies.length) {
-    return (
-      <PhoneFrame>
-        <div className="h-full bg-gradient-to-br from-red-600 via-pink-500 to-red-700 flex items-center justify-center p-6 pb-20 relative">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center space-y-4 max-w-md"
-          >
-            <h2 className="text-2xl font-bold text-white">No more movies!</h2>
-            <p className="text-white/90">
-              You've seen all the movies. Try a new room!
-            </p>
-            <div className="flex flex-col gap-4 justify-center">
-              <Button onClick={() => navigate(`/match/${roomCode}`, { 
-                state: { 
-                  matchMovieId: mockMovies[0].id,
-                  matches: [{ movieId: mockMovies[0].id, likedBy: true, likedByCount: participants.length, matchPercentage: 100 }]
-                } 
-              })}>
-                View Matches
-              </Button>
-              <Button onClick={() => navigate('/groups')} variant="secondary">
-                New Room
-              </Button>
-            </div>
-          </motion.div>
-          <BottomNavigation />
-        </div>
-      </PhoneFrame>
-    )
-  }
-
-  const currentMovie = movies[currentIndex]
-  const nextMovies = movies.slice(currentIndex, currentIndex + 3)
+  // Prevent index from going beyond movies array
+  const safeIndex = Math.min(currentIndex, movies.length - 1)
+  const currentMovie = movies[safeIndex]
+  const nextMovies = movies.slice(safeIndex, safeIndex + 3)
 
   return (
     <PhoneFrame>

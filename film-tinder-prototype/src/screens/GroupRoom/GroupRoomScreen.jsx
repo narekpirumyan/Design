@@ -25,11 +25,30 @@ export function GroupRoomScreen() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [participants] = useState(mockParticipants.slice(0, 5)) // 5 participants to show 3 + "+2"
   const [mode, setMode] = useState('swipe') // 'swipe', 'details', 'shorts'
+  const [showTutorial, setShowTutorial] = useState(false)
 
   // Reset mode to swipe on mount
   useEffect(() => {
     setMode('swipe')
   }, [])
+
+  // Check if tutorial should be shown on first visit
+  useEffect(() => {
+    if (!user) {
+      setShowTutorial(false)
+      return
+    }
+    
+    if (!hasCompletedTutorial('room')) {
+      // Small delay to ensure smooth screen transition
+      const timer = setTimeout(() => {
+        setShowTutorial(true)
+      }, 500)
+      return () => clearTimeout(timer)
+    } else {
+      setShowTutorial(false)
+    }
+  }, [user, hasCompletedTutorial])
 
   const modes = ['swipe', 'details', 'shorts']
   const currentModeIndex = modes.indexOf(mode)
@@ -261,6 +280,23 @@ export function GroupRoomScreen() {
         </div>
       </div>
       <BottomNavigation />
+
+      {/* Tutorial Guide */}
+      {showTutorial && (
+        <TutorialGuide
+          steps={getTutorialSteps('room', user)}
+          sectionId="room"
+          isActive={showTutorial}
+          onComplete={(sectionId) => {
+            completeTutorial(sectionId)
+            setShowTutorial(false)
+          }}
+          onSkip={(sectionId) => {
+            skipTutorial(sectionId)
+            setShowTutorial(false)
+          }}
+        />
+      )}
     </PhoneFrame>
   )
 }

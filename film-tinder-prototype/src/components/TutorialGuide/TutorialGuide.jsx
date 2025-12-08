@@ -96,13 +96,33 @@ export function TutorialGuide({
     }
 
     // Try multiple selector strategies
-    let element = document.querySelector(selector)
+    let element = null
+    
+    // First, try direct querySelector
+    try {
+      element = document.querySelector(selector)
+    } catch (e) {
+      console.warn('Selector error:', e)
+    }
     
     // If not found, try querySelectorAll and get first
     if (!element) {
-      const elements = document.querySelectorAll(selector)
-      if (elements.length > 0) {
-        element = elements[0]
+      try {
+        const elements = document.querySelectorAll(selector)
+        if (elements.length > 0) {
+          element = elements[0]
+        }
+      } catch (e) {
+        console.warn('SelectorAll error:', e)
+      }
+    }
+    
+    // If still not found, try by data attribute (extract value from selector)
+    if (!element && selector.includes('data-tutorial-target')) {
+      const attrValue = selector.match(/\[data-tutorial-target="([^"]+)"\]/)?.[1] || 
+                       selector.match(/data-tutorial-target="([^"]+)"/)?.[1]
+      if (attrValue) {
+        element = document.querySelector(`[data-tutorial-target="${attrValue}"]`)
       }
     }
     
@@ -112,14 +132,6 @@ export function TutorialGuide({
       const elements = document.getElementsByClassName(className)
       if (elements.length > 0) {
         element = elements[0]
-      }
-    }
-    
-    // If still not found, try by data attribute
-    if (!element && selector.includes('data-tutorial-target')) {
-      const attrValue = selector.match(/\[data-tutorial-target="([^"]+)"\]/)?.[1]
-      if (attrValue) {
-        element = document.querySelector(`[data-tutorial-target="${attrValue}"]`)
       }
     }
 
@@ -165,6 +177,12 @@ export function TutorialGuide({
       // Use requestAnimationFrame to ensure layout is complete
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
+          // Verify element is still valid before updating position
+          if (!element || !document.body.contains(element)) {
+            console.warn('Element no longer valid when updating position')
+            return
+          }
+          
           updateHighlightPosition()
           // Only scroll within the phone frame container, not the entire page
           const phoneFrame = document.querySelector('.phone-screen-content') || 
@@ -199,7 +217,9 @@ export function TutorialGuide({
               // Update position after scroll
               setTimeout(() => {
                 requestAnimationFrame(() => {
-                  updateHighlightPosition()
+                  if (element && document.body.contains(element)) {
+                    updateHighlightPosition()
+                  }
                 })
               }, 350)
             } else {

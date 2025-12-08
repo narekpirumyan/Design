@@ -190,7 +190,7 @@ export function MatchResultScreen() {
             <Button
               onClick={handleShare}
               variant="secondary"
-              className="flex items-center justify-center gap-2"
+              className="flex items-center justify-center gap-2 bg-white text-gray-900 hover:bg-gray-100 border border-gray-300"
             >
               <FiShare2 className="w-4 h-4" />
               Share
@@ -198,7 +198,7 @@ export function MatchResultScreen() {
             <Button
               onClick={() => alert('Reminder feature coming soon!')}
               variant="secondary"
-              className="flex items-center justify-center gap-2"
+              className="flex items-center justify-center gap-2 bg-white text-gray-900 hover:bg-gray-100 border border-gray-300"
             >
               <FiCalendar className="w-4 h-4" />
               Remind
@@ -208,7 +208,7 @@ export function MatchResultScreen() {
           <Button
             onClick={handleNewRoom}
             variant="outline"
-            className="w-full"
+            className="w-full bg-white text-gray-900 hover:bg-gray-100 border-2 border-gray-300"
           >
             Create New Room
           </Button>

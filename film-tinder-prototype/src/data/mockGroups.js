@@ -1,28 +1,12 @@
 // Mock groups/watchlists for adding movies
 export const mockGroups = [
   {
-    id: 'group1',
-    name: 'Weekend Movie Night',
-    members: 4,
-    avatar: '🎬',
-    color: '#6366f1',
-    lastActive: '2 hours ago'
-  },
-  {
     id: 'group2',
     name: 'Date Night Picks',
     members: 1,
     avatar: '💕',
     color: '#ec4899',
     lastActive: '1 day ago'
-  },
-  {
-    id: 'group3',
-    name: 'Family Watchlist',
-    members: 5,
-    avatar: '👨‍👩‍👧‍👦',
-    color: '#10b981',
-    lastActive: '3 days ago'
   },
   {
     id: 'group4',

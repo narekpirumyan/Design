@@ -23,20 +23,12 @@ export function WatchlistScreen() {
       isPersonal: true
     },
     {
-      id: 'wl2',
-      name: 'Weekend Movie Night',
-      sharedWith: [mockGroups[0].id],
-      movies: mockMovies.slice(2, 4),
-      groupName: mockGroups[0].name,
-      groupAvatar: mockGroups[0].avatar
-    },
-    {
       id: 'wl3',
       name: 'Date Night Picks',
-      sharedWith: [mockGroups[1].id],
+      sharedWith: [mockGroups[0].id],
       movies: mockMovies.slice(0, 1),
-      groupName: mockGroups[1].name,
-      groupAvatar: mockGroups[1].avatar
+      groupName: mockGroups[0].name,
+      groupAvatar: mockGroups[0].avatar
     }
   ]
 

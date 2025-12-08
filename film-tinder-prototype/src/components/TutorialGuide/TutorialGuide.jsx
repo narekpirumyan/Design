@@ -6,7 +6,6 @@ export function TutorialGuide({
   steps = [], 
   onComplete, 
   onSkip,
-  onStepChange,
   sectionId,
   isActive = false
 }) {
@@ -60,13 +59,12 @@ export function TutorialGuide({
     // Reset to first step when tutorial becomes active
     setCurrentStep(0)
     
-    // Highlight the first element
-    if (steps[0]?.targetSelector) {
-      highlightElement(steps[0].targetSelector)
-    }
-    
-    // Call onStepChange for initial step
-    onStepChange?.(0, steps[0])
+    // Highlight the first element with a delay to ensure DOM is ready
+    setTimeout(() => {
+      if (steps[0]?.targetSelector) {
+        highlightElement(steps[0].targetSelector)
+      }
+    }, 200)
 
     // Set up scroll/resize listeners
     updatePositionRef.current = () => updateHighlightPosition()
@@ -90,7 +88,7 @@ export function TutorialGuide({
     }
   }, [isActive, steps])
 
-  const highlightElement = (selector) => {
+  const highlightElement = (selector, retryCount = 0) => {
     if (!selector) {
       setHighlightedElement(null)
       setHighlightPosition(null)
@@ -123,6 +121,14 @@ export function TutorialGuide({
       if (attrValue) {
         element = document.querySelector(`[data-tutorial-target="${attrValue}"]`)
       }
+    }
+
+    // If element not found and we haven't exceeded retry limit, retry after a delay
+    if (!element && retryCount < 5) {
+      setTimeout(() => {
+        highlightElement(selector, retryCount + 1)
+      }, 200 * (retryCount + 1)) // Exponential backoff: 200ms, 400ms, 600ms, 800ms, 1000ms
+      return
     }
 
     if (element) {
@@ -168,7 +174,7 @@ export function TutorialGuide({
         } else {
           updateHighlightPosition()
         }
-      }, 100)
+      }, 150) // Slightly increased delay to ensure element is fully rendered
     } else {
       setHighlightedElement(null)
       setHighlightPosition(null)
@@ -179,14 +185,15 @@ export function TutorialGuide({
     if (currentStep < steps.length - 1) {
       const nextStep = currentStep + 1
       setCurrentStep(nextStep)
-      if (steps[nextStep]?.targetSelector) {
-        highlightElement(steps[nextStep].targetSelector)
-      } else {
-        setHighlightedElement(null)
-        setHighlightPosition(null)
-      }
-      // Call onStepChange callback if provided
-      onStepChange?.(nextStep, steps[nextStep])
+      // Small delay before highlighting to ensure DOM is ready
+      setTimeout(() => {
+        if (steps[nextStep]?.targetSelector) {
+          highlightElement(steps[nextStep].targetSelector)
+        } else {
+          setHighlightedElement(null)
+          setHighlightPosition(null)
+        }
+      }, 100)
     } else {
       handleComplete()
     }
@@ -196,14 +203,15 @@ export function TutorialGuide({
     if (currentStep > 0) {
       const prevStep = currentStep - 1
       setCurrentStep(prevStep)
-      if (steps[prevStep]?.targetSelector) {
-        highlightElement(steps[prevStep].targetSelector)
-      } else {
-        setHighlightedElement(null)
-        setHighlightPosition(null)
-      }
-      // Call onStepChange callback if provided
-      onStepChange?.(prevStep, steps[prevStep])
+      // Small delay before highlighting to ensure DOM is ready
+      setTimeout(() => {
+        if (steps[prevStep]?.targetSelector) {
+          highlightElement(steps[prevStep].targetSelector)
+        } else {
+          setHighlightedElement(null)
+          setHighlightPosition(null)
+        }
+      }, 100)
     }
   }
 

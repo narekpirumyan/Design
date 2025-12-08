@@ -411,14 +411,6 @@ export function GroupDetailsScreen() {
           steps={getTutorialSteps('groupDetails', user)}
           sectionId="groupDetails"
           isActive={showTutorial}
-          onStepChange={(stepIndex, step) => {
-            // Switch to the appropriate tab when tutorial step changes
-            if (step?.switchTab) {
-              setTimeout(() => {
-                setActiveTab(step.switchTab)
-              }, 300) // Small delay to allow highlight animation
-            }
-          }}
           onComplete={(sectionId) => {
             completeTutorial(sectionId)
             setShowTutorial(false)

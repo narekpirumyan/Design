@@ -189,17 +189,47 @@ export function TutorialGuide({
         }
       }
 
+      console.log('Setting highlighted element:', element, 'Selector:', selector)
       setHighlightedElement(element)
-      // Use requestAnimationFrame to ensure layout is complete
+      
+      // Immediately try to get position (don't wait for requestAnimationFrame)
+      // This ensures position is set synchronously with element
+      const rect = element.getBoundingClientRect()
+      const phoneFrame = document.querySelector('.phone-screen-content') || 
+                        element.closest('[class*="h-full"]') ||
+                        document.querySelector('[class*="relative"][class*="w-[375px]"]')
+      
+      if (phoneFrame) {
+        const frameRect = phoneFrame.getBoundingClientRect()
+        const position = {
+          top: rect.top - frameRect.top - 8,
+          left: rect.left - frameRect.left - 8,
+          width: rect.width + 16,
+          height: rect.height + 16
+        }
+        console.log('Setting highlight position:', position)
+        setHighlightPosition(position)
+      } else {
+        // Fallback to viewport-relative positioning
+        const position = {
+          top: rect.top - 8,
+          left: rect.left - 8,
+          width: rect.width + 16,
+          height: rect.height + 16
+        }
+        console.log('Setting highlight position (fallback):', position)
+        setHighlightPosition(position)
+      }
+      
+      // Use requestAnimationFrame for scroll handling only
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          // Verify element is still valid before updating position
+          // Verify element is still valid before scrolling
           if (!element || !document.body.contains(element)) {
-            console.warn('Element no longer valid when updating position')
+            console.warn('Element no longer valid when checking scroll')
             return
           }
           
-          updateHighlightPosition()
           // Only scroll within the phone frame container, not the entire page
           const phoneFrame = document.querySelector('.phone-screen-content') || 
                             element.closest('[class*="overflow"]')
@@ -232,17 +262,11 @@ export function TutorialGuide({
               
               // Update position after scroll
               setTimeout(() => {
-                requestAnimationFrame(() => {
-                  if (element && document.body.contains(element)) {
-                    updateHighlightPosition()
-                  }
-                })
+                if (element && document.body.contains(element)) {
+                  updateHighlightPosition()
+                }
               }, 350)
-            } else {
-              updateHighlightPosition()
             }
-          } else {
-            updateHighlightPosition()
           }
         })
       })

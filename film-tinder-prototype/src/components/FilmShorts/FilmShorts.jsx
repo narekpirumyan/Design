@@ -2,6 +2,18 @@ import { useState, useRef, useEffect } from 'react'
 import { motion, useMotionValue, useTransform } from 'framer-motion'
 import { FiChevronLeft } from 'react-icons/fi'
 
+// Get trailer video ID for each movie
+const getTrailerVideoId = (movieTitle) => {
+  const trailerIds = {
+    'Inception': 'YoHD9XEInc0',
+    'The Grand Budapest Hotel': '1Fg5iWmB5c0',
+    'Parasite': '5xH0HfJHsaY',
+    'Spirited Away': 'ByXuk9QqQkk',
+    'Mad Max: Fury Road': 'hEJnMQG9ev8'
+  }
+  return trailerIds[movieTitle] || 'YoHD9XEInc0' // Default to Inception if not found
+}
+
 export function FilmShorts({ movie, onBack, onSwipe, onAddToWatchlist }) {
   const [currentShortIndex, setCurrentShortIndex] = useState(0)
   const containerRef = useRef(null)
@@ -72,7 +84,7 @@ export function FilmShorts({ movie, onBack, onSwipe, onAddToWatchlist }) {
 
     const clips = movieShorts[movie.title] || defaultShorts
 
-    return clips.map((clip, index) => ({
+    const shorts = clips.map((clip, index) => ({
       id: String(index + 1),
       title: clip.title,
       videoId: clip.videoId,
@@ -81,6 +93,36 @@ export function FilmShorts({ movie, onBack, onSwipe, onAddToWatchlist }) {
       duration: '0:30',
       views: `${(Math.random() * 2 + 0.5).toFixed(1)}M`
     }))
+
+    // Get trailer video ID
+    const trailerVideoId = getTrailerVideoId(movie.title)
+    
+    // Check if the first item is the trailer (by videoId or title)
+    const isFirstItemTrailer = shorts.length > 0 && (
+      shorts[0].videoId === trailerVideoId || 
+      shorts[0].title.toLowerCase().includes('trailer') ||
+      shorts[0].title.toLowerCase() === movie.title.toLowerCase()
+    )
+
+    // If the first item is the trailer, move it to the end
+    if (isFirstItemTrailer) {
+      const trailer = shorts[0]
+      const otherShorts = shorts.slice(1)
+      return [...otherShorts, trailer]
+    }
+
+    // Also check if trailer exists elsewhere in the array and move it to the end
+    const trailerIndex = shorts.findIndex((short, index) => 
+      index > 0 && (short.videoId === trailerVideoId || short.title.toLowerCase().includes('trailer'))
+    )
+
+    if (trailerIndex !== -1) {
+      const trailer = shorts[trailerIndex]
+      const otherShorts = shorts.filter((_, index) => index !== trailerIndex)
+      return [...otherShorts, trailer]
+    }
+
+    return shorts
   }
 
   const shorts = getMovieShorts()

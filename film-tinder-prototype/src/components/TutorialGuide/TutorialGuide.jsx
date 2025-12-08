@@ -194,7 +194,7 @@ export function TutorialGuide({
       
       // Immediately try to get position (don't wait for requestAnimationFrame)
       // This ensures position is set synchronously with element
-      const rect = element.getBoundingClientRect()
+      // Reuse the rect we already calculated above
       const phoneFrame = document.querySelector('.phone-screen-content') || 
                         element.closest('[class*="h-full"]') ||
                         document.querySelector('[class*="relative"][class*="w-[375px]"]')

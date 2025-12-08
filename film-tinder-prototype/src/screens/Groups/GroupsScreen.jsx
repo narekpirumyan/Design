@@ -145,22 +145,22 @@ export function GroupsScreen() {
                   e.stopPropagation()
                   setShowPersonalWatchlist(true)
                 }}
-                className="bg-gradient-to-r from-pink-500 to-red-500 rounded-xl p-4 flex items-center gap-4 cursor-pointer hover:shadow-lg transition-shadow text-white"
+                className="bg-gradient-to-r from-pink-500 to-red-500 rounded-xl p-3 sm:p-4 flex items-center gap-2 sm:gap-4 cursor-pointer hover:shadow-lg transition-shadow text-white"
                 data-tutorial-target="personal-watchlist"
               >
-                <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl flex-shrink-0">
-                  <FiFilm className="w-6 h-6" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 flex items-center justify-center text-xl sm:text-2xl flex-shrink-0">
+                  <FiFilm className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-white truncate">My Personal Watchlist</h3>
-                  <p className="text-sm text-white/80 truncate">{personalWatchlistMovies.length} movies saved</p>
+                  <h3 className="font-semibold text-white truncate text-sm sm:text-base">My Personal Watchlist</h3>
+                  <p className="text-xs sm:text-sm text-white/80 truncate">{personalWatchlistMovies.length} movies saved</p>
                 </div>
-                <div className="flex gap-1">
+                <div className="flex gap-0.5 sm:gap-1 flex-shrink-0">
                   {personalWatchlistMovies.slice(0, 3).map((movie, idx) => (
                     <div
                       key={movie.id}
-                      className="w-8 h-8 rounded overflow-hidden border-2 border-white/30"
-                      style={{ marginLeft: idx > 0 ? '-8px' : '0' }}
+                      className="w-6 h-6 sm:w-8 sm:h-8 rounded overflow-hidden border-2 border-white/30"
+                      style={{ marginLeft: idx > 0 ? '-6px' : '0' }}
                     >
                       <img
                         src={movie.poster}
@@ -173,7 +173,7 @@ export function GroupsScreen() {
                     </div>
                   ))}
                   {personalWatchlistMovies.length > 3 && (
-                    <div className="w-8 h-8 rounded bg-white/20 border-2 border-white/30 flex items-center justify-center text-xs font-semibold">
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 rounded bg-white/20 border-2 border-white/30 flex items-center justify-center text-[10px] sm:text-xs font-semibold">
                       +{personalWatchlistMovies.length - 3}
                     </div>
                   )}

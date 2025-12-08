@@ -159,21 +159,24 @@ export const tutorialSteps = {
       description: 'See all movies that have been added to this group. Each movie shows who added it and when.',
       icon: null,
       action: 'Check out the movies tab to see what\'s been added!',
-      targetSelector: '[data-tutorial-target="movies-tab"]'
+      targetSelector: '[data-tutorial-target="movies-tab"]',
+      switchTab: 'movies'
     },
     {
       title: 'Members Tab',
       description: 'View all group members, see who\'s online, and add new members to the group.',
       icon: null,
       action: 'Explore the Members tab to see who\'s in your group!',
-      targetSelector: '[data-tutorial-target="members-tab"]'
+      targetSelector: '[data-tutorial-target="members-tab"]',
+      switchTab: 'members'
     },
     {
       title: 'History Tab',
       description: 'View your group\'s movie watching history - see what movies you\'ve watched together and ratings.',
       icon: null,
       action: 'Check the History tab to see past sessions!',
-      targetSelector: '[data-tutorial-target="history-tab"]'
+      targetSelector: '[data-tutorial-target="history-tab"]',
+      switchTab: 'sessions'
     }
   ],
   room: [

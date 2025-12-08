@@ -6,6 +6,7 @@ export function TutorialGuide({
   steps = [], 
   onComplete, 
   onSkip,
+  onStepChange,
   sectionId,
   isActive = false
 }) {
@@ -63,6 +64,9 @@ export function TutorialGuide({
     if (steps[0]?.targetSelector) {
       highlightElement(steps[0].targetSelector)
     }
+    
+    // Call onStepChange for initial step
+    onStepChange?.(0, steps[0])
 
     // Set up scroll/resize listeners
     updatePositionRef.current = () => updateHighlightPosition()
@@ -181,6 +185,8 @@ export function TutorialGuide({
         setHighlightedElement(null)
         setHighlightPosition(null)
       }
+      // Call onStepChange callback if provided
+      onStepChange?.(nextStep, steps[nextStep])
     } else {
       handleComplete()
     }
@@ -196,6 +202,8 @@ export function TutorialGuide({
         setHighlightedElement(null)
         setHighlightPosition(null)
       }
+      // Call onStepChange callback if provided
+      onStepChange?.(prevStep, steps[prevStep])
     }
   }
 

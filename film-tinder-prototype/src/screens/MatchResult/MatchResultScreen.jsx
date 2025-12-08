@@ -98,7 +98,7 @@ export function MatchResultScreen() {
             🎉
           </motion.div>
           <motion.h1 
-            className="text-3xl font-bold text-text-primary"
+            className="text-3xl font-bold text-white"
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3 }}
@@ -106,7 +106,7 @@ export function MatchResultScreen() {
             It's a Match!
           </motion.h1>
           <motion.p 
-            className="text-text-secondary"
+            className="text-white/90"
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4 }}
@@ -139,7 +139,7 @@ export function MatchResultScreen() {
               <h2 className="text-3xl font-bold text-white mb-2">
                 {matchMovie.title}
               </h2>
-              <p className="text-xl text-text-secondary mb-4">
+              <p className="text-xl text-white/90 mb-4">
                 {matchMovie.year}
               </p>
               <div className="flex flex-wrap gap-2">
@@ -151,16 +151,16 @@ export function MatchResultScreen() {
           </div>
 
           <div className="p-6 space-y-4">
-            <p className="text-text-secondary">{matchMovie.description}</p>
+            <p className="text-white/90">{matchMovie.description}</p>
 
             {/* Streaming Services */}
             <div className="space-y-2">
-              <h3 className="text-sm font-semibold text-text-muted uppercase">Available On</h3>
+              <h3 className="text-sm font-semibold text-white/80 uppercase">Available On</h3>
               <div className="flex flex-wrap gap-2">
                 {matchMovie.streamingServices.map((service, idx) => (
                   <div
                     key={idx}
-                    className="px-3 py-2 bg-primary/20 rounded-lg text-sm text-primary border border-primary/30"
+                    className="px-3 py-2 bg-primary/20 rounded-lg text-sm text-white border border-primary/30"
                   >
                     {service.name}
                   </div>
@@ -190,7 +190,7 @@ export function MatchResultScreen() {
             <Button
               onClick={handleShare}
               variant="secondary"
-              className="flex items-center justify-center gap-2 bg-white text-gray-900 hover:bg-gray-100 border border-gray-300"
+              className="flex items-center justify-center gap-2 bg-white text-gray-900 hover:bg-white/95 hover:text-gray-900 border border-gray-300"
             >
               <FiShare2 className="w-4 h-4" />
               Share
@@ -198,7 +198,7 @@ export function MatchResultScreen() {
             <Button
               onClick={() => alert('Reminder feature coming soon!')}
               variant="secondary"
-              className="flex items-center justify-center gap-2 bg-white text-gray-900 hover:bg-gray-100 border border-gray-300"
+              className="flex items-center justify-center gap-2 bg-white text-gray-900 hover:bg-white/95 hover:text-gray-900 border border-gray-300"
             >
               <FiCalendar className="w-4 h-4" />
               Remind
@@ -208,7 +208,7 @@ export function MatchResultScreen() {
           <Button
             onClick={handleNewRoom}
             variant="outline"
-            className="w-full bg-white text-gray-900 hover:bg-gray-100 border-2 border-gray-300"
+            className="w-full bg-white text-gray-900 hover:bg-white/95 hover:text-gray-900 border-2 border-gray-300"
           >
             Create New Room
           </Button>
@@ -222,7 +222,7 @@ export function MatchResultScreen() {
             transition={{ delay: 0.6 }}
             className="space-y-4"
           >
-            <h3 className="text-lg font-semibold text-text-primary">Other Options</h3>
+            <h3 className="text-lg font-semibold text-white">Other Options</h3>
             <div className="space-y-3">
               {alternativeMatches.map((movie, idx) => (
                 <div
@@ -238,8 +238,8 @@ export function MatchResultScreen() {
                     }}
                   />
                   <div className="flex-1">
-                    <h4 className="font-semibold text-text-primary">{movie.title}</h4>
-                    <p className="text-sm text-text-secondary">{movie.year}</p>
+                    <h4 className="font-semibold text-white">{movie.title}</h4>
+                    <p className="text-sm text-white/80">{movie.year}</p>
                     <div className="flex flex-wrap gap-1 mt-2">
                       {movie.vibeTags.slice(0, 2).map(tag => (
                         <VibeTag key={tag} tag={tag} />

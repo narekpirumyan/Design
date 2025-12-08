@@ -55,7 +55,7 @@ export const tutorialSteps = {
       description: 'Your personal watchlist appears at the top. All movies you like are automatically saved here.',
       icon: null,
       action: 'Tap your personal watchlist to see all your saved movies!',
-      targetSelector: '[class*="from-pink-500 to-red-500"]'
+      targetSelector: '[data-tutorial-target="personal-watchlist"]'
     },
     {
       title: 'Your Groups',

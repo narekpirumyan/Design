@@ -13,9 +13,10 @@ import { getTutorialSteps } from '../../data/tutorialSteps'
 
 export function GroupsScreen() {
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user, hasCompletedTutorial, completeTutorial, skipTutorial } = useAuth()
   const [activeTab, setActiveTab] = useState('groups') // 'friends' or 'groups'
   const [showPersonalWatchlist, setShowPersonalWatchlist] = useState(false)
+  const [showTutorial, setShowTutorial] = useState(false)
   const swipeAreaRef = useRef(null)
   const dragX = useMotionValue(0)
   const startX = useRef(0)
@@ -23,6 +24,16 @@ export function GroupsScreen() {
 
   // Personal watchlist - use all movies to ensure it's not empty
   const personalWatchlistMovies = [...mockMovies]
+  
+  // Check if tutorial should be shown on first visit
+  useEffect(() => {
+    if (user && !hasCompletedTutorial('groups')) {
+      // Small delay to ensure smooth screen transition
+      setTimeout(() => {
+        setShowTutorial(true)
+      }, 500)
+    }
+  }, [user, hasCompletedTutorial])
   
   // Handle swipe gesture for tab switching
   const handleDragStart = (event, info) => {
@@ -370,6 +381,21 @@ export function GroupsScreen() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Tutorial Guide */}
+      <TutorialGuide
+        steps={getTutorialSteps('groups', user)}
+        sectionId="groups"
+        isActive={showTutorial}
+        onComplete={(sectionId) => {
+          completeTutorial(sectionId)
+          setShowTutorial(false)
+        }}
+        onSkip={(sectionId) => {
+          skipTutorial(sectionId)
+          setShowTutorial(false)
+        }}
+      />
     </PhoneFrame>
   )
 }

@@ -6,6 +6,7 @@ export function SwipeableCard({
   movie, 
   onSwipe,
   onComment,
+  onReaction,
   index = 0,
   isTop = true 
 }) {
@@ -62,7 +63,7 @@ export function SwipeableCard({
       }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
     >
-      <MovieCard movie={movie} />
+      <MovieCard movie={movie} onReaction={isTop ? onReaction : undefined} />
       {isTop && (
         <>
           <motion.div 

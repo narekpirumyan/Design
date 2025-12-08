@@ -80,7 +80,7 @@ export function TutorialGuide({
       if (steps[0]?.targetSelector) {
         highlightElement(steps[0].targetSelector, 0)
       }
-    }, 400) // Increased delay to ensure all animations have completed
+    }, 200) // Reduced delay for faster appearance
 
     // Set up scroll/resize listeners
     updatePositionRef.current = () => updateHighlightPosition()
@@ -297,7 +297,7 @@ export function TutorialGuide({
               setHighlightedElement(null)
               setHighlightPosition(null)
             }
-          }, 400) // Increased delay to allow state update and animations to complete
+          }, 200) // Reduced delay for faster step transitions
         })
       })
     } else {
@@ -326,7 +326,7 @@ export function TutorialGuide({
               setHighlightedElement(null)
               setHighlightPosition(null)
             }
-          }, 400) // Increased delay to allow state update and animations to complete
+          }, 200) // Reduced delay for faster step transitions
         })
       })
     }
@@ -437,10 +437,25 @@ export function TutorialGuide({
           {/* Tutorial Guide Bottom/Top Sheet - positioned absolutely within phone frame */}
           <motion.div
             initial={{ y: guidePosition === 'bottom' ? '100%' : '-100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: guidePosition === 'bottom' ? '100%' : '-100%' }}
-            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className={`absolute left-0 right-0 bg-white z-[10001] overflow-hidden shadow-2xl pointer-events-auto ${
+            animate={{ 
+              y: 0,
+              transition: { 
+                type: 'spring', 
+                damping: 25, 
+                stiffness: 400,
+                mass: 0.8
+              }
+            }}
+            exit={{ 
+              y: guidePosition === 'bottom' ? '100%' : '-100%',
+              transition: { 
+                type: 'spring', 
+                damping: 25, 
+                stiffness: 400,
+                mass: 0.8
+              }
+            }}
+            className={`absolute left-0 right-0 bg-white z-[10001] overflow-hidden shadow-2xl pointer-events-auto transition-all duration-300 ${
               guidePosition === 'bottom' ? 'bottom-0 rounded-t-3xl' : 'top-0 rounded-b-3xl'
             }`}
             style={{

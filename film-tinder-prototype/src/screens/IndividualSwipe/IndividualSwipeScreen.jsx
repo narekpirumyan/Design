@@ -70,7 +70,7 @@ export function IndividualSwipeScreen() {
     if (user && !hasCompletedTutorial(interactionModel === 'scroll' ? 'scroll' : 'swipe')) {
       const timer = setTimeout(() => {
         setShowTutorial(true)
-      }, 500)
+      }, 200)
       return () => clearTimeout(timer)
     }
   }, [user, interactionModel, hasCompletedTutorial])

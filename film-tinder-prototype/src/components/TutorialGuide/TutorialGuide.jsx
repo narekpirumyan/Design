@@ -21,11 +21,27 @@ export function TutorialGuide({
   const updateHighlightPosition = () => {
     if (!highlightedElement) return
     
+    // Verify element is still in DOM
+    if (!document.body.contains(highlightedElement)) {
+      console.warn('Highlighted element no longer in DOM')
+      setHighlightedElement(null)
+      setHighlightPosition(null)
+      return
+    }
+    
     const rect = highlightedElement.getBoundingClientRect()
+    
+    // Verify element has valid dimensions
+    if (rect.width === 0 && rect.height === 0) {
+      console.warn('Element has zero dimensions, retrying...')
+      return
+    }
+    
     // Get the phone frame container to calculate relative position
     const phoneFrame = document.querySelector('[class*="relative"][class*="w-[375px]"]') || 
                        document.querySelector('.relative.w-\\[375px\\]') ||
-                       highlightedElement.closest('[class*="h-full"]')
+                       highlightedElement.closest('[class*="h-full"]') ||
+                       highlightedElement.closest('.phone-screen-content')
     
     if (phoneFrame) {
       const frameRect = phoneFrame.getBoundingClientRect()

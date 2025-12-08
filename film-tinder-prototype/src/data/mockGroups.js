@@ -11,7 +11,7 @@ export const mockGroups = [
   {
     id: 'group2',
     name: 'Date Night Picks',
-    members: 2,
+    members: 1,
     avatar: '💕',
     color: '#ec4899',
     lastActive: '1 day ago'

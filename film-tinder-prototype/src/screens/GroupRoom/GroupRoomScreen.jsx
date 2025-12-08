@@ -9,7 +9,6 @@ import { BottomNavigation } from '../../components/BottomNavigation/BottomNaviga
 import { TutorialGuide } from '../../components/TutorialGuide/TutorialGuide'
 import { FilmDetails } from '../../components/FilmDetails/FilmDetails'
 import { FilmShorts } from '../../components/FilmShorts/FilmShorts'
-import { CommentsModal } from '../../components/CommentsModal/CommentsModal'
 import { mockMovies } from '../../data/mockMovies'
 import { mockParticipants } from '../../utils/mockGroupState'
 import { FiX, FiFilm, FiInfo, FiVideo } from 'react-icons/fi'
@@ -24,10 +23,8 @@ export function GroupRoomScreen() {
   
   const [movies] = useState([...mockMovies].sort(() => Math.random() - 0.5))
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [participants] = useState(mockParticipants.slice(0, 4))
+  const [participants] = useState(mockParticipants.slice(0, 5)) // 5 participants to show 3 + "+2"
   const [mode, setMode] = useState('swipe') // 'swipe', 'details', 'shorts'
-  const [isCommentsModalOpen, setIsCommentsModalOpen] = useState(false)
-  const [selectedMovieForComments, setSelectedMovieForComments] = useState(null)
 
   // Reset mode to swipe on mount
   useEffect(() => {
@@ -70,16 +67,6 @@ export function GroupRoomScreen() {
 
   const handleReaction = (emoji) => {
     // Visual only - no state tracking needed
-  }
-
-  const handleComment = (movie) => {
-    setSelectedMovieForComments(movie)
-    setIsCommentsModalOpen(true)
-  }
-
-  const handleCloseCommentsModal = () => {
-    setIsCommentsModalOpen(false)
-    setSelectedMovieForComments(null)
   }
 
   const handleLeaveRoom = () => {
@@ -128,10 +115,25 @@ export function GroupRoomScreen() {
     <PhoneFrame>
       <div className="h-full bg-gradient-to-br from-red-600 via-pink-500 to-red-700 flex flex-col overflow-hidden relative pb-16">
         {/* Header */}
-        <div className="p-4 space-y-3 relative z-10">
+        <div className="p-4 relative z-10">
           <div className="flex items-center justify-between">
-            <div data-tutorial-target="room-code">
+            <div data-tutorial-target="room-code" className="flex items-center gap-3">
               <RoomCodeDisplay roomCode={roomCode} />
+              {/* Participants in room code area */}
+              <div className="flex items-center gap-1.5" data-tutorial-target="participants">
+                {participants.slice(0, 3).map((participant) => (
+                  <ParticipantAvatar
+                    key={participant.id}
+                    participant={participant}
+                    isActive={false}
+                    showName={false}
+                    size="small"
+                  />
+                ))}
+                {participants.length > 3 && (
+                  <span className="text-xs text-white/80 font-medium ml-1">+{participants.length - 3}</span>
+                )}
+              </div>
             </div>
             <button
               onClick={handleLeaveRoom}
@@ -140,26 +142,6 @@ export function GroupRoomScreen() {
             >
               <FiX className="w-5 h-5 text-white" />
             </button>
-          </div>
-
-          {/* Participants */}
-          <div className="flex items-center gap-3" data-tutorial-target="participants">
-            <div className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <span className="text-xs text-white font-semibold">i</span>
-              </div>
-              <span className="text-sm text-white/80 font-medium">Participants:</span>
-            </div>
-            <div className="flex gap-2 flex-1 overflow-x-auto">
-              {participants.map((participant) => (
-                <ParticipantAvatar
-                  key={participant.id}
-                  participant={participant}
-                  isActive={false}
-                  showName={false}
-                />
-              ))}
-            </div>
           </div>
         </div>
 
@@ -197,7 +179,6 @@ export function GroupRoomScreen() {
                             index={idx}
                             isTop={idx === 0}
                             onSwipe={idx === 0 ? handleSwipe : undefined}
-                            onComment={idx === 0 ? handleComment : undefined}
                             onReaction={idx === 0 ? handleReaction : undefined}
                           />
                         ))
@@ -209,6 +190,23 @@ export function GroupRoomScreen() {
                     </div>
                   </div>
 
+                  {/* Vertical Reaction Buttons - Right Bottom */}
+                  <div className="absolute bottom-20 right-4 z-30 flex flex-col gap-2">
+                    {['🔥', '😂', '😴'].map(emoji => (
+                      <motion.button
+                        key={emoji}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleReaction(emoji)
+                        }}
+                        whileTap={{ scale: 0.9 }}
+                        className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 flex items-center justify-center text-lg transition-all active:scale-95 border-2 border-white/30 shadow-lg"
+                        aria-label={`React with ${emoji}`}
+                      >
+                        {emoji}
+                      </motion.button>
+                    ))}
+                  </div>
                 </>
               )}
 
@@ -263,15 +261,6 @@ export function GroupRoomScreen() {
         </div>
       </div>
       <BottomNavigation />
-      
-      {/* Comments Modal */}
-      {isCommentsModalOpen && selectedMovieForComments && (
-        <CommentsModal
-          isOpen={isCommentsModalOpen}
-          onClose={handleCloseCommentsModal}
-          movie={selectedMovieForComments}
-        />
-      )}
     </PhoneFrame>
   )
 }

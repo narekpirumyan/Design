@@ -1,6 +1,6 @@
 import { VibeTag } from '../VibeTag/VibeTag'
 
-export function MovieCard({ movie, className = '', variant = 'default', onReaction }) {
+export function MovieCard({ movie, className = '', variant = 'default' }) {
   // For scroll mode, use a different layout
   const isScrollMode = variant === 'scroll'
   
@@ -29,27 +29,9 @@ export function MovieCard({ movie, className = '', variant = 'default', onReacti
             <VibeTag key={tag} tag={tag} />
           ))}
         </div>
-        <p className={`text-sm text-text-secondary ${isScrollMode ? 'line-clamp-2' : 'line-clamp-2'} mb-3`}>
+        <p className={`text-sm text-text-secondary ${isScrollMode ? 'line-clamp-2' : 'line-clamp-2'}`}>
           {movie.description}
         </p>
-        {/* Reaction Emojis */}
-        {onReaction && (
-          <div className="flex items-center gap-2 mt-3">
-            {['🔥', '😂', '😴', '🤯'].map(emoji => (
-              <button
-                key={emoji}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onReaction(emoji)
-                }}
-                className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 flex items-center justify-center text-lg transition-all active:scale-95 border-2 border-white/30"
-                aria-label={`React with ${emoji}`}
-              >
-                {emoji}
-              </button>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   )

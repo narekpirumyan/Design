@@ -1,11 +1,9 @@
 import { motion, useMotionValue, useTransform } from 'framer-motion'
 import { MovieCard } from '../MovieCard/MovieCard'
-import { FiMessageCircle } from 'react-icons/fi'
 
 export function SwipeableCard({ 
   movie, 
   onSwipe,
-  onComment,
   onReaction,
   index = 0,
   isTop = true 
@@ -63,7 +61,7 @@ export function SwipeableCard({
       }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
     >
-      <MovieCard movie={movie} onReaction={isTop ? onReaction : undefined} />
+      <MovieCard movie={movie} />
       {isTop && (
         <>
           <motion.div 
@@ -78,19 +76,6 @@ export function SwipeableCard({
           >
             PASS
           </motion.div>
-          
-          {/* Comment Button - Bottom Right (same style as scroll mode) */}
-          <motion.button
-            onClick={(e) => {
-              e.stopPropagation()
-              onComment?.(movie)
-            }}
-            whileTap={{ scale: 0.9 }}
-            className="absolute bottom-20 right-4 w-14 h-14 rounded-full bg-white/20 backdrop-blur-md border-2 border-white/30 flex items-center justify-center hover:bg-white/30 transition-colors z-20"
-            style={{ pointerEvents: 'auto' }}
-          >
-            <FiMessageCircle className="w-6 h-6 text-white" />
-          </motion.button>
         </>
       )}
     </motion.div>

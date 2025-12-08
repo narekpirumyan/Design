@@ -97,7 +97,7 @@ export function GroupDetailsScreen() {
       // Small delay to ensure smooth screen transition
       const timer = setTimeout(() => {
         setShowTutorial(true)
-      }, 500)
+      }, 200)
       return () => clearTimeout(timer)
     } else {
       setShowTutorial(false)

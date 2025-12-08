@@ -306,12 +306,12 @@ export function GroupsScreen() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-xl sm:rounded-2xl w-full max-w-md max-h-[90vh] sm:max-h-[80vh] flex flex-col overflow-hidden"
+              className="bg-white rounded-xl w-full max-w-[calc(100vw-1rem)] max-h-[95vh] sm:max-w-md sm:max-h-[80vh] sm:rounded-2xl flex flex-col overflow-hidden"
             >
               {/* Header */}
-              <div className="bg-gradient-to-r from-pink-500 to-red-500 p-4 sm:p-6 text-white flex-shrink-0">
+              <div className="bg-gradient-to-r from-pink-500 to-red-500 p-3 sm:p-6 text-white flex-shrink-0">
                 <div className="flex items-center justify-between mb-1 sm:mb-2">
-                  <h2 className="text-lg sm:text-2xl font-bold">My Personal Watchlist</h2>
+                  <h2 className="text-base sm:text-2xl font-bold truncate pr-2">My Personal Watchlist</h2>
                   <button
                     onClick={() => setShowPersonalWatchlist(false)}
                     className="p-1.5 sm:p-2 hover:bg-white/20 rounded-full transition-colors flex-shrink-0"
@@ -323,7 +323,7 @@ export function GroupsScreen() {
               </div>
 
               {/* Movies List */}
-              <div className="flex-1 overflow-y-auto p-3 sm:p-4">
+              <div className="flex-1 overflow-y-auto p-2 sm:p-4">
                 {personalWatchlistMovies.length > 0 ? (
                   <div className="space-y-2 sm:space-y-3">
                     {personalWatchlistMovies.map((movie) => (
@@ -336,21 +336,21 @@ export function GroupsScreen() {
                         <img
                           src={movie.poster}
                           alt={movie.title}
-                          className="w-12 h-[4.5rem] sm:w-16 sm:h-24 rounded-lg object-cover flex-shrink-0"
+                          className="w-10 h-[3.75rem] sm:w-16 sm:h-24 rounded-lg object-cover flex-shrink-0"
                           onError={(e) => {
                             e.target.src = 'https://via.placeholder.com/400x600/1e293b/94a3b8?text=No+Poster'
                           }}
                         />
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-gray-900 truncate text-sm sm:text-base">
+                          <h3 className="font-semibold text-gray-900 truncate text-xs sm:text-base">
                             {movie.title}
                           </h3>
-                          <p className="text-xs sm:text-sm text-gray-600">{movie.year}</p>
+                          <p className="text-[10px] sm:text-sm text-gray-600">{movie.year}</p>
                           <div className="flex flex-wrap gap-1 mt-1 sm:mt-2">
                             {movie.vibeTags.slice(0, 2).map((tag) => (
                               <span
                                 key={tag}
-                                className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 bg-pink-100 text-pink-700 rounded-full"
+                                className="text-[9px] sm:text-xs px-1 sm:px-2 py-0.5 sm:py-1 bg-pink-100 text-pink-700 rounded-full"
                               >
                                 {tag}
                               </span>

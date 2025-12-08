@@ -298,7 +298,7 @@ export function GroupsScreen() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[10000] bg-black/70 flex items-center justify-center p-4"
+            className="fixed inset-0 z-[10000] bg-black/70 flex items-center justify-center p-2 sm:p-4"
             onClick={() => setShowPersonalWatchlist(false)}
           >
             <motion.div
@@ -306,51 +306,51 @@ export function GroupsScreen() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl w-full max-w-md max-h-[80vh] flex flex-col overflow-hidden"
+              className="bg-white rounded-xl sm:rounded-2xl w-full max-w-md max-h-[90vh] sm:max-h-[80vh] flex flex-col overflow-hidden"
             >
               {/* Header */}
-              <div className="bg-gradient-to-r from-pink-500 to-red-500 p-6 text-white">
-                <div className="flex items-center justify-between mb-2">
-                  <h2 className="text-2xl font-bold">My Personal Watchlist</h2>
+              <div className="bg-gradient-to-r from-pink-500 to-red-500 p-4 sm:p-6 text-white flex-shrink-0">
+                <div className="flex items-center justify-between mb-1 sm:mb-2">
+                  <h2 className="text-lg sm:text-2xl font-bold">My Personal Watchlist</h2>
                   <button
                     onClick={() => setShowPersonalWatchlist(false)}
-                    className="p-2 hover:bg-white/20 rounded-full transition-colors"
+                    className="p-1.5 sm:p-2 hover:bg-white/20 rounded-full transition-colors flex-shrink-0"
                   >
-                    <FiX className="w-5 h-5" />
+                    <FiX className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
                 </div>
-                <p className="text-white/80 text-sm">{personalWatchlistMovies.length} movies</p>
+                <p className="text-white/80 text-xs sm:text-sm">{personalWatchlistMovies.length} movies</p>
               </div>
 
               {/* Movies List */}
-              <div className="flex-1 overflow-y-auto p-4">
+              <div className="flex-1 overflow-y-auto p-3 sm:p-4">
                 {personalWatchlistMovies.length > 0 ? (
-                  <div className="space-y-3">
+                  <div className="space-y-2 sm:space-y-3">
                     {personalWatchlistMovies.map((movie) => (
                       <motion.div
                         key={movie.id}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="flex items-center gap-4 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors"
+                        className="flex items-center gap-2 sm:gap-4 p-2 sm:p-3 rounded-lg sm:rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors"
                       >
                         <img
                           src={movie.poster}
                           alt={movie.title}
-                          className="w-16 h-24 rounded-lg object-cover flex-shrink-0"
+                          className="w-12 h-[4.5rem] sm:w-16 sm:h-24 rounded-lg object-cover flex-shrink-0"
                           onError={(e) => {
                             e.target.src = 'https://via.placeholder.com/400x600/1e293b/94a3b8?text=No+Poster'
                           }}
                         />
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-gray-900 truncate">
+                          <h3 className="font-semibold text-gray-900 truncate text-sm sm:text-base">
                             {movie.title}
                           </h3>
-                          <p className="text-sm text-gray-600">{movie.year}</p>
-                          <div className="flex flex-wrap gap-1 mt-2">
+                          <p className="text-xs sm:text-sm text-gray-600">{movie.year}</p>
+                          <div className="flex flex-wrap gap-1 mt-1 sm:mt-2">
                             {movie.vibeTags.slice(0, 2).map((tag) => (
                               <span
                                 key={tag}
-                                className="text-xs px-2 py-1 bg-pink-100 text-pink-700 rounded-full"
+                                className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 bg-pink-100 text-pink-700 rounded-full"
                               >
                                 {tag}
                               </span>
@@ -361,8 +361,8 @@ export function GroupsScreen() {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-12">
-                    <p className="text-gray-500">No movies in your watchlist yet</p>
+                  <div className="text-center py-8 sm:py-12">
+                    <p className="text-gray-500 text-sm sm:text-base">No movies in your watchlist yet</p>
                   </div>
                 )}
               </div>

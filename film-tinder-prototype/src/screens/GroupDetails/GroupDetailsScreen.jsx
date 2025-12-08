@@ -79,11 +79,30 @@ const mockFilmSessions = [
 export function GroupDetailsScreen() {
   const { groupId } = useParams()
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user, hasCompletedTutorial, completeTutorial, skipTutorial } = useAuth()
   const [activeTab, setActiveTab] = useState('movies') // 'movies', 'members', 'sessions'
+  const [showTutorial, setShowTutorial] = useState(false)
 
   // Find the group
   const group = mockGroups.find(g => g.id === groupId)
+
+  // Check if tutorial should be shown on first visit
+  useEffect(() => {
+    if (!user) {
+      setShowTutorial(false)
+      return
+    }
+    
+    if (!hasCompletedTutorial('groupDetails')) {
+      // Small delay to ensure smooth screen transition
+      const timer = setTimeout(() => {
+        setShowTutorial(true)
+      }, 500)
+      return () => clearTimeout(timer)
+    } else {
+      setShowTutorial(false)
+    }
+  }, [user, hasCompletedTutorial])
 
   if (!group) {
     return (
@@ -385,7 +404,23 @@ export function GroupDetailsScreen() {
         </div>
       </div>
       <BottomNavigation />
-      
+
+      {/* Tutorial Guide */}
+      {showTutorial && (
+        <TutorialGuide
+          steps={getTutorialSteps('groupDetails', user)}
+          sectionId="groupDetails"
+          isActive={showTutorial}
+          onComplete={(sectionId) => {
+            completeTutorial(sectionId)
+            setShowTutorial(false)
+          }}
+          onSkip={(sectionId) => {
+            skipTutorial(sectionId)
+            setShowTutorial(false)
+          }}
+        />
+      )}
     </PhoneFrame>
   )
 }

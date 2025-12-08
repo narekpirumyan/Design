@@ -298,7 +298,7 @@ export function GroupsScreen() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[10000] bg-black/70 flex items-center justify-center p-2 sm:p-4"
+            className="fixed inset-0 z-[10000] bg-black/70 flex items-center justify-center p-1 sm:p-4"
             onClick={() => setShowPersonalWatchlist(false)}
           >
             <motion.div
@@ -306,7 +306,7 @@ export function GroupsScreen() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-xl w-full max-w-[calc(100vw-1rem)] max-h-[95vh] sm:max-w-md sm:max-h-[80vh] sm:rounded-2xl flex flex-col overflow-hidden"
+              className="bg-white rounded-xl w-[calc(100%-0.5rem)] max-w-[367px] max-h-[95vh] sm:w-full sm:max-w-md sm:max-h-[80vh] sm:rounded-2xl flex flex-col overflow-hidden"
             >
               {/* Header */}
               <div className="bg-gradient-to-r from-pink-500 to-red-500 p-3 sm:p-6 text-white flex-shrink-0">

@@ -124,70 +124,92 @@ export function TutorialGuide({
     }
 
     // If element not found and we haven't exceeded retry limit, retry after a delay
-    if (!element && retryCount < 8) {
+    if (!element && retryCount < 10) {
       setTimeout(() => {
         highlightElement(selector, retryCount + 1)
-      }, 150 * (retryCount + 1)) // Exponential backoff: 150ms, 300ms, 450ms, 600ms, 750ms, 900ms, 1050ms, 1200ms
+      }, 100 * (retryCount + 1)) // Exponential backoff: 100ms, 200ms, 300ms, etc.
       return
     }
 
     if (element) {
       // Check if element is actually visible and has dimensions (not still animating)
       const rect = element.getBoundingClientRect()
-      const isElementReady = rect.width > 0 && rect.height > 0 && 
-                            (element.offsetHeight > 0 || element.offsetWidth > 0)
+      const computedStyle = window.getComputedStyle(element)
+      const isElementReady = rect.width > 0 && 
+                            rect.height > 0 && 
+                            element.offsetHeight > 0 && 
+                            element.offsetWidth > 0 &&
+                            computedStyle.opacity !== '0' &&
+                            computedStyle.visibility !== 'hidden' &&
+                            computedStyle.display !== 'none'
       
       // If element exists but isn't ready yet, retry
-      if (!isElementReady && retryCount < 8) {
+      if (!isElementReady && retryCount < 10) {
         setTimeout(() => {
           highlightElement(selector, retryCount + 1)
-        }, 150 * (retryCount + 1))
+        }, 100 * (retryCount + 1))
         return
       }
 
+      // Double-check element is still in DOM and valid
+      if (!document.body.contains(element)) {
+        if (retryCount < 10) {
+          setTimeout(() => {
+            highlightElement(selector, retryCount + 1)
+          }, 100 * (retryCount + 1))
+          return
+        }
+      }
+
       setHighlightedElement(element)
-      // Update position immediately without scrolling the page
-      setTimeout(() => {
-        updateHighlightPosition()
-        // Only scroll within the phone frame container, not the entire page
-        const phoneFrame = document.querySelector('.phone-screen-content') || 
-                          element.closest('[class*="overflow"]')
-        if (phoneFrame) {
-          const elementRect = element.getBoundingClientRect()
-          const containerRect = phoneFrame.getBoundingClientRect()
-          
-          // Check if element is visible within container
-          const isVisible = (
-            elementRect.top >= containerRect.top &&
-            elementRect.bottom <= containerRect.bottom &&
-            elementRect.left >= containerRect.left &&
-            elementRect.right <= containerRect.right
-          )
-          
-          // Only scroll if element is not fully visible
-          if (!isVisible) {
-            const scrollTop = phoneFrame.scrollTop
-            const elementTop = element.offsetTop
-            const elementHeight = element.offsetHeight
-            const containerHeight = phoneFrame.clientHeight
+      // Use requestAnimationFrame to ensure layout is complete
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          updateHighlightPosition()
+          // Only scroll within the phone frame container, not the entire page
+          const phoneFrame = document.querySelector('.phone-screen-content') || 
+                            element.closest('[class*="overflow"]')
+          if (phoneFrame) {
+            const elementRect = element.getBoundingClientRect()
+            const containerRect = phoneFrame.getBoundingClientRect()
             
-            // Calculate scroll position to center element
-            const targetScroll = elementTop - (containerHeight / 2) + (elementHeight / 2)
+            // Check if element is visible within container
+            const isVisible = (
+              elementRect.top >= containerRect.top &&
+              elementRect.bottom <= containerRect.bottom &&
+              elementRect.left >= containerRect.left &&
+              elementRect.right <= containerRect.right
+            )
             
-            phoneFrame.scrollTo({
-              top: targetScroll,
-              behavior: 'smooth'
-            })
-            
-            // Update position after scroll
-            setTimeout(updateHighlightPosition, 300)
+            // Only scroll if element is not fully visible
+            if (!isVisible) {
+              const scrollTop = phoneFrame.scrollTop
+              const elementTop = element.offsetTop
+              const elementHeight = element.offsetHeight
+              const containerHeight = phoneFrame.clientHeight
+              
+              // Calculate scroll position to center element
+              const targetScroll = elementTop - (containerHeight / 2) + (elementHeight / 2)
+              
+              phoneFrame.scrollTo({
+                top: targetScroll,
+                behavior: 'smooth'
+              })
+              
+              // Update position after scroll
+              setTimeout(() => {
+                requestAnimationFrame(() => {
+                  updateHighlightPosition()
+                })
+              }, 350)
+            } else {
+              updateHighlightPosition()
+            }
           } else {
             updateHighlightPosition()
           }
-        } else {
-          updateHighlightPosition()
-        }
-      }, 200) // Increased delay to ensure element is fully rendered and animated
+        })
+      })
     } else {
       setHighlightedElement(null)
       setHighlightPosition(null)
@@ -197,19 +219,27 @@ export function TutorialGuide({
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
       const nextStep = currentStep + 1
-      setCurrentStep(nextStep)
       // Clear previous highlight first
       setHighlightedElement(null)
       setHighlightPosition(null)
-      // Longer delay before highlighting to ensure DOM is ready and animations complete
-      setTimeout(() => {
-        if (steps[nextStep]?.targetSelector) {
-          highlightElement(steps[nextStep].targetSelector, 0)
-        } else {
-          setHighlightedElement(null)
-          setHighlightPosition(null)
-        }
-      }, 300) // Increased delay to allow animations to complete
+      
+      // Use requestAnimationFrame to ensure DOM updates are complete
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          // Now update the step
+          setCurrentStep(nextStep)
+          
+          // Wait for state update and DOM to be ready
+          setTimeout(() => {
+            if (steps[nextStep]?.targetSelector) {
+              highlightElement(steps[nextStep].targetSelector, 0)
+            } else {
+              setHighlightedElement(null)
+              setHighlightPosition(null)
+            }
+          }, 400) // Increased delay to allow state update and animations to complete
+        })
+      })
     } else {
       handleComplete()
     }
@@ -218,19 +248,27 @@ export function TutorialGuide({
   const handlePrevious = () => {
     if (currentStep > 0) {
       const prevStep = currentStep - 1
-      setCurrentStep(prevStep)
       // Clear previous highlight first
       setHighlightedElement(null)
       setHighlightPosition(null)
-      // Longer delay before highlighting to ensure DOM is ready and animations complete
-      setTimeout(() => {
-        if (steps[prevStep]?.targetSelector) {
-          highlightElement(steps[prevStep].targetSelector, 0)
-        } else {
-          setHighlightedElement(null)
-          setHighlightPosition(null)
-        }
-      }, 300) // Increased delay to allow animations to complete
+      
+      // Use requestAnimationFrame to ensure DOM updates are complete
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          // Now update the step
+          setCurrentStep(prevStep)
+          
+          // Wait for state update and DOM to be ready
+          setTimeout(() => {
+            if (steps[prevStep]?.targetSelector) {
+              highlightElement(steps[prevStep].targetSelector, 0)
+            } else {
+              setHighlightedElement(null)
+              setHighlightPosition(null)
+            }
+          }, 400) // Increased delay to allow state update and animations to complete
+        })
+      })
     }
   }
 

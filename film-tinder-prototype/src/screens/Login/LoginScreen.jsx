@@ -96,7 +96,7 @@ export function LoginScreen() {
 
           {/* Title */}
           <h1 className="text-3xl font-bold text-white text-center mb-2">
-            Welcome to Film Tinder
+            Welcome to CinéA
           </h1>
           <p className="text-white/80 text-center mb-8">
             Discover your next favorite movie
